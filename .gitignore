@@ -1,11 +1,7 @@
 /target
-/Servers
-/Servers2
-/Servers3
+.classpath
+.project
 /.metadata
-/test
-/TEs
 /.settings
 /WebRoot/WEB-INF/classes
 /WebRoot/WEB-INF/lib
-
