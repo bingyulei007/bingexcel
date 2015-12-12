@@ -1,5 +1,7 @@
 package com.bing.excel;
 
+import java.lang.reflect.Field;
+
 import org.apache.poi.ss.usermodel.Row;
 
 /**
@@ -9,13 +11,15 @@ import org.apache.poi.ss.usermodel.Row;
  * @version 1.0
  * @since JDK 1.7 文件名称：BingRowHandler.java 类说明：
  */
-public class BingRowHandler<T> {
+public class RowHandler<T> {
 	private Row row;
 
-	public BingRowHandler(Row row) {
+	public RowHandler(Row row) {
 		this.row = row;
 	}
-	public T readRowToEntity(){
-		return null;
+	public T readRowToEntity(Class<T> clazz) throws InstantiationException, IllegalAccessException{
+		T t=clazz.newInstance();
+		Field[] fields = clazz.getDeclaredFields();
+		return t;
 	}
 }

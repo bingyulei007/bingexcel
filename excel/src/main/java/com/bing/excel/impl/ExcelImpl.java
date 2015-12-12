@@ -11,7 +11,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import com.bing.excel.BingExcel;
+import com.bing.excel.ExcelBing;
 
 /**  
  * 创建时间：2015-12-8上午11:56:30  
@@ -22,7 +22,7 @@ import com.bing.excel.BingExcel;
  * 文件名称：BingExcelImpl.java  
  * 类说明：  
  */
-public class BingExcelImpl implements BingExcel {
+public class ExcelImpl implements ExcelBing {
 	@Override
 	public <T> List<T> readFileToList(File file, Class<T> clazz, int startRowNum) throws EncryptedDocumentException, InvalidFormatException, IOException {
 		

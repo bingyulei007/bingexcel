@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bing.common.Builder;
+import com.bing.excel.impl.ExcelImpl;
 
 /**
  * <p>
@@ -27,13 +28,13 @@ import com.bing.common.Builder;
  * @author zhongtao.shi
  * @date 2015-12-8
  */
-public class BingExcelBuilder implements Builder<BingExcel> {
+public class ExcelBingBuilder implements Builder<ExcelBing> {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * bingExcel:对应的excel工具类。
 	 */
-	private BingExcel bingExcel;
+	private ExcelBing bingExcel;
 
 	/**
 	 * <p>
@@ -41,17 +42,19 @@ public class BingExcelBuilder implements Builder<BingExcel> {
 	 * <p>
 	 * Description: 构造新的builder对象<／p>
 	 */
-	private BingExcelBuilder() {
+	private ExcelBingBuilder() {
 		
 	}
 
-	public static Builder<BingExcel> toBuilder() {
-		return new BingExcelBuilder();
+	public static Builder<ExcelBing> toBuilder() {
+		return new ExcelBingBuilder();
 	}
 
 	@Override
-	public BingExcel builder() {
-		
+	public ExcelBing builder() {
+		if(bingExcel==null){
+			bingExcel=new ExcelImpl();
+		}
 		return this.bingExcel;
 	}
 

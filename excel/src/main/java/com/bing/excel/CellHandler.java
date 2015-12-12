@@ -7,7 +7,7 @@ package com.bing.excel;
  * @version 1.0
  * @since JDK 1.7 文件名称：BingCellHandler.java 类说明：
  */
-public class BingCellHandler {
+public class CellHandler {
 	public Object getCellVal() {
 		return null;
 	}

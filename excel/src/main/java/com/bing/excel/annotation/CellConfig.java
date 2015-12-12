@@ -18,7 +18,12 @@ import com.bing.excel.convertor.FieldConvertor;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface BingCell {
+public @interface CellConfig {
+	/**
+	 * <p>Title: 下标值</p>
+	 * <p>Description: 从0开始</p>
+	 * @return
+	 */
 	public int index() default 0;
 	public String format() default "";
 	public Class<FieldConvertor> convertor();

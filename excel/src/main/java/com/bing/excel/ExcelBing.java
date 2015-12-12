@@ -25,7 +25,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
  *         2015 2015-4-24 下午5:49:55
  * 
  */
-public interface BingExcel {
+public interface ExcelBing {
 	/**
 	 * <p>
 	 * Title: readFileToList<／p>

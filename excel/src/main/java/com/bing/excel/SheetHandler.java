@@ -16,10 +16,10 @@ import org.apache.poi.ss.usermodel.Sheet;
  * 文件名称：BingSheetHandler.java  
  * 类说明：  处理Sheet辅助类
  */
-public  class BingSheetHandler <T>{
+public  class SheetHandler <T>{
 	private Sheet sheet;
 	private List<T> list =new ArrayList<>();
-	public BingSheetHandler(Sheet sheet) {
+	public SheetHandler(Sheet sheet) {
 		this.sheet=sheet;
 	}
 
