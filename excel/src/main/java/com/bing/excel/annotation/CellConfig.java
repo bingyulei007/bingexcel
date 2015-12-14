@@ -26,5 +26,5 @@ public @interface CellConfig {
 	 */
 	public int index() default 0;
 	public String format() default "";
-	public Class<FieldConvertor> convertor();
+	
 }
