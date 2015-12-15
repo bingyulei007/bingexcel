@@ -1,4 +1,4 @@
-package com.bing.excel.impl;
+package com.bing.excel.core.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import com.bing.excel.ExcelBing;
+import com.bing.excel.core.ExcelBing;
+import com.bing.excel.core.handler.SheetHandler;
+
 
 /**  
  * 创建时间：2015-12-8上午11:56:30  

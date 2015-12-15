@@ -19,7 +19,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.junit.Test;
 
-import com.bing.excel.impl.ExcelImpl;
+import com.bing.excel.core.ExcelBing;
 
 /**
  * 创建时间：2015-12-8下午12:22:38 项目名称：excel
@@ -84,6 +84,5 @@ public class Mytest {
 		System.out.println(int.class.isPrimitive());
 		System.out.println(String.class.isPrimitive());
 		System.out.println(ExcelBing.class.isPrimitive());
-		System.out.println(ExcelImpl.class.isPrimitive());
 	}
 }

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.bing.excel.convertor.FieldConvertor;
+import com.bing.excel.convertor.Convertor;
 
 /**
  * 创建时间：2015-12-14下午2:11:27 项目名称：excel
@@ -21,7 +21,7 @@ import com.bing.excel.convertor.FieldConvertor;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface BingConvertor {
-	Class<? extends FieldConvertor> value();
+	Class<? extends Convertor> value();
 
 	Class<?>[] types() default {};
 

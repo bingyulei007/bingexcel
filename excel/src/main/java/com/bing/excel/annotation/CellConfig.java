@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.bing.excel.convertor.FieldConvertor;
+import com.bing.excel.convertor.Convertor;
 
 /**
  * 创建时间：2015-12-8下午9:41:18 项目名称：excel

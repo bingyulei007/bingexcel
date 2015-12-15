@@ -1,4 +1,7 @@
 package com.bing.excel.convertor;
+
+
+
 /**  
  * 创建时间：2015-12-8下午9:51:00  
  * 项目名称：excel  
@@ -8,6 +11,7 @@ package com.bing.excel.convertor;
  * 文件名称：FieldConvertor.java  
  * 类说明：  
  */
-public interface FieldConvertor {
-
+public interface Convertor extends ConverterMatcher {
+	 // void marshal(Object source,   MarshallingContext context);
+	  //Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context);
 }

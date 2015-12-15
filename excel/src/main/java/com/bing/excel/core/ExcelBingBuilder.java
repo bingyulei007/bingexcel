@@ -1,10 +1,10 @@
-package com.bing.excel;
+package com.bing.excel.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bing.common.Builder;
-import com.bing.excel.impl.ExcelImpl;
+import com.bing.excel.core.impl.ExcelImpl;
 
 /**
  * <p>

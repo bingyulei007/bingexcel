@@ -3,7 +3,7 @@ package com.bing.excel.annotation;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.bing.excel.convertor.FieldConvertor;
+import com.bing.excel.convertor.Convertor;
 
 /**  
  * 创建时间：2015-12-11下午8:33:01  
@@ -15,7 +15,7 @@ import com.bing.excel.convertor.FieldConvertor;
  * 类说明：  
  */
 public class AnnotationMapper {
-	private Set<FieldConvertor> hashsSet=new HashSet<>();
+	private Set<Convertor> hashsSet=new HashSet<>();
 	public  boolean containConvertor(){
 		
 		

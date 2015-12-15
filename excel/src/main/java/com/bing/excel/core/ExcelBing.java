@@ -1,4 +1,4 @@
-package com.bing.excel;
+package com.bing.excel.core;
 
 import java.io.File;
 import java.io.IOException;
