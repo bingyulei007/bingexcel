@@ -12,7 +12,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import com.bing.excel.core.ExcelBing;
-import com.bing.excel.core.handler.SheetHandler;
+import com.bing.excel.core.handler.UnmarshallHandler;
 
 
 /**  
@@ -25,6 +25,7 @@ import com.bing.excel.core.handler.SheetHandler;
  * 类说明：  
  */
 public class ExcelImpl implements ExcelBing {
+	
 	@Override
 	public <T> List<T> readFileToList(File file, Class<T> clazz, int startRowNum) throws EncryptedDocumentException, InvalidFormatException, IOException {
 		
@@ -34,7 +35,7 @@ public class ExcelImpl implements ExcelBing {
 	@Override
 	public <T> List<T> readFileToList(File file, Class<T> clazz, int sheetIndex, int startRowNum) throws EncryptedDocumentException, InvalidFormatException, IOException {
 		Workbook workbook = WorkbookFactory.create(file);
-		return null;
+		return readSheetToList(workbook.getSheetAt(sheetIndex), clazz, startRowNum);
 	}
 
 	@Override
@@ -46,7 +47,14 @@ public class ExcelImpl implements ExcelBing {
 	public <T> List<T> readStreamToList(InputStream stream, int sheetIndex, Class<T> clazz, int startRowNum) throws EncryptedDocumentException, InvalidFormatException, IOException {
 		Workbook workbook = WorkbookFactory.create(stream);
 		Sheet sheetAt = workbook.getSheetAt(sheetIndex);
-		return null;
+		return readSheetToList(sheetAt, clazz, startRowNum);
 	}
-	
+	public <T> List<T> readSheetToList(Sheet sheet,Class<T> clazz, int startRowNum){
+		if(null==clazz){
+			throw new NullPointerException("获得的实体类型为空");
+		}
+		UnmarshallHandler<T> handler=new UnmarshallHandler<>(sheet);
+		handler.process(clazz);
+		return handler.getResult();
+	}
 }

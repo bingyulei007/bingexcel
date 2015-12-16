@@ -47,7 +47,9 @@ public class ExcelBingBuilder implements Builder<ExcelBing> {
 	}
 
 	public static Builder<ExcelBing> toBuilder() {
+		
 		return new ExcelBingBuilder();
+		
 	}
 
 	@Override

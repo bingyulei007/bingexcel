@@ -14,13 +14,7 @@ public interface Handler<T> {
 	 * <p>Title: 处理转换的逻辑</p>
 	 * <p>Description: </p>
 	 */
-	void process();
+	void process( Class<T> clazz);
 	
 	
-	/**
-	 * <p>Title: 得到处理结果</p>
-	 * <p>Description: </p>
-	 * @return
-	 */
-	T getResult();
 }

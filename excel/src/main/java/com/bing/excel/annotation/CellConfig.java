@@ -25,6 +25,11 @@ public @interface CellConfig {
 	 * @return
 	 */
 	public int index() default 0;
+	/**
+	 * <p>Title: format 格式化结果输出</p>
+	 * <p>Description: see at <code>java.util.String#format()</code>,这个值就是format参数，当对应属性是 String类型时候才起作用。</p>
+	 * @return
+	 */
 	public String format() default "";
 	
 }
