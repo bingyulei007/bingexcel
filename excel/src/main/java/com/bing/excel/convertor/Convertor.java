@@ -11,7 +11,7 @@ import org.apache.poi.ss.usermodel.Cell;
  * @version 1.0   
  * @since JDK 1.7
  * 文件名称：Convertor.java  
- * 类说明：  
+ * 类说明：  这里面convertor是针对实体类的filed。主要用于扩展转换，默认的目前应该支持boolean，枚举。
  */
 public interface Convertor {
 	 // void marshal(Object source,   MarshallingContext context);

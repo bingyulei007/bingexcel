@@ -37,21 +37,14 @@ public class UnmarshallHandler<T> implements Handler<T> {
 				// Handle it as needed
 				continue;
 			}
-			int lastColumn = r.getLastCellNum();
-			Map<String, Integer> fieldOrderMapper = mapper.getFieldOrderMapper();
+			
 			T instance;
 			try {
 				instance = defaultClass.newInstance();
 			} catch (Exception e) {
 				throw new ConvertorException("构造实例失败，请确认构造方法等", e);
 			}
-			Field[] declaredFields = defaultClass.getDeclaredFields();
-			for (Field field : declaredFields) {
-				Integer index = fieldOrderMapper.get(field.getName());
-				if(index!=null){
-					
-				}
-			}
+			
 		/*	Cell c = r.getCell(cn, Row.RETURN_BLANK_AS_NULL);
 			if (c == null) {
 
