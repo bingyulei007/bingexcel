@@ -40,7 +40,7 @@ public class AnnotationMapper {
 		if (cellConfig != null) {
 			int index = cellConfig.index();
 			mapper.setIndex(index);
-			if(field.getType().equals(String.class)){
+			if(field.getType().isPrimitive()){
 				String format = cellConfig.format();
 				if (StringUtils.isNoneEmpty(format)) {
 					mapper.setFormat(format);
@@ -64,7 +64,7 @@ public class AnnotationMapper {
 	}
 
 
-	private class Mapper{
+	public class Mapper{
 		private int index;
 		private  Class<? extends Convertor> convertor;
 		private String format;

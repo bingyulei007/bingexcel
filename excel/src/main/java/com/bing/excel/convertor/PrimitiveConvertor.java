@@ -13,7 +13,14 @@ import org.apache.poi.ss.usermodel.Cell;
  * 文件名称：FieldConvertor.java  
  * 类说明：  
  */
-public interface PrimitiveConvertor  {
+public interface PrimitiveConvertor  extends ConverterMatcher {
 	 // void marshal(Object source,   MarshallingContext context);
-	  Object unmarshal(Cell cell, Class<?> calss);
+	  /**
+	 * <p>Title: unmarshal</p>
+	 * <p>Description: </p>
+	 * @param source excel中读取的值，首先看看有没有 注解属性，如果没有-如果与目标的基本类型一样，直接转换
+	 * @param calss 对应filed的类型。
+	 * @return
+	 */
+	Object unmarshal(Object source, Class<?> calss);
 }

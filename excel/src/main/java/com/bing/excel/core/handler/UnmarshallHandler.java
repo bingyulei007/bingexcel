@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import com.bing.excel.annotation.AnnotationMapper;
+import com.bing.excel.annotation.AnnotationMapper.Mapper;
 import com.bing.excel.exception.ConvertorException;
 
 /**
@@ -44,7 +45,11 @@ public class UnmarshallHandler<T> implements Handler<T> {
 			} catch (Exception e) {
 				throw new ConvertorException("构造实例失败，请确认构造方法等", e);
 			}
-			
+			Map<String, Mapper> fieldMapper = mapper.getFieldMapper();
+			for (Map.Entry<String, Mapper> entity : fieldMapper.entrySet()) {
+				String key = entity.getKey();
+//				ent
+			}
 		/*	Cell c = r.getCell(cn, Row.RETURN_BLANK_AS_NULL);
 			if (c == null) {
 

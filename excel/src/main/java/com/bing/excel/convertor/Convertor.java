@@ -13,7 +13,7 @@ import org.apache.poi.ss.usermodel.Cell;
  * 文件名称：Convertor.java  
  * 类说明：  这里面convertor是针对实体类的filed。主要用于扩展转换，默认的目前应该支持boolean，枚举。
  */
-public interface Convertor {
+public interface Convertor extends ConverterMatcher {
 	 // void marshal(Object source,   MarshallingContext context);
-	  Object unmarshal(Cell cell, Class<?> clazz);
+	  Object unmarshal(Cell cell);
 }

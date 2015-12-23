@@ -1,6 +1,7 @@
 package com.bing.excel.convertor;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 import org.apache.poi.ss.usermodel.Cell;
 
@@ -13,16 +14,20 @@ import org.apache.poi.ss.usermodel.Cell;
  * 文件名称：FieldConvertor.java  
  * 类说明：  
  */
-public class FieldConvertor implements Convertor {
+public abstract class FieldConvertor implements Convertor {
 
-	private Class<?> clazz;
-	private Cell cell;
 	@Override
-	public Object unmarshal(Cell cell, Class<?> clazz) {
-		this.clazz=clazz;
-		this.cell=cell;
+	public Object unmarshal(Cell cell) {
 		return null;
 	}
+	/**
+	 * 
+	 * <p>Title: 测试对应的cell对应的类型能不能应用本转换器。</p>
+	 * <p>Description:注意一点，及时返回true ，也不代表转换过程没有出错。这个是用来匹配转换器的 </p>
+	 * @return
+	 */
+	@Override
+	public abstract boolean canConvert(Class<?> clz) ;
 
 	
 }

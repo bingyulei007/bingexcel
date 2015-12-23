@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -115,10 +117,11 @@ public class Mytest {
 
 	@Test
 	public void testMe() {
-		System.out.println(Integer.class.isPrimitive());
-		System.out.println("a".getClass().isAssignableFrom(String.class));
-		System.out.println(String.class.isPrimitive());
-		System.out.println(ExcelBing.class.isPrimitive());
-		System.out.println(String.class.getName());
+//		System.out.println(Integer.class.isPrimitive());
+//		System.out.println("a".getClass().isAssignableFrom(String.class));
+//		System.out.println(String.class.isPrimitive());
+//		System.out.println(ExcelBing.class.isPrimitive());
+//		System.out.println(String.class.getName());
+		System.out.println(Collection.class.isAssignableFrom(ArrayList.class));
 	}
 }
