@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.SAXParser;
+
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
@@ -123,5 +125,16 @@ public class Mytest {
 //		System.out.println(ExcelBing.class.isPrimitive());
 //		System.out.println(String.class.getName());
 		System.out.println(Collection.class.isAssignableFrom(ArrayList.class));
+	}
+	@Test
+	public void testReaderxlsx(){
+		String path="E:/a.xlsx";
+		ExcelUtil e=new ExcelUtil();
+		try {
+			e.process(path);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
 	}
 }
