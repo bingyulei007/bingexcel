@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<account-info>
+	<account id="1000" user="admin" password="admin2admin" role="oms-manager" phone="18115691115"/>
+	<account id="1001" user="刘鹤" password="9iju76gbh" role="oms-manager"  phone="13511608161"/>
+	<account id="1002" user="高棋" password="7hbn388uj" role="oms-manager" phone="18115691115"/>
+	<account id="1003" user="崔文俊" password="10jpka" role="oms-manager" phone="18896723719"/>
+	<account id="1004" user="肖加鹏" password="10koj76tg" role="oms-manager" phone="13111111111"/>
+	<account id="1005" user="吴庆华" password="1201ybh6t" role="oms-manager" phone="13999999999"/>
+	
+	<account id="1006" user="陆冰倩" password="8jnm765zh" role="oms-user" phone="15862393421"/>
+	<account id="1007" user="周勇" password="h65tfz2wd" role="oms-user" phone="15851480241"/>
+	<account id="1008" user="朱润霞" password="63278563" role="oms-user" phone="13814890719"/>
+	<account id="2001" user="练昀竹" password="56321478" role="oms-user" phone="15050136842"/>
+	
+	<account id="1009" user="吴美华" password="kdsf239d" role="bd-user" phone="15996314935"/>
+	<account id="1010" user="朱昌富" password="89dfsd2j" role="bd-user" phone="15262408767"/>
+	<account id="1011" user="陈叶浪" password="837djnkn" role="bd-user" phone="15601595077"/>
+	<account id="1012" user="游凯强" password="1235jkqx" role="bd-user" phone="18362693662"/>
+	<account id="1013" user="许林峰" password="90kkc3aa" role="bd-user" phone="15262407595"/>
+	<account id="1014" user="顾宸恺" password="4652uhsf" role="bd-user" phone="18994191991"/>
+</account-info>

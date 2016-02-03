@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<worksheet>
+	<dimension></dimension>
+	<sheetViews>
+		<sheetView>
+			<selection>
+			</selection>
+		</sheetView>
+	</sheetViews>
+	<sheetFormatPr></sheetFormatPr>
+	<cols>
+		<col>
+		</col>
+	</cols>
+	<sheetData>
+		<row>
+			<!-- 单元格 -->
+			<c>
+				<!-- 值 -->
+				<v></v>
+			</c>
+			<c>
+				<v></v>
+			</c>
+		</row>
+		<row>
+			<c>
+				<v></v>
+			</c>
+			<c>
+			<!-- 如果是公式，多上这个标签 -->
+			<f></f>
+				<v></v>
+			</c>
+		</row>
+	</sheetData>
+	<phoneticPr>
+	</phoneticPr>
+	<pageMargins>
+		<pageSetup></pageSetup>
+	</pageMargins>
+</worksheet>
