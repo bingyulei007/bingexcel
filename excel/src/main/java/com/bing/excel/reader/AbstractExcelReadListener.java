@@ -2,7 +2,8 @@ package com.bing.excel.reader;
 
 import java.util.List;
 
-import com.bing.excel.reader.sax.DefaultXSSFSaxHandler.CellKV;
+import com.bing.excel.reader.vo.CellKV;
+
 
 public abstract class AbstractExcelReadListener implements ExcelReadListener {
 

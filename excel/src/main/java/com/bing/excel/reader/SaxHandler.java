@@ -9,11 +9,11 @@ public interface SaxHandler {
 	/**
 	 * 处理所用数据对象
 	 */
-	void process() throws IOException, OpenXML4JException , SAXException;
+	void readSheets() throws IOException, OpenXML4JException , SAXException;
 	/**
 	 * 读取指定的数据
 	 * @param index sheetDate对应下标 0 start
 	 */
-	void process(int index)throws IOException, OpenXML4JException , SAXException;
-	void process(String indexName)throws IOException, OpenXML4JException , SAXException;
+	void readSheet(int index)throws IOException, OpenXML4JException , SAXException;
+	void readSheet(String indexName)throws IOException, OpenXML4JException , SAXException;
 }

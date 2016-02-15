@@ -45,10 +45,10 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import com.bing.excel.exception.BingSaxReadStopException;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
-import com.bing.excel.reader.sax.DefaultXSSFSaxHandler.CellKV;
 import com.bing.excel.reader.sax.ExcelReadOnlySharedStringsTable;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
+import com.bing.excel.reader.vo.CellKV;
 
 /**
  * 创建时间：2015-12-8下午12:22:38 项目名称：excel
@@ -429,7 +429,7 @@ public class Mytest {
 		DefaultXSSFSaxHandler handler = new DefaultXSSFSaxHandler(path,
 				new Myte(), false);
 		handler.setMaxReturnLine(5);
-		handler.process();
+		handler.readSheets();
 
 	}
 }
