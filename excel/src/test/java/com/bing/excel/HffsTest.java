@@ -1,5 +1,6 @@
 package com.bing.excel;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -10,6 +11,8 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import com.bing.excel.reader.AbstractExcelReadListener;
+import com.bing.excel.reader.ExcelReaderFactory;
+import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.hssf.DefaultHSSFHandler;
 import com.bing.excel.reader.vo.CellKV;
 
@@ -18,7 +21,7 @@ public class HffsTest {
 
 		@Override
 		public void optRow(int curRow, List<CellKV> rowList) {
-			
+			System.out.println(rowList);
 		}
 
 		@Override
@@ -43,5 +46,12 @@ public class HffsTest {
 		DefaultHSSFHandler handler=new DefaultHSSFHandler(path,new Myte(),true);
 		handler.setMaxReturnLine(5);
 		handler.readSheets();
+	}
+	@Test
+	public  void testMe1() throws Exception{
+		String path = "E:/a1.xls";
+		SaxHandler handler = ExcelReaderFactory.create(new File(path), new Myte());
+		//handler.readSheets();
+		handler.readSheet(1);
 	}
 }

@@ -84,7 +84,7 @@ public class DefaultHSSFHandler extends HSSFListenerAbstract  implements SaxHand
 	@Override
 	public void optRows(int sheetIndex, int curRow, List<CellKV> rowlist)
 			throws SQLException {
-		System.out.println("sheet:"+sheetIndex+"  curRow:"+curRow+"  rowlist:"+rowlist);
+		//System.out.println("sheet:"+sheetIndex+"  curRow:"+curRow+"  rowlist:"+rowlist);
 		excelReader.optRow(curRow, rowlist);
 	}
 	

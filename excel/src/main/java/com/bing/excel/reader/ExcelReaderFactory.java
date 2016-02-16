@@ -31,9 +31,9 @@ public class ExcelReaderFactory {
 			OPCPackage pkg = OPCPackage.open(file, PackageAccess.READ);
 			try {
 				return create(pkg, excelReader, ignoreNumFormat, maxReturnLines);
-			} catch (IllegalArgumentException | IOException ioe) {
+			} catch (IllegalArgumentException | IOException e1) {
 				pkg.revert();
-				throw ioe;
+				throw e1;
 			}
 		}
 

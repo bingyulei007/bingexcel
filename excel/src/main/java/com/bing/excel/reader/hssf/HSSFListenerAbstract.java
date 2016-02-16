@@ -136,7 +136,9 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			boundSheetRecords.add(record);
 		} else if(EOFRecord.sid==sid){
 			if (sheetName != null && sheetIndex != -1) {
-				excelReader.endSheet(sheetIndex, sheetName);
+				if (startRead) {
+					excelReader.endSheet(sheetIndex, sheetName);
+				}
 			}
 			if(boundSheetRecords.size()==(sheetIndex+1)){
 				excelReader.endWorkBook();
@@ -160,7 +162,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 				}
 				sheetName = orderedBSRs[sheetIndex].getSheetname();
 				startRead = true;
-				excelReader.startSheet(sid, sheetName);
+				
 				if (aimSheetName != null) {
 					if (aimSheetName != sheetName) {
 						startRead = false;
@@ -170,6 +172,9 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 					if (aimSheetIndex != sheetIndex) {
 						startRead = false;
 					}
+				}
+				if (startRead) {
+					excelReader.startSheet(sheetIndex, sheetName);
 				}
 			}else if(br.getType() == BOFRecord.TYPE_WORKBOOK){
 				
