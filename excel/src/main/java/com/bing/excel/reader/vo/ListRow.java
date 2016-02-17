@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.management.DescriptorKey;
+
 
 /**
  * listrow 对象
@@ -22,6 +24,7 @@ public class ListRow implements Iterable<CellKV>{
 	 * 会创建一个新的arraylist 对象。
 	 * @return 返回新的list对象
 	 */
+	@Deprecated
 	public List<CellKV> getList() {
 		if (list == null)
 			return Collections.emptyList();
@@ -53,18 +56,22 @@ public class ListRow implements Iterable<CellKV>{
 			return Collections.emptyList().toString();
 		return list.toString();
 	}
+	/**
+	 * 返回对应的array对象，如果kv的index没有对应的arr顺序，用null代替
+	 * @return
+	 */
 	public String[] toArray() {
 		if(maxIndex!=-1){
-			String[]  arr=new String[maxIndex+1];
-			for (CellKV kv : list) {
-				arr[kv.getIndex()]=kv.getValue();
-			}
-			
-			return arr;
+			return toArray(maxIndex+1);
 		}else{
 			return new String[0];
 		}
 	}
+	/**
+	 * 返回对应的array对象，如果kv的index没有对应的arr顺序，用null代替
+	 * @param length
+	 * @return
+	 */
 	public String[] toArray(int length) {
 		
 			String[]  arr=new String[length];
@@ -92,6 +99,11 @@ public class ListRow implements Iterable<CellKV>{
 		}
 		return list.iterator();
 	}
-	
+	public int size() {
+		if(list!=null){
+			return list.size();
+		}
+		return 0;
+	}
 	
 }

@@ -19,6 +19,14 @@ import com.bing.excel.reader.hssf.DefaultHSSFHandler;
 import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
 
 public class ExcelReaderFactory {
+	/**
+	 * @param file
+	 * @param excelReader
+	 * @param ignoreNumFormat  是否忽略数据格式  (default=false，按照格式读取)
+	 * @param maxReturnLines 可为null，当null时候，不限制
+	 * @return
+	 * @throws Exception
+	 */
 	public static SaxHandler create(File file, ExcelReadListener excelReader,
 			boolean ignoreNumFormat, Integer maxReturnLines) throws Exception {
 		if (!file.exists()) {
@@ -39,12 +47,45 @@ public class ExcelReaderFactory {
 
 	}
 
+	/**
+	 * @param file
+	 * @param excelReader
+	 * @return
+	 * @throws Exception
+	 */
 	public static SaxHandler create(File file, ExcelReadListener excelReader)
 			throws Exception {
 		return create(file, excelReader, false, null);
 
 	}
+	/**
+	 * @param file
+	 * @param excelReader
+	 * @param ignoreNumFormat 是否忽略数据格式  (default=false，按照格式读取)
+	 * @return
+	 * @throws Exception
+	 */
+	public static SaxHandler create(File file, ExcelReadListener excelReader,boolean ignoreNumFormat)
+			throws Exception {
+		return create(file, excelReader, ignoreNumFormat, null);
+		
+	}
+	public static SaxHandler create(File file, ExcelReadListener excelReader,Integer maxReturnLines)
+			throws Exception {
+		return create(file, excelReader, false, null);
+		
+	}
 
+	/**
+	 * @param inp
+	 * @param excelReader
+	 * @param ignoreNumFormat 是否忽略数据格式  (default=false，按照格式读取) 
+	 * @param maxReturnLines
+	 * @return
+	 * @throws InvalidFormatException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public static SaxHandler create(InputStream inp,
 			ExcelReadListener excelReader, boolean ignoreNumFormat,
 			Integer maxReturnLines) throws InvalidFormatException, IOException, SQLException {
@@ -72,16 +113,42 @@ public class ExcelReaderFactory {
 
 	
 
+	/**
+	 * @param inp
+	 * @param excelReader
+	 * @param maxReturnLines <code>null</code> 不限制，
+	 * @return
+	 * @throws InvalidFormatException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public static SaxHandler create(InputStream inp,
 			ExcelReadListener excelReader, Integer maxReturnLines) throws InvalidFormatException, IOException, SQLException {
 		  return create(inp, excelReader, false, maxReturnLines);
 	}
 
+	/**
+	 * @param inp
+	 * @param excelReader
+	 * @param ignoreNumFormat 是否忽略数据格式  (default=false，按照格式读取)
+	 * @return
+	 * @throws InvalidFormatException
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public static SaxHandler create(InputStream inp,
 			ExcelReadListener excelReader, boolean ignoreNumFormat) throws InvalidFormatException, IOException, SQLException {
 		 return create(inp, excelReader, ignoreNumFormat, null);
 	}
 
+	/**
+	 * @param pkg
+	 * @param excelReader
+	 * @return
+	 * @throws SQLException
+	 * @throws InvalidFormatException
+	 * @throws IOException
+	 */
 	public static SaxHandler create(OPCPackage pkg,
 			ExcelReadListener excelReader) throws SQLException,
 			InvalidFormatException, IOException {

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
 import org.apache.poi.hssf.eventusermodel.HSSFListener;
 import org.apache.poi.hssf.eventusermodel.HSSFRequest;
@@ -38,6 +39,12 @@ import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.vo.CellKV;
 import com.bing.excel.reader.vo.ListRow;
 
+/**
+ * @author shizhongtao
+ *
+ * @date 2016-2-17
+ * Description:  
+ */
 public abstract class HSSFListenerAbstract implements HSSFListener {
 	private POIFSFileSystem fs;
 
@@ -235,20 +242,22 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			curRow = thisRow = lrec.getRow();
 			thisColumn = lrec.getColumn();
 			value = lrec.getValue().trim();
-			value = value.equals("") ? "" : value;
-			this.rowlist.add(new CellKV(thisColumn, value));
+			if(StringUtils.isNotEmpty(value)){
+				rowlist.add(new CellKV(thisColumn, value));
+				}
 		} else if (LabelSSTRecord.sid == sid) {
 			LabelSSTRecord lsrec = (LabelSSTRecord) record;
 
 			curRow = thisRow = lsrec.getRow();
 			thisColumn = lsrec.getColumn();
 			if (sstRecord == null) {
-				rowlist.add(new CellKV(thisColumn, ""));
+				//rowlist.add(new CellKV(thisColumn, ""));
 			} else {
 				value = sstRecord.getString(lsrec.getSSTIndex()).toString()
 						.trim();
-				value = value.equals("") ? "" : value;
-				rowlist.add(new CellKV(thisColumn, value));
+				if(StringUtils.isNotEmpty(value)){
+					rowlist.add(new CellKV(thisColumn, value));
+					}
 			}
 		} else if (NoteRecord.sid == sid) {
 			NoteRecord nrec = (NoteRecord) record;
@@ -263,9 +272,10 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			curRow = thisRow = numrec.getRow();
 			thisColumn = numrec.getColumn();
 			value = formatListener.formatNumberDateCell(numrec).trim();
-			value = value.equals("") ? "" : value;
 			// Format
+			if(StringUtils.isNotEmpty(value)){
 			rowlist.add(new CellKV(thisColumn, value));
+			}
 		} else if (RKRecord.sid == sid) {
 			RKRecord rkrec = (RKRecord) record;
 
@@ -285,12 +295,12 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			MissingCellDummyRecord mc = (MissingCellDummyRecord) record;
 			curRow = thisRow = mc.getRow();
 			thisColumn = mc.getColumn();
-			rowlist.add(new CellKV(thisColumn, ""));
+			//rowlist.add(new CellKV(thisColumn, ""));
 		}
 		// 如果str非空
-		if (thisStr != null) {
-			rowlist.add(new CellKV(thisColumn, thisStr));
-		}
+			if(StringUtils.isNotEmpty(thisStr)){
+				rowlist.add(new CellKV(thisColumn, thisStr));
+				}
 
 		// 更新行和列的值
 		if (thisRow > -1)

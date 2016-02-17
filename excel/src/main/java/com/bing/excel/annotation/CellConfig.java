@@ -6,7 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.bing.excel.convertor.Convertor;
 
 /**
  * 创建时间：2015-12-8下午9:41:18 项目名称：excel
@@ -25,11 +24,6 @@ public @interface CellConfig {
 	 * @return
 	 */
 	public int index() default 0;
-	/**
-	 * <p>Title: format 格式化结果输出</p>
-	 * <p>Description: see at <code>java.util.String#format()</code>,这个值就是format参数，当对应属性是 String类型时候才起作用。</p>
-	 * @return
-	 */
-	public String format() default "";
+	
 	
 }

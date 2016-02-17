@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 
 import com.bing.excel.annotation.AnnotationMapper;
 import com.bing.excel.annotation.AnnotationMapper.Mapper;
 import com.bing.excel.exception.ConvertorException;
+import com.bing.excel.reader.vo.ListRow;
 
 /**
  * 创建时间：2015-12-8下午7:08:01 项目名称：excel
@@ -20,17 +18,12 @@ import com.bing.excel.exception.ConvertorException;
  * @version 1.0
  * @since JDK 1.7 文件名称：BingSheetHandler.java 类说明： 处理Sheet辅助类
  */
-public class UnmarshallHandler<T> implements Handler<T> {
-	private Class<T> defaultClass;
-	private Sheet sheet;
+public class UnmarshallHandler  implements Handler  {
+	private Class<?> defaultClass;
 	private AnnotationMapper mapper;
-	private List<T> list = new ArrayList<>();
 
-	public UnmarshallHandler(Sheet sheet) {
-		this.sheet = sheet;
-	}
 
-	public List<T> ReadToList(int fromRow) {
+	public Object ReadToEntity(ListRow row) {
 		for (int j = fromRow; j <= sheet.getLastRowNum(); j++) {
 			Row r = sheet.getRow(j);
 			if (r == null) {
@@ -59,14 +52,14 @@ public class UnmarshallHandler<T> implements Handler<T> {
 			
 			
 		}
-		return list;
+		return null;
 	}
 
 	/*
 	 * 注册转换类型
 	 */
 	@Override
-	public void process(Class<T> clazz) {
+	public void process(Class<?> clazz) {
 		if (null == clazz) {
 			throw new NullPointerException("获得的实体类型为空");
 		}
@@ -78,8 +71,5 @@ public class UnmarshallHandler<T> implements Handler<T> {
 		}
 	}
 
-	public List<T> getResult() {
-		return this.list;
-	}
 
 }

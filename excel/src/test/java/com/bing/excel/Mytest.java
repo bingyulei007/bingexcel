@@ -42,6 +42,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import com.bing.excel.convertor.DataTypeDetect;
 import com.bing.excel.exception.BingSaxReadStopException;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
@@ -430,5 +431,26 @@ public class Mytest {
 		handler.setMaxReturnLine(5);
 		handler.readSheets();
 
+	}
+	@Test
+	public void testRe(){
+		 System.out.println(DataTypeDetect.isYMD("20140203"));
+		 System.out.println(DataTypeDetect.isYMD("2014-12-12"));
+		 System.out.println(DataTypeDetect.isYMD("2014/02/02"));
+		 System.out.println(DataTypeDetect.isYMD("2014年12月01"));
+		 System.out.println(DataTypeDetect.isYMD("2014年12月01  "));
+		 System.out.println(DataTypeDetect.isYMD("2014-12-01 0:0:0"));
+		 System.out.println(DataTypeDetect.isYMD("2014-12-01 00:00:00"));
+		 System.out.println("__________________________________");
+		 System.out.println(DataTypeDetect.isYMD("2014-12-01 00:00:000"));
+		 System.out.println(DataTypeDetect.isYMD("2014-13-01 a"));
+		 System.out.println(DataTypeDetect.isYMD("2014-13-01 "));
+		 System.out.println(DataTypeDetect.isYMD("201563"));
+		 System.out.println(DataTypeDetect.isYMD("2014年13月01"));
+		 System.out.println(DataTypeDetect.isYMD("2014-13-01 00:00:"));
+		 System.out.println(DataTypeDetect.isYMD("2014-13-01 00:00"));
+		 System.out.println(DataTypeDetect.isYMD("150102"));
+		 System.out.println(DataTypeDetect.isYMD("1952020300"));
+		 System.out.println(DataTypeDetect.isYMD("150102"));
 	}
 }

@@ -2,7 +2,9 @@ package com.bing.excel.reader.vo;
 
 import javax.management.RuntimeOperationsException;
 
-public  class CellKV {
+import com.google.common.base.MoreObjects;
+
+public class CellKV {
 
 	/**
 	 * @serial Attribute name.
@@ -15,12 +17,12 @@ public  class CellKV {
 	private String value = null;
 
 	/**
-	 * Constructs an Attribute object which associates the given attribute
-	 * name with the given value.
+	 * Constructs an CellKV object which associates the given attribute name
+	 * with the given value.
 	 * 
 	 * @param name
-	 *            A String containing the name of the attribute to be
-	 *            created. Cannot be null.
+	 *            A String containing the name of the attribute to be created.
+	 *            Cannot be null.
 	 * @param value
 	 *            The Object which is assigned to the attribute. This object
 	 *            must be of the same type as the attribute.
@@ -29,9 +31,8 @@ public  class CellKV {
 	public CellKV(int index, String value) {
 
 		if (index < 0) {
-			throw new RuntimeOperationsException(
-					new IllegalArgumentException(
-							"CellKV index cannot be ls 0 "));
+			throw new RuntimeOperationsException(new IllegalArgumentException(
+					"CellKV index cannot be ls 0 "));
 		}
 
 		this.index = index;
@@ -48,7 +49,7 @@ public  class CellKV {
 	}
 
 	/**
-	 * Returns an Object that is the value of this attribute.
+	 * Returns an String that is the value of this attribute.
 	 * 
 	 * @return the value of the attribute.
 	 */
@@ -57,12 +58,13 @@ public  class CellKV {
 	}
 
 	/**
-	 * Returns a String object representing this Attribute's value. The
-	 * format of this string is not specified, but users can expect that two
-	 * Attributes return the same string if and only if they are equal.
+	 * Returns a String object representing this Attribute's value. The format
+	 * of this string is not specified, but users can expect that two Attributes
+	 * return the same string if and only if they are equal.
 	 */
 	public String toString() {
-		return "{" + getIndex() + " ： " + getValue() + "}";
+		return MoreObjects.toStringHelper(this).omitNullValues()
+				.add("index", index).add("value", value).toString();
 	}
 
 }

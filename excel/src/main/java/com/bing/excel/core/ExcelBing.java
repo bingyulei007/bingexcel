@@ -40,10 +40,9 @@ public interface ExcelBing {
 	 * @throws InvalidFormatException
 	 * @throws EncryptedDocumentException
 	 */
-	<T> List<T> readFileToList(File file, Class<T> clazz, int startRowNum) throws EncryptedDocumentException, InvalidFormatException, IOException;
+	<T> List<T> readFileToList(File file, Class<T> clazz, int startRowNum) ;
+	<T> List<T> readFileToList(File file, Class<T> clazz, ReaderCondition condition) ;
 
-	<T> List<T> readFileToList(File file, Class<T> clazz, int sheetIndex, int startRowNum) throws EncryptedDocumentException, InvalidFormatException,
-			IOException;
 	/**
 	 * @param file
 	 * @param clazzArr 测试
@@ -54,10 +53,10 @@ public interface ExcelBing {
 	 * @throws InvalidFormatException
 	 * @throws IOException
 	 */
-	<T> List<T> readFileToList(File file, Class<T>[] clazzArr, int[] sheetIndexArr, int startRowNum) throws EncryptedDocumentException, InvalidFormatException,
-	IOException;
+	List[] readFileToList(File file, Class[] clazzArr, int[] sheetIndexArr, int startRowNum) ;
 
-	<T> List<T> readStreamToList(InputStream stream, Class<T> clazz, int startRowNum) throws EncryptedDocumentException, InvalidFormatException, IOException;
+	<T> List<T> readStreamToList(InputStream stream, Class<T> clazz, int startRowNum) ;
 
-	<T> List<T> readStreamToList(InputStream stream, int sheetIndex, Class<T> clazz, int startRowNum) throws EncryptedDocumentException, InvalidFormatException, IOException;
+	<T> List<T> readStreamToList(InputStream stream,  Class<T> clazz, ReaderCondition condition) ;
+	List[] readStreamToList(InputStream stream,  Class[] clazzArr,int[] sheetIndexArr, int startRowNum) ;
 }

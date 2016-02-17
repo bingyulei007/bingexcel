@@ -44,6 +44,12 @@ import com.bing.excel.reader.usermodel.ExcelHSSFDataFormatter;
 * provides an easy way to look up the format strings used by cells from their
 * ids.
 */
+/**
+ * @author shizhongtao
+ *
+ * @date 2016-2-17
+ * Description:  
+ */
 public class ExcelFormatTrackingHSSFListener implements HSSFListener {
 	private static POILogger logger = POILogFactory.getLogger(ExcelFormatTrackingHSSFListener.class);
 	private final HSSFListener _childListener;

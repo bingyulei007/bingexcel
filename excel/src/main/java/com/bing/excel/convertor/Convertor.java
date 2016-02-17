@@ -15,5 +15,5 @@ import org.apache.poi.ss.usermodel.Cell;
  */
 public interface Convertor extends ConverterMatcher {
 	 // void marshal(Object source,   MarshallingContext context);
-	  Object unmarshal(Cell cell);
+	  Object unmarshal(Object cell);
 }

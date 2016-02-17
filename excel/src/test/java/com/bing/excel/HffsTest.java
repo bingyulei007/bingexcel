@@ -24,13 +24,13 @@ public class HffsTest {
 		@Override
 		public void optRow(int curRow, ListRow rowList) {
 			System.out.println(rowList);
-			System.out.println(ArrayUtils.toString(rowList.toArray()));
+			/*System.out.println(ArrayUtils.toString(rowList.toArray()));
 			System.out.println(ArrayUtils.toString(rowList.toArray(5)));
 			System.out.println(ArrayUtils.toString(rowList.toArray(2)));
 			for (CellKV cellKV : rowList) {
 				System.out.println(cellKV);
 			}
-			rowList=null;
+			rowList=null;*/
 		/*	for (CellKV cellKV : rowList) {
 				System.out.println(cellKV);
 			}*/
@@ -61,8 +61,15 @@ public class HffsTest {
 	}
 	@Test
 	public  void testMe1() throws Exception{
-		String path = "E:/a1.xls";
+		String path = "E:/a1.xlsx";
 		SaxHandler handler = ExcelReaderFactory.create(new File(path), new Myte());
+		handler.readSheets();
+		//handler.readSheet(1);
+	}
+	@Test
+	public  void testDateAll() throws Exception{
+		String path = "E:/date.xlsx";
+		SaxHandler handler = ExcelReaderFactory.create(new File(path), new Myte(),true);
 		handler.readSheets();
 		//handler.readSheet(1);
 	}

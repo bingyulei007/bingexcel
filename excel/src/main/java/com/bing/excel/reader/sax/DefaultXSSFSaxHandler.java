@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -312,8 +313,11 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 				String formattedValue, XSSFComment comment)
 				 {
 			
-			int column = nameToColumn(cellReference);
-			rowList.add(new CellKV(column, formattedValue));
+			if (StringUtils.isNotEmpty(formattedValue)) {
+				int column = nameToColumn(cellReference);
+				rowList.add(new CellKV(column, formattedValue));
+			}
+			
 		}
 
 		@Override

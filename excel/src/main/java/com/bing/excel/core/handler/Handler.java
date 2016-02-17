@@ -8,13 +8,13 @@ package com.bing.excel.core.handler;
  * 文件名称：Handler.java  
  * 类说明：  转换excel数据到类实体时候  的抽象对象
  */
-public interface Handler<T> {
+public interface Handler {
 
 	/**
 	 * <p>Title: 处理转换的逻辑</p>
 	 * <p>Description: </p>
 	 */
-	void process( Class<T> clazz);
+	void process( Class<?> clazz);
 	
 	
 }
