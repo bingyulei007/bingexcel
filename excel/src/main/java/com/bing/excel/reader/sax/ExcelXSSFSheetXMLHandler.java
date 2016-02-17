@@ -369,12 +369,12 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 				break;
 			}
 
-			// Do we have a comment for this cell?
-			checkForEmptyCellComments(EmptyCellCommentsCheckType.CELL);
+			// Do we have a comment for this cell? 先注释掉
+			//checkForEmptyCellComments(EmptyCellCommentsCheckType.CELL);
 			XSSFComment comment = commentsTable != null ? commentsTable
 					.findCellComment(cellRef) : null;
 
-			// Output
+			// Output 上面已经输出
 			output.cell(rowNum, cellRef, thisStr, comment);
 		} else if ("f".equals(name)) {
 			fIsOpen = false;

@@ -25,6 +25,7 @@ import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
 import com.bing.excel.reader.vo.CellKV;
+import com.bing.excel.reader.vo.ListRow;
 
 /**
  * @author shizhongtao
@@ -260,7 +261,7 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 
 	private static class DefaultSheetContentsHandler implements
 			BingSheetContentsHandler {
-		private List<CellKV> rowList;
+		private ListRow rowList;
 		private ExcelReadListener excelReader;
 		private int maxReadLine = Integer.MAX_VALUE;
 
@@ -297,7 +298,7 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 			if (rowNum > maxReadLine) {
 				throw new BingSaxReadStopException("stop mark");
 			}
-			rowList = new ArrayList<>();
+			rowList = new ListRow();
 		}
 
 		@Override
@@ -312,7 +313,6 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 				 {
 			
 			int column = nameToColumn(cellReference);
-
 			rowList.add(new CellKV(column, formattedValue));
 		}
 

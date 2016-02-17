@@ -26,7 +26,7 @@ import com.bing.excel.core.handler.UnmarshallHandler;
  * 文件名称：BingExcelImpl.java  
  * 类说明：  
  */
-public class ExcelImpl implements ExcelBing {
+public  abstract class ExcelBingImpl implements ExcelBing {
 	private Set<Convertor> globalConvertor;
 	
 	@Override

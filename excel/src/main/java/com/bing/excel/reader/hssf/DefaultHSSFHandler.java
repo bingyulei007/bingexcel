@@ -14,6 +14,7 @@ import org.xml.sax.SAXException;
 import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.vo.CellKV;
+import com.bing.excel.reader.vo.ListRow;
 
 public class DefaultHSSFHandler extends HSSFListenerAbstract  implements SaxHandler{
 
@@ -82,7 +83,7 @@ public class DefaultHSSFHandler extends HSSFListenerAbstract  implements SaxHand
 	}
 
 	@Override
-	public void optRows(int sheetIndex, int curRow, List<CellKV> rowlist)
+	public void optRows(int sheetIndex, int curRow, ListRow rowlist)
 			throws SQLException {
 		//System.out.println("sheet:"+sheetIndex+"  curRow:"+curRow+"  rowlist:"+rowlist);
 		excelReader.optRow(curRow, rowlist);

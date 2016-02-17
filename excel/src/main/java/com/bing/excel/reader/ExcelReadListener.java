@@ -1,9 +1,7 @@
 package com.bing.excel.reader;
 
-import java.util.List;
 
-import com.bing.excel.exception.BingSaxReadStopException;
-import com.bing.excel.reader.vo.CellKV;
+import com.bing.excel.reader.vo.ListRow;
 
 public interface ExcelReadListener {
 	/**
@@ -16,7 +14,7 @@ public interface ExcelReadListener {
 	 * @param rowList
 	 *            当前数据行的数据集合
 	 */
-	void optRow(int curRow, List<CellKV> rowList);
+	void optRow(int curRow, ListRow rowList);
 	void startSheet(int sheetIndex, String name);
 	void endSheet(int sheetIndex, String name);
 	void endWorkBook();

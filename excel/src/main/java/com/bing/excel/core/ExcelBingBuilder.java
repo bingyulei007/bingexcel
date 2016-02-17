@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bing.common.Builder;
-import com.bing.excel.core.impl.ExcelImpl;
+import com.bing.excel.core.impl.ExcelBingImpl;
 
 /**
  * <p>
@@ -55,7 +55,7 @@ public class ExcelBingBuilder implements Builder<ExcelBing> {
 	@Override
 	public ExcelBing builder() {
 		if(bingExcel==null){
-			bingExcel=new ExcelImpl();
+			//bingExcel=new ExcelBingImpl();
 		}
 		return this.bingExcel;
 	}

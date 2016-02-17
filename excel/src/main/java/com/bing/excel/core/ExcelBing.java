@@ -44,6 +44,18 @@ public interface ExcelBing {
 
 	<T> List<T> readFileToList(File file, Class<T> clazz, int sheetIndex, int startRowNum) throws EncryptedDocumentException, InvalidFormatException,
 			IOException;
+	/**
+	 * @param file
+	 * @param clazzArr 测试
+	 * @param sheetIndexArr
+	 * @param startRowNum
+	 * @return
+	 * @throws EncryptedDocumentException
+	 * @throws InvalidFormatException
+	 * @throws IOException
+	 */
+	<T> List<T> readFileToList(File file, Class<T>[] clazzArr, int[] sheetIndexArr, int startRowNum) throws EncryptedDocumentException, InvalidFormatException,
+	IOException;
 
 	<T> List<T> readStreamToList(InputStream stream, Class<T> clazz, int startRowNum) throws EncryptedDocumentException, InvalidFormatException, IOException;
 

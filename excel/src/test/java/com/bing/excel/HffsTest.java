@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -15,13 +16,24 @@ import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.hssf.DefaultHSSFHandler;
 import com.bing.excel.reader.vo.CellKV;
+import com.bing.excel.reader.vo.ListRow;
 
 public class HffsTest {
 	public static class Myte extends AbstractExcelReadListener {
 
 		@Override
-		public void optRow(int curRow, List<CellKV> rowList) {
+		public void optRow(int curRow, ListRow rowList) {
 			System.out.println(rowList);
+			System.out.println(ArrayUtils.toString(rowList.toArray()));
+			System.out.println(ArrayUtils.toString(rowList.toArray(5)));
+			System.out.println(ArrayUtils.toString(rowList.toArray(2)));
+			for (CellKV cellKV : rowList) {
+				System.out.println(cellKV);
+			}
+			rowList=null;
+		/*	for (CellKV cellKV : rowList) {
+				System.out.println(cellKV);
+			}*/
 		}
 
 		@Override
@@ -51,7 +63,7 @@ public class HffsTest {
 	public  void testMe1() throws Exception{
 		String path = "E:/a1.xls";
 		SaxHandler handler = ExcelReaderFactory.create(new File(path), new Myte());
-		//handler.readSheets();
-		handler.readSheet(1);
+		handler.readSheets();
+		//handler.readSheet(1);
 	}
 }

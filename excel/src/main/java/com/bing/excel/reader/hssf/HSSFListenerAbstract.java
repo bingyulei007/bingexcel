@@ -36,6 +36,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.vo.CellKV;
+import com.bing.excel.reader.vo.ListRow;
 
 public abstract class HSSFListenerAbstract implements HSSFListener {
 	private POIFSFileSystem fs;
@@ -66,7 +67,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 	private boolean outputNextStringRecord;
 
 	private int curRow;
-	private List<CellKV> rowlist;
+	private ListRow rowlist;
 	@SuppressWarnings("unused")
 	private String sheetName;
 	private ExcelReadListener excelReader;
@@ -85,7 +86,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			ExcelReadListener excelReader,boolean ignoreNumFormat) throws SQLException {
 		this.fs = fs;
 		this.curRow = 0;
-		this.rowlist = new ArrayList<>();
+		this.rowlist = new ListRow();
 		this.excelReader = excelReader;
 		this.ignoreNumFormat=ignoreNumFormat;
 	}
@@ -97,7 +98,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 	// excel记录行操作方法，以sheet索引，行索引和行元素列表为参数，对sheet的一行元素进行操作，元素为String类型
 	public abstract void optRows(int sheetIndex, int curRow,
-			List<CellKV> rowlist) throws SQLException;
+			ListRow rowlist) throws SQLException;
 
 	/**
 	 * 遍历 excel 文件

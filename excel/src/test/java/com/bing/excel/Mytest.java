@@ -49,6 +49,7 @@ import com.bing.excel.reader.sax.ExcelReadOnlySharedStringsTable;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
 import com.bing.excel.reader.vo.CellKV;
+import com.bing.excel.reader.vo.ListRow;
 
 /**
  * 创建时间：2015-12-8下午12:22:38 项目名称：excel
@@ -399,11 +400,9 @@ public class Mytest {
 	public static class Myte extends AbstractExcelReadListener {
 
 		@Override
-		public void optRow(int curRow, List<CellKV> rowList) {
+		public void optRow(int curRow, ListRow rowList) {
 			System.out.println("行：" + curRow);
-			for (CellKV cellKV : rowList) {
-				System.out.println(cellKV);
-			}
+				System.out.println(rowList);
 		}
 
 		@Override
