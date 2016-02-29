@@ -20,10 +20,10 @@ import com.bing.excel.reader.vo.ListRow;
 
 public class HffsTest {
 	public static class Myte extends AbstractExcelReadListener {
-
+private long start;
 		@Override
 		public void optRow(int curRow, ListRow rowList) {
-			System.out.println(rowList);
+		//	System.out.println(rowList);
 			/*System.out.println(ArrayUtils.toString(rowList.toArray()));
 			System.out.println(ArrayUtils.toString(rowList.toArray(5)));
 			System.out.println(ArrayUtils.toString(rowList.toArray(2)));
@@ -34,15 +34,18 @@ public class HffsTest {
 		/*	for (CellKV cellKV : rowList) {
 				System.out.println(cellKV);
 			}*/
+			System.out.println(curRow);
 		}
 
 		@Override
 		public void startSheet(int sheetIndex, String name) {
+			start= System.currentTimeMillis();
 			System.out.println("start:"+sheetIndex+":"+name);
 		}
 
 		@Override
 		public void endSheet(int sheetIndex, String name) {
+			System.out.println(System.currentTimeMillis()-start);
 			System.out.println("end:"+sheetIndex+":"+name);
 		}
 
@@ -68,7 +71,7 @@ public class HffsTest {
 	}
 	@Test
 	public  void testDateAll() throws Exception{
-		String path = "E:/date.xlsx";
+		String path = "E:/bc.xlsx";
 		SaxHandler handler = ExcelReaderFactory.create(new File(path), new Myte(),true);
 		handler.readSheets();
 		//handler.readSheet(1);

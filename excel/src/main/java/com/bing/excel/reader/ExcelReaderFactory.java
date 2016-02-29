@@ -72,7 +72,7 @@ public class ExcelReaderFactory {
 	}
 	public static SaxHandler create(File file, ExcelReadListener excelReader,Integer maxReturnLines)
 			throws Exception {
-		return create(file, excelReader, false, null);
+		return create(file, excelReader, false, maxReturnLines);
 		
 	}
 

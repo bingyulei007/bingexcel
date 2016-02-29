@@ -12,7 +12,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import com.bing.excel.convertor.Convertor;
+import com.bing.excel.convertor.Converter;
 import com.bing.excel.core.ExcelBing;
 import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.handler.UnmarshallHandler;
@@ -30,7 +30,7 @@ import com.bing.excel.reader.vo.ListRow;
  * 类说明：  
  */
 public  abstract class ExcelBingImpl implements ExcelBing {
-	private Set<Convertor> globalConvertor;
+	private Set<Converter> globalConvertor;
 	
 	
 	
@@ -66,7 +66,7 @@ public  abstract class ExcelBingImpl implements ExcelBing {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	public void registerConvertor(Convertor convertor){
+	public void registerConvertor(Converter convertor){
 		//如果是基本类型，
 	}
 	public static class BingExcelReaderListener extends AbstractExcelReadListener {

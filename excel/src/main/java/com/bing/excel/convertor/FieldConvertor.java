@@ -14,12 +14,15 @@ import org.apache.poi.ss.usermodel.Cell;
  * 文件名称：FieldConvertor.java  
  * 类说明：  
  */
-public abstract class FieldConvertor implements Convertor {
+public  class FieldConvertor implements Converter {
 
+	
 	@Override
-	public Object unmarshal(Cell cell) {
+	public Object unmarshal(Object cell) {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
 	/**
 	 * 
 	 * <p>Title: 测试对应的cell对应的类型能不能应用本转换器。</p>
@@ -27,7 +30,9 @@ public abstract class FieldConvertor implements Convertor {
 	 * @return
 	 */
 	@Override
-	public abstract boolean canConvert(Class<?> clz) ;
+	public  boolean canConvert(Class<?> clz){
+		return false;
+	} ;
 
 	
 }

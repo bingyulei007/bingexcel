@@ -21,7 +21,7 @@ public @interface CellConfig {
 	/**
 	 * <p>Title: 下标值</p>
 	 * <p>Description: 从0开始</p>
-	 * @return
+	 * @return 转换为orm模型中java的类，如果不能转换返回null，基本类型中为默认值。
 	 */
 	public int index() default 0;
 	

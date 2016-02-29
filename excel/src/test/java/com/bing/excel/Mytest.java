@@ -42,7 +42,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import com.bing.excel.convertor.DataTypeDetect;
 import com.bing.excel.exception.BingSaxReadStopException;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
@@ -51,6 +50,8 @@ import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
 import com.bing.excel.reader.vo.CellKV;
 import com.bing.excel.reader.vo.ListRow;
+import com.bing.utils.DataTypeDetect;
+import com.google.common.primitives.Doubles;
 
 /**
  * 创建时间：2015-12-8下午12:22:38 项目名称：excel
@@ -453,4 +454,76 @@ public class Mytest {
 		 System.out.println(DataTypeDetect.isYMD("1952020300"));
 		 System.out.println(DataTypeDetect.isYMD("150102"));
 	}
+	@Test
+	public void testReNum(){
+		System.out.println(DataTypeDetect.isNumType("20140203"));
+		System.out.println(DataTypeDetect.isNumType("20140203.3225"));
+		System.out.println(DataTypeDetect.isNumType("201402.03.3225"));
+		System.out.println(DataTypeDetect.isNumType("201 40203.3225"));
+		System.out.println(DataTypeDetect.isNumType("201a40203.3225"));
+		System.out.println(DataTypeDetect.isNumType("201a402"));
+		System.out.println(Integer.MAX_VALUE);
+		System.out.println(Long.MAX_VALUE);
+		
+	}
+	@Test
+	public void testIntegerNum(){
+		System.out.println(DataTypeDetect.isIntegerType("20140203"));
+		System.out.println(DataTypeDetect.isIntegerType("201402.00000"));
+		System.out.println(DataTypeDetect.isIntegerType("214748364"));
+		System.out.println(DataTypeDetect.isIntegerType("2147483646"));
+		System.out.println(DataTypeDetect.isIntegerType("1147483647.0000"));
+		System.out.println(DataTypeDetect.isIntegerType("1147483646"));
+		System.out.println(Integer.MAX_VALUE);
+		System.out.println(DataTypeDetect.isIntegerType("11147483647"));
+		System.out.println(DataTypeDetect.isIntegerType("201 40203"));
+		System.out.println(DataTypeDetect.isIntegerType("20140203.3225"));
+		System.out.println(DataTypeDetect.isIntegerType("201a40203.3225"));
+		System.out.println(DataTypeDetect.isIntegerType("2147483647"));
+		System.out.println(DataTypeDetect.isIntegerType("011147483647"));
+		System.out.println(DataTypeDetect.isIntegerType("201a402"));
+		
+		
+	}
+	@Test
+	public void testBoolean(){
+		System.out.println(DataTypeDetect.isBooleanType("是"));
+		System.out.println(DataTypeDetect.isBooleanType("否"));
+		System.out.println(DataTypeDetect.isBooleanType("0"));
+		System.out.println(DataTypeDetect.isBooleanType("真"));
+		System.out.println(DataTypeDetect.isBooleanType("假"));
+		System.out.println(DataTypeDetect.isBooleanType("20"));
+		System.out.println(DataTypeDetect.isBooleanType("h"));
+		System.out.println(DataTypeDetect.isBooleanType("-6"));
+		
+	}
+	@Test
+	public void testCd(){
+	
+		System.out.println(Double.parseDouble("0x0.21p0"));
+		System.out.println(Double.parseDouble("0x1.2ap4"));
+		System.out.println(Boolean.parseBoolean("1"));
+		System.out.println(Boolean.parseBoolean("10"));
+		System.out.println(Boolean.parseBoolean("0"));
+		System.out.println(Boolean.parseBoolean("false"));
+		
+	}
+	@Test
+	public void testCad(){
+		Pattern p = Pattern.compile("(?:ab)\\d+(bc)\\d(\\1)|a.+f");
+		Matcher m=p.matcher("ab121bc2bcfa");
+		System.out.println(m.matches());
+		System.out.println(m.group());
+		
+	}
+	@Test
+	public void testp()
+	{
+		System.out.println(int.class.isPrimitive());
+		System.out.println(double.class.isPrimitive());
+		System.out.println(boolean.class.isPrimitive());
+		System.out.println(Boolean.class.isPrimitive());
+		System.out.println(Double.class.isPrimitive());
+	}
+	
 }

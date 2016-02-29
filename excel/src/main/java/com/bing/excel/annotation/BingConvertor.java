@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.bing.excel.convertor.Convertor;
+import com.bing.excel.convertor.Converter;
 
 /**
  * 创建时间：2015-12-14下午2:11:27 项目名称：excel
@@ -21,19 +21,23 @@ import com.bing.excel.convertor.Convertor;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface BingConvertor {
-	Class<? extends Convertor> value();
+	Class<? extends Converter> value();
 
+	// TODO 占时不支持带不同类型参数的构造方法，此处先预留吧
+	//单类型的构造方法可以支持，参数顺序就按照数组中元素的顺序
 	Class<?>[] types() default {};
 
 	String[] strings() default {};
 
 	byte[] bytes() default {};
+	
 
 	char[] chars() default {};
 
 	short[] shorts() default {};
 
 	int[] ints() default {};
+	Integer[] intas() default {};
 
 	long[] longs() default {};
 

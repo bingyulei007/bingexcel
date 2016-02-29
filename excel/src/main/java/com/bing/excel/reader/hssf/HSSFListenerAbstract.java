@@ -85,6 +85,11 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 	private String aimSheetName = null;
 	private int aimSheetIndex = -1;
 
+	/**
+	 * 开始读取exclesheet标识
+	 */
+	private boolean startReadSheet=false;
+
 	public HSSFListenerAbstract(POIFSFileSystem fs,
 			ExcelReadListener excelReader) throws SQLException {
 		this(fs,excelReader,false);
@@ -144,8 +149,9 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			boundSheetRecords.add(record);
 		} else if(EOFRecord.sid==sid){
 			if (sheetName != null && sheetIndex != -1) {
-				if (startRead) {
+				if (startReadSheet) {
 					excelReader.endSheet(sheetIndex, sheetName);
+					startReadSheet=false;
 				}
 			}
 			if(boundSheetRecords.size()==(sheetIndex+1)){
@@ -182,6 +188,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 					}
 				}
 				if (startRead) {
+					this.startReadSheet=true;
 					excelReader.startSheet(sheetIndex, sheetName);
 				}
 			}else if(br.getType() == BOFRecord.TYPE_WORKBOOK){
