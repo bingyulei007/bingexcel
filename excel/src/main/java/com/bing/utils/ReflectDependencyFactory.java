@@ -4,15 +4,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Comparator;
 import java.util.List;
-
-import com.bing.excel.annotation.BingConvertor;
-import com.bing.excel.convertor.FieldConvertor;
-import com.bing.excel.convertor.PrimitiveConvertor;
 import com.google.common.primitives.Primitives;
-import com.thoughtworks.xstream.converters.reflection.ObjectAccessException;
 
 /**
  * @author shizhongtao
@@ -87,7 +81,7 @@ public class ReflectDependencyFactory {
 
 				for (int j = 0; j < parameterTypes.length; j++) {
 					if (parameterTypes[j].isPrimitive()) {
-						parameterTypes[j] = Primitives.box(parameterTypes[j]);
+						parameterTypes[j] = Primitives.wrap(parameterTypes[j]);
 					}
 				}
 
@@ -96,10 +90,11 @@ public class ReflectDependencyFactory {
 				// of the parameter declaration
 				matchingDependencies.clear();
 				usedDeps = 0;
+				
 				for (int j = 0, k = 0; j < parameterTypes.length
 						&& parameterTypes.length + k - j <= typedDependencies.length; k++) {
-					if (parameterTypes[j]
-							.isAssignableFrom(typedDependencies[k].type)) {
+					//确保有一个参数能对上
+					if (parameterTypes[j].isAssignableFrom(typedDependencies[k].type)) {
 						matchingDependencies.add(typedDependencies[k].value);
 						usedDeps |= 1L << k;
 						if (++j == parameterTypes.length) {
@@ -169,7 +164,7 @@ public class ReflectDependencyFactory {
 			if (bestMatchingCtor == null) {
 				if (possibleCtor == null) {
 					usedDeps = 0;
-					throw new ObjectAccessException(
+					throw new IllegalArgumentException(
 							"Cannot construct "
 									+ type.getName()
 									+ ", none of the dependencies match any constructor's parameters");
@@ -190,30 +185,22 @@ public class ReflectDependencyFactory {
 				instance = bestMatchingCtor.newInstance(matchingDependencies
 						.toArray());
 			}
-			if (usedDependencies != null) {
-				usedDependencies.clear();
-				int i = 0;
-				for (long l = 1; l < usedDeps; l <<= 1, ++i) {
-					if ((usedDeps & l) > 0) {
-						usedDependencies.set(i);
-					}
-				}
-			}
+			
 			return instance;
 		} catch (final InstantiationException e) {
-			throw new ObjectAccessException("Cannot construct "
+			throw new IllegalArgumentException("Cannot construct "
 					+ type.getName(), e);
 		} catch (final IllegalAccessException e) {
-			throw new ObjectAccessException("Cannot construct "
+			throw new IllegalArgumentException("Cannot construct "
 					+ type.getName(), e);
 		} catch (final InvocationTargetException e) {
-			throw new ObjectAccessException("Cannot construct "
+			throw new IllegalArgumentException("Cannot construct "
 					+ type.getName(), e);
 		} catch (final SecurityException e) {
-			throw new ObjectAccessException("Cannot construct "
+			throw new IllegalArgumentException("Cannot construct "
 					+ type.getName(), e);
 		} catch (final ExceptionInInitializerError e) {
-			throw new ObjectAccessException("Cannot construct "
+			throw new IllegalArgumentException("Cannot construct "
 					+ type.getName(), e);
 		}
 	}

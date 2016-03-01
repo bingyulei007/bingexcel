@@ -1,4 +1,4 @@
-package com.bing.excel.convertor;
+package com.bing.excel.converter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

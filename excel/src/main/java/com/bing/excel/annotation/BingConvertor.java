@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.bing.excel.convertor.Converter;
+import com.bing.excel.converter.Converter;
 
 /**
  * 创建时间：2015-12-14下午2:11:27 项目名称：excel
@@ -37,7 +37,6 @@ public @interface BingConvertor {
 	short[] shorts() default {};
 
 	int[] ints() default {};
-	Integer[] intas() default {};
 
 	long[] longs() default {};
 

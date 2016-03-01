@@ -1,4 +1,4 @@
-package com.bing.excel.convertor;
+package com.bing.excel.converter;
 
 import org.apache.poi.ss.usermodel.Cell;
 

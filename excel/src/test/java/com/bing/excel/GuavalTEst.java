@@ -2,6 +2,7 @@ package com.bing.excel;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -59,6 +60,43 @@ public class GuavalTEst {
 		System.out.println(cacheFormCallable.getUnchecked("b0"));
 		System.out.println(cacheFormCallable.getUnchecked("b"));
 	}
+	@Test
+	public void testCach2() throws ExecutionException  {
+		 Cache<Object, Object> build = CacheBuilder.newBuilder().maximumSize(1000)
+				.build();
+		System.out.println(build.get("a",new Callable<Object>() {
+
+			@Override
+			public Object call() throws Exception {
+				System.out.println("a first");
+				return new Date().getTime();
+			}
+		}));
+		System.out.println(build.get("a",new Callable<Object>() {
+
+			@Override
+			public Object call() throws Exception {
+				System.out.println("a secont");
+				return new Date().getTime();
+			}
+		}));
+		System.out.println(build.get("b0",new Callable<Object>() {
+
+			@Override
+			public Object call() throws Exception {
+				System.out.println("b0 first");
+				return new Date().getTime();
+			}
+		}));
+		System.out.println(build.get("b",new Callable<Object>() {
+
+			@Override
+			public Object call() throws Exception {
+				System.out.println("b first");
+				return new Date().getTime();
+			}
+		}));
+	}
 
 	@Test
 	public void testStringim() {
@@ -84,15 +122,22 @@ public class GuavalTEst {
 		System.out.println(box);
 	}
 
-	static class Person implements Comparable<Person> {
+	public static class Person implements Comparable<Person> {
 		private int id;
 		private String name;
 		private int age;
 
+	
 		public Person(int id, String name, int age) {
 			super();
 			this.id = id;
 			this.name = name;
+			this.age = age;
+		}
+		public Person(int id, int name, int age) {
+			super();
+			this.id = id;
+			
 			this.age = age;
 		}
 
