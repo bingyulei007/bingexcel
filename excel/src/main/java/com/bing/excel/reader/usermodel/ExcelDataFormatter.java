@@ -87,6 +87,7 @@ import org.apache.poi.util.LocaleUtil;
  *  <li>simulate Excel's handling of a format string of all # when the value is 0.
  *   Excel will output "", <code>DataFormatter</code> will output "0".
  * </ul>
+ * Modified 02/01/2016 by shizhongtao - * 
  */
 public class ExcelDataFormatter implements Observer{
 

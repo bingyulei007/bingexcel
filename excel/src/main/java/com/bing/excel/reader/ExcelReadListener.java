@@ -3,6 +3,12 @@ package com.bing.excel.reader;
 
 import com.bing.excel.reader.vo.ListRow;
 
+/**
+ * @author shizhongtao
+ *
+ * @date 2016-3-1
+ * Description:  
+ */
 public interface ExcelReadListener {
 	/**
 	 * 该方法自动被调用，每读一行调用一次，在方法中写自己的业务逻辑即可

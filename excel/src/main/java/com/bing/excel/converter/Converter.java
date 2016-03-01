@@ -11,6 +11,6 @@ package com.bing.excel.converter;
  * 类说明：  这里面convertor是针对实体类的filed。主要用于扩展转换,目前版本中，convertor中必须有无参的构造方法。
  */
 public interface Converter extends ConverterMatcher {
-	 // void marshal(Object source,   MarshallingContext context);
+	  void marshal(Object source);
 	  Object unmarshal(Object cell);
 }

@@ -18,6 +18,12 @@ import org.apache.poi.util.IOUtils;
 import com.bing.excel.reader.hssf.DefaultHSSFHandler;
 import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
 
+/**
+ * @author shizhongtao
+ *
+ * @date 2016-3-1
+ * Description:  
+ */
 public class ExcelReaderFactory {
 	/**
 	 * @param file

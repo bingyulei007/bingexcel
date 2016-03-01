@@ -4,6 +4,12 @@ package com.bing.excel.reader;
 import com.bing.excel.reader.vo.ListRow;
 
 
+/**
+ * @author shizhongtao
+ *
+ * @date 2016-3-1
+ * Description:  
+ */
 public abstract class AbstractExcelReadListener implements ExcelReadListener {
 
 	@Override
