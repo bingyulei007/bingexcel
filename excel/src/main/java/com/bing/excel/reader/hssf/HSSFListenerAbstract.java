@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
 import org.apache.poi.hssf.eventusermodel.HSSFListener;
@@ -38,6 +39,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.vo.CellKV;
 import com.bing.excel.reader.vo.ListRow;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * @author shizhongtao
@@ -83,8 +85,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 	private boolean ignoreNumFormat = false;
 
 	private String aimSheetName = null;
-	private int aimSheetIndex = -1;
-
+	ImmutableSet<Integer> aimSheetIndex;
 	/**
 	 * 开始读取exclesheet标识
 	 */
@@ -182,8 +183,10 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 						startRead = false;
 					}
 				}
-				if (aimSheetIndex != -1) {
-					if (aimSheetIndex != sheetIndex) {
+				if (aimSheetIndex != null) {
+					if (aimSheetIndex.contains(sheetIndex)) {
+						startRead = true;
+					}else{
 						startRead = false;
 					}
 				}
@@ -351,8 +354,18 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 		this.aimSheetName = aimSheetName;
 	}
 
-	public void setAimSheetIndex(int aimSheetIndex) {
-		this.aimSheetIndex = aimSheetIndex;
+	public void setAimSheetIndex(int[] aimSheetIndex) {
+		
+		ImmutableSet.Builder<Integer> build =ImmutableSet.builder();
+		for (int i = 0; i < aimSheetIndex.length; i++) {
+			if(aimSheetIndex[i]<0){
+				throw new IllegalArgumentException("sheet 表的下标不能为负数");
+			}else{
+				build.add(aimSheetIndex[i]);
+			}
+		}
+		ImmutableSet<Integer> setSheets = build.build();
+		this.aimSheetIndex = setSheets;
 	}
 
 }

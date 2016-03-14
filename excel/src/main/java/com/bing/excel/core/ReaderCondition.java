@@ -3,35 +3,63 @@ package com.bing.excel.core;
 
 /**
  * @author shizhongtao
- *
- * @date 2016-2-17
- * Description:  
+ * 
+ * @date 2016-2-17 Description:
  */
-public class ReaderCondition {
+public class ReaderCondition<T>  {
 	private int startRow = 0;
 	private int endRow = Integer.MAX_VALUE;
 	private int sheetIndex = 0;
-	
-	public ReaderCondition startRow(int startRow){
-		this.startRow=startRow;
+	private Class<T> clazz;
+
+	public ReaderCondition(int sheetIndex, Class<T> clazz) {
+		this.sheetIndex = sheetIndex;
+		this.clazz = clazz;
+	}
+
+	public ReaderCondition(Class<T> clazz) {
+		this.clazz = clazz;
+	}
+
+	public ReaderCondition(int sheetIndex, int startRow, Class<T> clazz) {
+		this.startRow = startRow;
+		this.sheetIndex = sheetIndex;
+		this.clazz = clazz;
+	}
+
+	public ReaderCondition<T> setStartRow(int startRow) {
+		this.startRow = startRow;
 		return this;
 	}
-	public ReaderCondition endRow(int endRow){
-		this.endRow=endRow;
+
+	/**
+	 * @param endRow the end index num of row  ，0 started。default <code>Integer.MAX_VALUE</code> 
+	 * @return
+	 */
+	public ReaderCondition<T> setEndRow(int endRow) {
+		this.endRow = endRow;
 		return this;
 	}
-	public ReaderCondition sheetIndex(int sheetIndex){
-		this.sheetIndex=sheetIndex;
+
+	public ReaderCondition<T> setSheetIndex(int sheetIndex) {
+		this.sheetIndex = sheetIndex;
 		return this;
 	}
+
 	public int getStartRow() {
 		return startRow;
 	}
+
 	public int getEndRow() {
 		return endRow;
 	}
+
 	public int getSheetIndex() {
 		return sheetIndex;
 	}
-	
+
+	public Class<T> getTargetClazz() {
+		return clazz;
+	}
+
 }

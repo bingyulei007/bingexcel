@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -17,6 +21,7 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -44,6 +49,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.bing.excel.exception.BingSaxReadStopException;
 import com.bing.excel.reader.AbstractExcelReadListener;
+import com.bing.excel.reader.ExcelReaderFactory;
+import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
 import com.bing.excel.reader.sax.ExcelReadOnlySharedStringsTable;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler;
@@ -52,6 +59,7 @@ import com.bing.excel.reader.vo.CellKV;
 import com.bing.excel.reader.vo.ListRow;
 import com.bing.utils.DataTypeDetect;
 import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Ints;
 
 /**
  * 创建时间：2015-12-8下午12:22:38 项目名称：excel
@@ -376,9 +384,8 @@ public class Mytest {
 
 		@Override
 		public void cell(int rowNum, String cellReference,
-				String formattedValue, XSSFComment comment)
-				 {
-			
+				String formattedValue, XSSFComment comment) {
+
 			if (comment != null) {
 
 				System.out.println("cell====" + cellReference + ":"
@@ -404,17 +411,17 @@ public class Mytest {
 		@Override
 		public void optRow(int curRow, ListRow rowList) {
 			System.out.println("行：" + curRow);
-				System.out.println(rowList);
+			System.out.println(rowList);
 		}
 
 		@Override
 		public void startSheet(int sheetIndex, String name) {
-			System.out.println("start:"+sheetIndex+":"+name);
+			System.out.println("start:" + sheetIndex + ":" + name);
 		}
 
 		@Override
 		public void endSheet(int sheetIndex, String name) {
-			System.out.println("end:"+sheetIndex+":"+name);
+			System.out.println("end:" + sheetIndex + ":" + name);
 		}
 
 		@Override
@@ -425,37 +432,39 @@ public class Mytest {
 	}
 
 	@Test
-	public void testbing() throws IOException, OpenXML4JException, SAXException {
-		String path = "E:/a1.xlsx";
-		DefaultXSSFSaxHandler handler = new DefaultXSSFSaxHandler(path,
-				new Myte(), false);
-		handler.setMaxReturnLine(5);
-		handler.readSheets();
+	public void testbing() throws Exception {
+		String path = "E:/a1.xls";
+		SaxHandler handler = ExcelReaderFactory.create(new File(path),
+				new Myte());
+
+		handler.readSheet(new int[] { 0, 1 });
 
 	}
+
 	@Test
-	public void testRe(){
-		 System.out.println(DataTypeDetect.isYMD("20140203"));
-		 System.out.println(DataTypeDetect.isYMD("2014-12-12"));
-		 System.out.println(DataTypeDetect.isYMD("2014/02/02"));
-		 System.out.println(DataTypeDetect.isYMD("2014年12月01"));
-		 System.out.println(DataTypeDetect.isYMD("2014年12月01  "));
-		 System.out.println(DataTypeDetect.isYMD("2014-12-01 0:0:0"));
-		 System.out.println(DataTypeDetect.isYMD("2014-12-01 00:00:00"));
-		 System.out.println("__________________________________");
-		 System.out.println(DataTypeDetect.isYMD("2014-12-01 00:00:000"));
-		 System.out.println(DataTypeDetect.isYMD("2014-13-01 a"));
-		 System.out.println(DataTypeDetect.isYMD("2014-13-01 "));
-		 System.out.println(DataTypeDetect.isYMD("201563"));
-		 System.out.println(DataTypeDetect.isYMD("2014年13月01"));
-		 System.out.println(DataTypeDetect.isYMD("2014-13-01 00:00:"));
-		 System.out.println(DataTypeDetect.isYMD("2014-13-01 00:00"));
-		 System.out.println(DataTypeDetect.isYMD("150102"));
-		 System.out.println(DataTypeDetect.isYMD("1952020300"));
-		 System.out.println(DataTypeDetect.isYMD("150102"));
+	public void testRe() {
+		System.out.println(DataTypeDetect.isYMD("20140203"));
+		System.out.println(DataTypeDetect.isYMD("2014-12-12"));
+		System.out.println(DataTypeDetect.isYMD("2014/02/02"));
+		System.out.println(DataTypeDetect.isYMD("2014年12月01"));
+		System.out.println(DataTypeDetect.isYMD("2014年12月01  "));
+		System.out.println(DataTypeDetect.isYMD("2014-12-01 0:0:0"));
+		System.out.println(DataTypeDetect.isYMD("2014-12-01 00:00:00"));
+		System.out.println("__________________________________");
+		System.out.println(DataTypeDetect.isYMD("2014-12-01 00:00:000"));
+		System.out.println(DataTypeDetect.isYMD("2014-13-01 a"));
+		System.out.println(DataTypeDetect.isYMD("2014-13-01 "));
+		System.out.println(DataTypeDetect.isYMD("201563"));
+		System.out.println(DataTypeDetect.isYMD("2014年13月01"));
+		System.out.println(DataTypeDetect.isYMD("2014-13-01 00:00:"));
+		System.out.println(DataTypeDetect.isYMD("2014-13-01 00:00"));
+		System.out.println(DataTypeDetect.isYMD("150102"));
+		System.out.println(DataTypeDetect.isYMD("1952020300"));
+		System.out.println(DataTypeDetect.isYMD("150102"));
 	}
+
 	@Test
-	public void testReNum(){
+	public void testReNum() {
 		System.out.println(DataTypeDetect.isNumType("20140203"));
 		System.out.println(DataTypeDetect.isNumType("20140203.3225"));
 		System.out.println(DataTypeDetect.isNumType("201402.03.3225"));
@@ -464,10 +473,11 @@ public class Mytest {
 		System.out.println(DataTypeDetect.isNumType("201a402"));
 		System.out.println(Integer.MAX_VALUE);
 		System.out.println(Long.MAX_VALUE);
-		
+
 	}
+
 	@Test
-	public void testIntegerNum(){
+	public void testIntegerNum() {
 		System.out.println(DataTypeDetect.isIntegerType("20140203"));
 		System.out.println(DataTypeDetect.isIntegerType("201402.00000"));
 		System.out.println(DataTypeDetect.isIntegerType("214748364"));
@@ -482,11 +492,11 @@ public class Mytest {
 		System.out.println(DataTypeDetect.isIntegerType("2147483647"));
 		System.out.println(DataTypeDetect.isIntegerType("011147483647"));
 		System.out.println(DataTypeDetect.isIntegerType("201a402"));
-		
-		
+
 	}
+
 	@Test
-	public void testBoolean(){
+	public void testBoolean() {
 		System.out.println(DataTypeDetect.isBooleanType("是"));
 		System.out.println(DataTypeDetect.isBooleanType("否"));
 		System.out.println(DataTypeDetect.isBooleanType("0"));
@@ -495,35 +505,115 @@ public class Mytest {
 		System.out.println(DataTypeDetect.isBooleanType("20"));
 		System.out.println(DataTypeDetect.isBooleanType("h"));
 		System.out.println(DataTypeDetect.isBooleanType("-6"));
-		
+
 	}
+
 	@Test
-	public void testCd(){
-	
-		System.out.println(Double.parseDouble("0x0.21p0"));
-		System.out.println(Double.parseDouble("0x1.2ap4"));
-		System.out.println(Boolean.parseBoolean("1"));
-		System.out.println(Boolean.parseBoolean("10"));
-		System.out.println(Boolean.parseBoolean("0"));
-		System.out.println(Boolean.parseBoolean("false"));
-		
+	public void testCd2() {
+		Pattern excelChangeDoubel =  Pattern
+				.compile("^[-]?\\d*\\.\\d*?(9{1,}[1-8]|0{1,}[1-9])$");
+		String[] array = ArrayUtils.toArray("12.0299999999999999955",
+				"-13.999999999999996", "-67.7040000000001", "5.29998",
+				"52.362000000000005");
+		for (String temp : array) {
+			System.out.println(excelChangeDoubel.matcher(temp).matches());
+		}
 	}
+		@Test
+		public void testCd() {
+			
+			String[] array = ArrayUtils.toArray("12.029999999999999995",
+					"-13.999999999999996", "-67.7040000000001", "5.29998",
+					"52.362000000000005");
+		for (String temp : array) {
+			if (temp.length() > 16) {
+				Pattern p = Pattern
+						.compile("^[+-]?\\d*\\.\\d*?(?=9{3,}[1-8]$)");
+				Pattern p2 = Pattern
+						.compile("^[+-]?\\d*\\.\\d*?(?=0{3,}[1-9]$)");
+				Matcher matcher = p.matcher(temp);
+				Matcher matcher2 = p2.matcher(temp);
+				if (matcher.find()) {
+					String re = matcher.group();
+
+					char[] charArray = re.toCharArray();
+					char lc = charArray[charArray.length - 1];
+					if (lc == '.') {
+						char[] ab = Arrays.copyOfRange(charArray, 0,
+								charArray.length - 1);
+
+						int parseInt = Integer.parseInt(String.valueOf(ab));
+						if (charArray[0] == '-') {
+							System.out.println(parseInt - 1);
+						} else {
+							System.out.println(parseInt + 1);
+						}
+					} else {
+						charArray[charArray.length - 1] = (char) (lc + 1);
+						System.out.println(String.valueOf(charArray));
+					}
+				} else if (matcher2.find()) {
+					String re = matcher2.group();
+
+					char[] charArray = re.toCharArray();
+					char lc = charArray[charArray.length - 1];
+					if (lc == '.') {
+						char[] ab = Arrays.copyOfRange(charArray, 0,
+								charArray.length - 1);
+							System.out.println(String.valueOf(ab));
+						
+					} else {
+						
+						System.out.println(String.valueOf(charArray));
+					}
+				}else{
+					System.out.println(temp);
+				}
+			}else{
+				System.out.println(temp);
+			}
+		}
+
+	}
+
 	@Test
-	public void testCad(){
+	public void testCad() {
 		Pattern p = Pattern.compile("(?:ab)\\d+(bc)\\d(\\1)|a.+f");
-		Matcher m=p.matcher("ab121bc2bcfa");
+		Matcher m = p.matcher("ab121bc2bcfa");
 		System.out.println(m.matches());
 		System.out.println(m.group());
-		
+
 	}
+
 	@Test
-	public void testp()
-	{
-		System.out.println(int.class.isPrimitive());
-		System.out.println(double.class.isPrimitive());
-		System.out.println(boolean.class.isPrimitive());
-		System.out.println(Boolean.class.isPrimitive());
-		System.out.println(Double.class.isPrimitive());
+	public void testp() {
+		BigDecimal decimal = new BigDecimal(-9999999999779999d);
+		
+		System.out.println(getD(-9999999999779999d));
+		System.out.println(getD(-9.999999999779999d));
+		System.out.println(getD(-60.70400000000002));
 	}
-	
+	Pattern excelChangeDoubel = Pattern
+			.compile("^[-]?\\d*\\.\\d*?(9{1,}[1-8]|0{1,}[1-9])$");
+	DecimalFormat generalDecimalNumFormat = new DecimalFormat("#.##################", DecimalFormatSymbols.getInstance(Locale.SIMPLIFIED_CHINESE));
+	public String getD(double value){
+		
+		String re= generalDecimalNumFormat.format(value);
+    	int reLength = re.length();
+    	if(reLength>16&&excelChangeDoubel.matcher(re).matches()){
+    		int index=re.indexOf('.');
+    		if(re.startsWith("-")){
+				index-=1;
+			}
+    		if(index>0&&index<15){
+    			
+    			BigDecimal decimal = new BigDecimal(value);
+        		value =decimal.setScale(15-index, BigDecimal.ROUND_HALF_UP).doubleValue();
+        		return generalDecimalNumFormat.format(value);
+    		}
+    		
+    	}
+    	return re;
+	}
+
 }

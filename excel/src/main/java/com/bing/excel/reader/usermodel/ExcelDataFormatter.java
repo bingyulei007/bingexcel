@@ -797,7 +797,28 @@ public class ExcelDataFormatter implements Observer{
         
         // else Number
         if(ignoreNumFormat){
-        	return String.valueOf(value);
+        	String re= generalDecimalNumFormat.format(value);
+        	int reLength = re.length();
+        	/*
+        	 * FIXME 在excel中，所能表达的double类型最多15个数字。而在excel底层存储中却可以存储到17？18？位数字，
+        	 * 并且（由于excle的bug）？，比如-60.704会在底层存储为-60.7040000000000001，从而读取数据与excel中看到的
+        	 * 不一致。顾此处临时解决这个问题
+        	 * 
+        	 */
+        	if(reLength>16){
+        		int index=re.indexOf('.');
+        		if(re.startsWith("-")){
+    				index-=1;
+    			}
+        		if(index>0&&index<15){
+        			
+        			BigDecimal decimal = new BigDecimal(value);
+            		value =decimal.setScale(15-index, BigDecimal.ROUND_HALF_UP).doubleValue();
+            		return generalDecimalNumFormat.format(value);
+        		}
+        		
+        	}
+        	return re;
         }
         Format numberFormat = getFormat(value, formatIndex, formatString);
         if (numberFormat == null) {
@@ -997,7 +1018,7 @@ public class ExcelDataFormatter implements Observer{
         dateSymbols = DateFormatSymbols.getInstance(locale);
         decimalSymbols = DecimalFormatSymbols.getInstance(locale);
         generalWholeNumFormat = new DecimalFormat("#", decimalSymbols);
-        generalDecimalNumFormat = new DecimalFormat("#.##########", decimalSymbols);
+        generalDecimalNumFormat = new DecimalFormat("#.##################", decimalSymbols);
 
         // init built-in formats
 

@@ -8,6 +8,8 @@ import java.util.List;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
+import com.bing.excel.core.impl.ExcelBingImpl.SheetVo;
+
 
 /**
  * 操作excel的类，需要poi3.13的jar包<br>
@@ -30,33 +32,59 @@ public interface ExcelBing {
 	 * <p>
 	 * Title: readFileToList<／p>
 	 * <p>
-	 * Description:读取表 <／p>
+	 * Description:读取excel 的第一个sheet页到list<／p>
 	 * 
 	 * @param file
 	 * @param clazz
 	 * @param startRowNum
 	 * @return
-	 * @throws IOException
-	 * @throws InvalidFormatException
-	 * @throws EncryptedDocumentException
+	 * @throws Exception 
 	 */
-	<T> List<T> readFileToList(File file, Class<T> clazz, int startRowNum) ;
-	<T> List<T> readFileToList(File file, Class<T> clazz, ReaderCondition condition) ;
-
+	<T> SheetVo<T> readSheet(File file, Class<T> clazz, int startRowNum) throws Exception ;
 	/**
+	 * 根据condition条件读取相应的sheet到list对象
 	 * @param file
-	 * @param clazzArr 测试
-	 * @param sheetIndexArr
+	 * @param clazz
+	 * @param condition
+	 * @return
+	 * @throws Exception 
+	 */
+	<T> SheetVo<T> readSheet(File file, ReaderCondition<T> condition) throws Exception ;
+
+	
+	 /**
+	  * 读取所condition 对应 sheet表格，到list
+	 * @param file
+	 * @param conditions 每个表格对应的condition，注：对于返回的条数，取conditions中 endNum的最小值
+	 * @return 
+	 * @throws Exception 
+	 */
+	List<SheetVo> readSheetsToList(File file,ReaderCondition[] conditions) throws Exception ;
+	 
+	 
+	/**
+	 * 读取所有sheet表格，到list
+	 * @param file
+	 * @param clazz 表格转换成的对象
 	 * @param startRowNum
 	 * @return
-	 * @throws EncryptedDocumentException
-	 * @throws InvalidFormatException
-	 * @throws IOException
 	 */
-	List[] readFileToList(File file, Class[] clazzArr, int[] sheetIndexArr, int startRowNum) ;
+	<T> List<SheetVo<T>> readSheetsToList(File file, Class<T> clazz, int startRowNum) ;
 
-	<T> List<T> readStreamToList(InputStream stream, Class<T> clazz, int startRowNum) ;
+	/**
+	 * 读取第一个sheet到SheetVo
+	 * @param stream
+	 * @param condition
+	 * @return
+	 */
+	<T> SheetVo<T> readStream(InputStream stream,ReaderCondition<T> condition) ;
 
-	<T> List<T> readStreamToList(InputStream stream,  Class<T> clazz, ReaderCondition condition) ;
-	List[] readStreamToList(InputStream stream,  Class[] clazzArr,int[] sheetIndexArr, int startRowNum) ;
+	 List<SheetVo> readStreamToList(InputStream stream,  ReaderCondition[] condition) ;
+	 /**
+	  * 适合所有sheet中数据结构一样的excel
+	 * @param stream
+	 * @param condition
+	 * @return
+	 */
+	<T> List<SheetVo<T>> readStreamToList(InputStream stream,  ReaderCondition<T> condition) ;
 }

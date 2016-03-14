@@ -2,12 +2,14 @@ package com.bing.excel;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -39,6 +41,14 @@ public class GuavalTEst {
 	}
 
 	@Test
+	public void testImmutable() {
+		ImmutableSet.Builder<Integer> build = ImmutableSet.builder();
+		ImmutableSet<Integer> setSheets = build.add(
+				ArrayUtils.toObject(new int[] { 1, 2, 3, 45 })).build();
+		System.out.println(setSheets.contains(3));
+	}
+
+	@Test
 	public void testStringFormat() {
 		System.out.println(String.format("转换 %s为Double发生错误", "abc"));
 		System.out.println(Double.MAX_VALUE);
@@ -60,11 +70,12 @@ public class GuavalTEst {
 		System.out.println(cacheFormCallable.getUnchecked("b0"));
 		System.out.println(cacheFormCallable.getUnchecked("b"));
 	}
+
 	@Test
-	public void testCach2() throws ExecutionException  {
-		 Cache<Object, Object> build = CacheBuilder.newBuilder().maximumSize(1000)
-				.build();
-		System.out.println(build.get("a",new Callable<Object>() {
+	public void testCach2() throws ExecutionException {
+		Cache<Object, Object> build = CacheBuilder.newBuilder()
+				.maximumSize(1000).build();
+		System.out.println(build.get("a", new Callable<Object>() {
 
 			@Override
 			public Object call() throws Exception {
@@ -72,7 +83,7 @@ public class GuavalTEst {
 				return new Date().getTime();
 			}
 		}));
-		System.out.println(build.get("a",new Callable<Object>() {
+		System.out.println(build.get("a", new Callable<Object>() {
 
 			@Override
 			public Object call() throws Exception {
@@ -80,7 +91,7 @@ public class GuavalTEst {
 				return new Date().getTime();
 			}
 		}));
-		System.out.println(build.get("b0",new Callable<Object>() {
+		System.out.println(build.get("b0", new Callable<Object>() {
 
 			@Override
 			public Object call() throws Exception {
@@ -88,7 +99,7 @@ public class GuavalTEst {
 				return new Date().getTime();
 			}
 		}));
-		System.out.println(build.get("b",new Callable<Object>() {
+		System.out.println(build.get("b", new Callable<Object>() {
 
 			@Override
 			public Object call() throws Exception {
@@ -104,45 +115,66 @@ public class GuavalTEst {
 		for (String string : set) {
 			System.out.println(string);
 		}
+		System.out.println(Person2.class.getModifiers());
 	}
+
 	@Test
 	public void testtypenull() {
-		Object[] arr={"a","b","",null,45};
+		Object[] arr = { "a", "b", "", null, 45 };
 		for (int i = 0; i < arr.length; i++) {
 			Class depType = arr[i].getClass();
 			System.out.println(depType.isPrimitive());
 			System.out.println(depType);
 		}
 	}
+
 	@Test
 	public void testBox() {
 		Class<Integer> wrap = Primitives.wrap(int.class);
-		Class box = com.thoughtworks.xstream.core.util.Primitives.box(int.class);
+		Class box = com.thoughtworks.xstream.core.util.Primitives
+				.box(int.class);
 		System.out.println(wrap);
 		System.out.println(box);
 	}
-
-	public static class Person implements Comparable<Person> {
+	enum DXNB{
+		a,b,c,d;
+	}
+	public static abstract class Person2{
 		private int id;
-		private String name;
-		private int age;
-
-	
+		public  String namePerson2;
+		private   class Me2{
+			private int a=3;
+		}
+	}
+	public static class Person extends Person2 implements Comparable<Person> {
+		private int id;
+		private transient String name;
+		private static String namesta;
+		private static final String namestaf="asd";
+		private final int age;
+		private DXNB asd ;
+		private DXNB ac=DXNB.b ;
+		private Date birstday;
+		private Person2 p;
+		private List<Person2> listP;
 		public Person(int id, String name, int age) {
 			super();
 			this.id = id;
 			this.name = name;
 			this.age = age;
 		}
+
 		public Person(int id, int name, int age) {
 			super();
 			this.id = id;
-			
+
 			this.age = age;
 		}
 
 		public Person() {
+			
 			super();
+			age=1;
 		}
 
 		public Person(String name, int age) {
@@ -171,14 +203,19 @@ public class GuavalTEst {
 			return age;
 		}
 
-		public void setAge(int age) {
-			this.age = age;
-		}
 
 		@Override
 		public int compareTo(Person that) {
 			return ComparisonChain.start().compare(id, that.id)
 					.compare(age, that.age).compare(name, that.name).result();
+		}
+
+		public DXNB getAsd() {
+			return asd;
+		}
+
+		public void setAsd(DXNB asd) {
+			this.asd = asd;
 		}
 
 	}

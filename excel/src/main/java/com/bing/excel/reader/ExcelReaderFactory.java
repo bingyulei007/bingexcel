@@ -34,17 +34,17 @@ public class ExcelReaderFactory {
 	 * @throws Exception
 	 */
 	public static SaxHandler create(File file, ExcelReadListener excelReader,
-			boolean ignoreNumFormat, Integer maxReturnLines) throws Exception {
+			boolean ignoreNumFormat) throws Exception {
 		if (!file.exists()) {
 			throw new FileNotFoundException(file.toString());
 		}
 		try {
 			POIFSFileSystem fs = new POIFSFileSystem(file);
-			return create(fs, excelReader, ignoreNumFormat, maxReturnLines);
+			return create(fs, excelReader, ignoreNumFormat);
 		} catch (OfficeXmlFileException e) {
 			OPCPackage pkg = OPCPackage.open(file, PackageAccess.READ);
 			try {
-				return create(pkg, excelReader, ignoreNumFormat, maxReturnLines);
+				return create(pkg, excelReader, ignoreNumFormat);
 			} catch (IllegalArgumentException | IOException e1) {
 				pkg.revert();
 				throw e1;
@@ -61,27 +61,24 @@ public class ExcelReaderFactory {
 	 */
 	public static SaxHandler create(File file, ExcelReadListener excelReader)
 			throws Exception {
-		return create(file, excelReader, false, null);
+		return create(file, excelReader, false);
 
 	}
+	
+	
 	/**
-	 * @param file
+	 * @param inp
 	 * @param excelReader
-	 * @param ignoreNumFormat 是否忽略数据格式  (default=false，按照格式读取)
+	 * @param maxReturnLines <code>null</code> 不限制，
 	 * @return
-	 * @throws Exception
+	 * @throws InvalidFormatException
+	 * @throws IOException
+	 * @throws SQLException
 	 */
-	public static SaxHandler create(File file, ExcelReadListener excelReader,boolean ignoreNumFormat)
-			throws Exception {
-		return create(file, excelReader, ignoreNumFormat, null);
-		
+	public static SaxHandler create(InputStream inp,
+			ExcelReadListener excelReader) throws InvalidFormatException, IOException, SQLException {
+		  return create(inp, excelReader, false);
 	}
-	public static SaxHandler create(File file, ExcelReadListener excelReader,Integer maxReturnLines)
-			throws Exception {
-		return create(file, excelReader, false, maxReturnLines);
-		
-	}
-
 	/**
 	 * @param inp
 	 * @param excelReader
@@ -93,8 +90,7 @@ public class ExcelReaderFactory {
 	 * @throws SQLException
 	 */
 	public static SaxHandler create(InputStream inp,
-			ExcelReadListener excelReader, boolean ignoreNumFormat,
-			Integer maxReturnLines) throws InvalidFormatException, IOException, SQLException {
+			ExcelReadListener excelReader, boolean ignoreNumFormat) throws InvalidFormatException, IOException, SQLException {
 		 // If clearly doesn't do mark/reset, wrap up
         if (! inp.markSupported()) {
             inp = new PushbackInputStream(inp, 8);
@@ -106,45 +102,15 @@ public class ExcelReaderFactory {
         // Try to create
         if (POIFSFileSystem.hasPOIFSHeader(header8)) {
             POIFSFileSystem fs = new POIFSFileSystem(inp);
-            return create(fs, excelReader, ignoreNumFormat, maxReturnLines);
+            return create(fs, excelReader, ignoreNumFormat);
         }
         if (POIXMLDocument.hasOOXMLHeader(inp)) {
              OPCPackage pkg = OPCPackage.open(inp);
-             return create(pkg, excelReader, ignoreNumFormat, maxReturnLines);
+             return create(pkg, excelReader, ignoreNumFormat);
         }
         throw new InvalidFormatException("Your InputStream was neither an OLE2 stream, nor an OOXML stream");
     
 
-	}
-
-	
-
-	/**
-	 * @param inp
-	 * @param excelReader
-	 * @param maxReturnLines <code>null</code> 不限制，
-	 * @return
-	 * @throws InvalidFormatException
-	 * @throws IOException
-	 * @throws SQLException
-	 */
-	public static SaxHandler create(InputStream inp,
-			ExcelReadListener excelReader, Integer maxReturnLines) throws InvalidFormatException, IOException, SQLException {
-		  return create(inp, excelReader, false, maxReturnLines);
-	}
-
-	/**
-	 * @param inp
-	 * @param excelReader
-	 * @param ignoreNumFormat 是否忽略数据格式  (default=false，按照格式读取)
-	 * @return
-	 * @throws InvalidFormatException
-	 * @throws IOException
-	 * @throws SQLException
-	 */
-	public static SaxHandler create(InputStream inp,
-			ExcelReadListener excelReader, boolean ignoreNumFormat) throws InvalidFormatException, IOException, SQLException {
-		 return create(inp, excelReader, ignoreNumFormat, null);
 	}
 
 	/**
@@ -158,7 +124,7 @@ public class ExcelReaderFactory {
 	public static SaxHandler create(OPCPackage pkg,
 			ExcelReadListener excelReader) throws SQLException,
 			InvalidFormatException, IOException {
-		return create(pkg, excelReader, false, null);
+		return create(pkg, excelReader, false);
 	}
 
 	/*
@@ -171,20 +137,17 @@ public class ExcelReaderFactory {
 	 * IOException{ return create(pkg,excelReader,ignoreNumFormat,null); }
 	 */
 	public static SaxHandler create(OPCPackage pkg,
-			ExcelReadListener excelReader, boolean ignoreNumFormat,
-			Integer maxReturnLines) throws SQLException,
+			ExcelReadListener excelReader, boolean ignoreNumFormat) throws SQLException,
 			InvalidFormatException, IOException {
 		DefaultXSSFSaxHandler handler = new DefaultXSSFSaxHandler(pkg,
 				excelReader, ignoreNumFormat);
-		if (maxReturnLines != null) {
-			handler.setMaxReturnLine(maxReturnLines);
-		}
+		
 		return handler;
 	}
 
 	public static SaxHandler create(POIFSFileSystem fs,
 			ExcelReadListener excelReader) throws SQLException {
-		return create(fs, excelReader, false, null);
+		return create(fs, excelReader, false);
 	}
 
 	/*
@@ -196,13 +159,10 @@ public class ExcelReaderFactory {
 	 * create(fs,excelReader,ignoreNumFormat,null); }
 	 */
 	public static SaxHandler create(POIFSFileSystem fs,
-			ExcelReadListener excelReader, boolean ignoreNumFormat,
-			Integer maxReturnLines) throws SQLException {
+			ExcelReadListener excelReader, boolean ignoreNumFormat) throws SQLException {
 		DefaultHSSFHandler handler = new DefaultHSSFHandler(fs, excelReader,
 				ignoreNumFormat);
-		if (maxReturnLines != null) {
-			handler.setMaxReturnLine(maxReturnLines);
-		}
+		
 		return handler;
 	}
 }

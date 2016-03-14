@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -27,6 +29,9 @@ import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
 import com.bing.excel.reader.vo.CellKV;
 import com.bing.excel.reader.vo.ListRow;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * @author shizhongtao
@@ -98,6 +103,12 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 	}
 
 	@Override
+	public void readSheets(int maxReadLine) throws IOException, OpenXML4JException, SAXException {
+		setMaxReturnLine(maxReadLine);
+		readSheets();
+	}
+	
+	@Override
 	public void readSheets() throws IOException, OpenXML4JException, SAXException {
 		if (pkg == null) {
 			throw new NullPointerException("OPCPackage 对象为空");
@@ -152,12 +163,40 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 	 * @see com.bing.excel.reader.SaxHandler#process(int)
 	 */
 	@Override
+	public void readSheet(int index,int maxReadLine) throws IOException, OpenXML4JException,
+			SAXException {
+		setMaxReturnLine(maxReadLine);
+		readSheet(new int[]{index});
+	}
+	@Override
 	public void readSheet(int index) throws IOException, OpenXML4JException,
+	SAXException {
+		readSheet(new int[]{index});
+	}
+
+	@Override
+	public void readSheet(int[] indexs,int maxReadLine) throws IOException, OpenXML4JException,
+	SAXException {
+		setMaxReturnLine(maxReadLine);
+		readSheet(indexs);
+	}
+	@Override
+	public void readSheet(int[] indexs) throws IOException, OpenXML4JException,
 			SAXException {
 		if (pkg == null) {
 			throw new NullPointerException("OPCPackage 对象为空");
 		}
-		XSSFReader xssfReader = new XSSFReader(pkg);
+		//ImmutableCollection<Integer> sheetSelect=
+		ImmutableSet.Builder<Integer> build =ImmutableSet.builder();
+		for (int i : indexs) {
+			if(i<0){
+				throw new IllegalArgumentException("sheet 表的下标不能为负数");
+			}else{
+				build.add(i);
+			}
+		}
+		ImmutableSet<Integer> setSheets = build.build();
+ 		XSSFReader xssfReader = new XSSFReader(pkg);
 		XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) xssfReader
 				.getSheetsData();
 		ExcelReadOnlySharedStringsTable strings = new ExcelReadOnlySharedStringsTable(
@@ -172,8 +211,7 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 		while (sheets.hasNext()) {
 			try (InputStream sheet = sheets.next()) {
 				String name = sheets.getSheetName();
-
-				if (sheetIndex != index) {
+				if (!setSheets.contains(sheetIndex)) {
 					sheetIndex++;
 					continue;
 				}
@@ -193,10 +231,17 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 				}
 				excelReader.endSheet(sheetIndex, name);
 				sheetIndex++;
-				break;
 			}
 		}
 		excelReader.endWorkBook();
+		
+	}
+
+	@Override
+	public void readSheet(String indexName, int maxReadLine)
+			throws IOException, OpenXML4JException, SAXException {
+		setMaxReturnLine(maxReadLine);
+		readSheet(indexName);
 	}
 
 	@Override
@@ -256,7 +301,7 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 		this.parser = parser;
 	}
 
-	public void setMaxReturnLine(int num) {
+	protected void setMaxReturnLine(int num) {
 		this.handler.setMaxReadLine(num);
 	}
 

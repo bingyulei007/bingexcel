@@ -3,7 +3,7 @@ package com.bing.excel.mapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.bing.excel.converter.Converter;
+import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.common.FieldRelation;
 
 public class ConversionMapper {
@@ -14,7 +14,7 @@ public class ConversionMapper {
 
 	public void registerLocalConverter(Class definedIn,
 			String fieldName, int index, Class<?> targetType,
-			Converter converter) {
+			FieldValueConverter converter) {
 		registerLocalConverter(definedIn, fieldName, new Mapper(index,
 				converter, targetType));
 	}
@@ -24,7 +24,7 @@ public class ConversionMapper {
 		fieldMapper.put(new FieldRelation(definedIn, fieldName), mapper);
 	}
 
-	public Converter getLocalConverter(Class definedIn,
+	public FieldValueConverter getLocalConverter(Class definedIn,
 			String fieldName) {
 		return fieldMapper.get(new FieldRelation(definedIn, fieldName))
 				.getConverter();
@@ -39,7 +39,7 @@ public class ConversionMapper {
 		private int index;
 		private boolean isPrimitive = true;
 		private Class<?> clazz;
-		private Converter converter;
+		private FieldValueConverter converter;
 
 		public int getIndex() {
 			return index;
@@ -53,11 +53,11 @@ public class ConversionMapper {
 			return clazz;
 		}
 
-		public Converter getConverter() {
+		public FieldValueConverter getConverter() {
 			return converter;
 		}
 
-		public Mapper(int index, Converter converter, Class<?> clazz) {
+		public Mapper(int index, FieldValueConverter converter, Class<?> clazz) {
 			super();
 			this.index = index;
 			this.isPrimitive = clazz.isPrimitive();

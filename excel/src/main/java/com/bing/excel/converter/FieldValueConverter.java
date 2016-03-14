@@ -10,7 +10,7 @@ package com.bing.excel.converter;
  * 文件名称：Convertor.java  
  * 类说明：  这里面convertor是针对实体类的filed。主要用于扩展转换,目前版本中，convertor中必须有无参的构造方法。
  */
-public interface Converter  {
-	  void marshal(Object source);
-	  Object unmarshal(Object cell);
+public interface FieldValueConverter extends ConverterMatcher {
+	  void toObject(Object source);
+	  Object fromString(Object cell);
 }

@@ -18,65 +18,97 @@ import com.bing.excel.reader.vo.ListRow;
 
 /**
  * @author shizhongtao
- *
- * @date 2016-2-17
- * Description:  
+ * 
+ * @date 2016-2-17 Description:
  */
-public class DefaultHSSFHandler extends HSSFListenerAbstract  implements SaxHandler{
+public class DefaultHSSFHandler extends HSSFListenerAbstract implements
+		SaxHandler {
 
 	private ExcelReadListener excelReader;
-	
-	
-	
-	
-	
+
+	@Override
+	public void readSheets(int maxReadLine) throws IOException,
+			OpenXML4JException, SAXException {
+		setMaxReturnLine(maxReadLine);
+		readSheets();
+	}
+
+	@Override
+	public void readSheet(int index, int maxReadLine) throws IOException,
+			OpenXML4JException, SAXException {
+		setMaxReturnLine(maxReadLine);
+		 readSheet(index);
+	}
+
+	@Override
+	public void readSheet(int[] indexs, int maxReadLine) throws IOException,
+			OpenXML4JException, SAXException {
+			setMaxReturnLine(maxReadLine);
+			readSheet(indexs);
+
+	}
+
+	@Override
+	public void readSheet(String indexName, int maxReadLine)
+			throws IOException, OpenXML4JException, SAXException {
+		setMaxReturnLine(maxReadLine);
+		 readSheet(indexName);
+	}
+
 	public DefaultHSSFHandler(String path, ExcelReadListener excelReader)
-			throws  FileNotFoundException, IOException, SQLException {
-		this(path,excelReader,false);
+			throws FileNotFoundException, IOException, SQLException {
+		this(path, excelReader, false);
 	}
-	
-	public DefaultHSSFHandler(InputStream in,  ExcelReadListener excelReader)
-			throws  SQLException, IOException {
-		this(in,excelReader,false);
+
+	public DefaultHSSFHandler(InputStream in, ExcelReadListener excelReader)
+			throws SQLException, IOException {
+		this(in, excelReader, false);
 	}
-	
+
 	public DefaultHSSFHandler(POIFSFileSystem fs, ExcelReadListener excelReader)
 			throws SQLException {
-		this(fs,excelReader,false);
-		
+		this(fs, excelReader, false);
+
 	}
-	
-	public DefaultHSSFHandler(String path, ExcelReadListener excelReader,boolean ignoreNumFormat)
-			throws  FileNotFoundException, IOException, SQLException {
-		this(new FileInputStream(path),excelReader,ignoreNumFormat);
-		
+
+	public DefaultHSSFHandler(String path, ExcelReadListener excelReader,
+			boolean ignoreNumFormat) throws FileNotFoundException, IOException,
+			SQLException {
+		this(new FileInputStream(path), excelReader, ignoreNumFormat);
+
 	}
-	
-	public DefaultHSSFHandler(InputStream in,  ExcelReadListener excelReader,boolean ignoreNumFormat)
-			throws  SQLException, IOException {
-		this(new POIFSFileSystem(in),excelReader,ignoreNumFormat);
-		
+
+	public DefaultHSSFHandler(InputStream in, ExcelReadListener excelReader,
+			boolean ignoreNumFormat) throws SQLException, IOException {
+		this(new POIFSFileSystem(in), excelReader, ignoreNumFormat);
+
 	}
-	
-	public DefaultHSSFHandler(POIFSFileSystem fs, ExcelReadListener excelReader,boolean ignoreNumFormat)
+
+	public DefaultHSSFHandler(POIFSFileSystem fs,
+			ExcelReadListener excelReader, boolean ignoreNumFormat)
 			throws SQLException {
-		super(fs,excelReader,ignoreNumFormat);
+		super(fs, excelReader, ignoreNumFormat);
 		this.excelReader = excelReader;
 	}
 
-	
-
 	@Override
-	public void readSheets() throws IOException, OpenXML4JException, SAXException {
+	public void readSheets() throws IOException, OpenXML4JException,
+			SAXException {
 		process();
-		
+
 	}
 
 	@Override
 	public void readSheet(int index) throws IOException, OpenXML4JException,
 			SAXException {
-		if(index>=0){
-		setAimSheetIndex(index);
+		readSheet(new int[] { index });
+	}
+
+	@Override
+	public void readSheet(int[] indexs) throws IOException, OpenXML4JException,
+			SAXException {
+		if (indexs.length >= 0) {
+			setAimSheetIndex(indexs);
 		}
 		process();
 	}
@@ -84,7 +116,7 @@ public class DefaultHSSFHandler extends HSSFListenerAbstract  implements SaxHand
 	@Override
 	public void readSheet(String indexName) throws IOException,
 			OpenXML4JException, SAXException {
-		setAimSheetName(indexName);		
+		setAimSheetName(indexName);
 		process();
 	}
 
@@ -93,5 +125,5 @@ public class DefaultHSSFHandler extends HSSFListenerAbstract  implements SaxHand
 			throws SQLException {
 		excelReader.optRow(curRow, rowlist);
 	}
-	
+
 }

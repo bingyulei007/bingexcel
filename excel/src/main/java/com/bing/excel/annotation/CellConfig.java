@@ -20,10 +20,20 @@ import java.lang.annotation.Target;
 public @interface CellConfig {
 	/**
 	 * <p>Title: 下标值</p>
-	 * <p>Description: 从0开始</p>
+	 * <p>Description: 从0开始，转入时候必须有值，转出时用index值确定在excel中列数，如果没有则不能确定位置。</p>
 	 * @return 转换为orm模型中java的类，如果不能转换返回null，基本类型中为默认值。
 	 */
-	public int index() default 0;
+	public int index() ;
 	
+	/**
+	 * excel导出时候，字段是否忽略导出，default <code>false</code>。
+	 * @return
+	 */
+	public boolean omitOutput() default false;
 	
+	/**
+	 * 输出时候的title名称
+	 * @return
+	 */
+	public String aliasOutputName() default "";
 }

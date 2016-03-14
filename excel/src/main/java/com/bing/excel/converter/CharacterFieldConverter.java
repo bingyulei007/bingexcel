@@ -1,6 +1,6 @@
 package com.bing.excel.converter;
 
-public final class DateFieldConverter extends AbstractConvertor {
+public final class CharacterFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public boolean canConvert(Class<?> clz) {
@@ -9,7 +9,7 @@ public final class DateFieldConverter extends AbstractConvertor {
 	}
 
 	@Override
-	public Object unmarshal(Object cell) {
+	public Object fromString(Object cell) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -1,6 +1,7 @@
 package com.bing.excel;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -137,16 +138,7 @@ public class StringParesUtilTest {
 		listb.add(Person.class);
 		System.out.println(map.get(list));
 		System.out.println(map.get(listb));*/
-		 final Constructor[] ctors = Person.class.getConstructors();
-         if (ctors.length > 1) {
-             Arrays.sort(ctors, new Comparator() {
-                 public int compare(final Object o1, final Object o2) {
-                     return ((Constructor)o2).getParameterTypes().length
-                         - ((Constructor)o1).getParameterTypes().length;
-                 }
-             });
-         }
-		System.out.println(ctors);
+         
 	}
 	
 }
