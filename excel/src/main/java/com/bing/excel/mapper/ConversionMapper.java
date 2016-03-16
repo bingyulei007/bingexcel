@@ -7,7 +7,7 @@ import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.common.FieldRelation;
 
 public class ConversionMapper {
-	private final Map<FieldRelation, Mapper> fieldMapper = new HashMap<>();
+	private final Map<FieldRelation, FieldConverterMapper> fieldMapper = new HashMap<>();
 
 	public ConversionMapper() {
 	}
@@ -15,12 +15,12 @@ public class ConversionMapper {
 	public void registerLocalConverter(Class definedIn,
 			String fieldName, int index, Class<?> targetType,
 			FieldValueConverter converter) {
-		registerLocalConverter(definedIn, fieldName, new Mapper(index,
+		registerLocalConverter(definedIn, fieldName, new FieldConverterMapper(index,
 				converter, targetType));
 	}
 
 	public void registerLocalConverter(Class definedIn,
-			String fieldName, Mapper mapper) {
+			String fieldName, FieldConverterMapper mapper) {
 		fieldMapper.put(new FieldRelation(definedIn, fieldName), mapper);
 	}
 
@@ -30,12 +30,12 @@ public class ConversionMapper {
 				.getConverter();
 	}
 
-	public Mapper getLocalConverterMapper(Class definedIn,
+	public FieldConverterMapper getLocalConverterMapper(Class definedIn,
 			String fieldName) {
 		return fieldMapper.get(new FieldRelation(definedIn, fieldName));
 	}
 
-	public static class Mapper {
+	public static class FieldConverterMapper {
 		private int index;
 		private boolean isPrimitive = true;
 		private Class<?> clazz;
@@ -57,7 +57,7 @@ public class ConversionMapper {
 			return converter;
 		}
 
-		public Mapper(int index, FieldValueConverter converter, Class<?> clazz) {
+		public FieldConverterMapper(int index, FieldValueConverter converter, Class<?> clazz) {
 			super();
 			this.index = index;
 			this.isPrimitive = clazz.isPrimitive();

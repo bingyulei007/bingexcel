@@ -1,6 +1,10 @@
 package com.bing.excel.converter;
 
 
+import com.bing.excel.mapper.OrmMapper;
+import com.bing.excel.reader.vo.CellKV;
+
+
 
 /**  
  * 创建时间：2015-12-15下午2:12:56  
@@ -8,9 +12,9 @@ package com.bing.excel.converter;
  * @author shizhongtao  
  * @version 1.0   
  * 文件名称：Convertor.java  
- * 类说明：  这里面convertor是针对实体类的filed。主要用于扩展转换,目前版本中，convertor中必须有无参的构造方法。
  */
 public interface Converter  {
 	  void marshal(Object source);
-	  Object unmarshal(Object cell);
+	  Object unmarshal(Iterable<CellKV> source,OrmMapper ormMapper);
 }
+ 

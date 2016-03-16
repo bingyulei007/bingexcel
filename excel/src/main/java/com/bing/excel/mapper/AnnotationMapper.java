@@ -16,12 +16,15 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import javax.management.DescriptorKey;
+
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.converter.ConverterMatcher;
 import com.bing.excel.exception.InitializationException;
 import com.bing.excel.exception.MissingCellConfigException;
+import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 import com.bing.utils.ReflectDependencyFactory;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -33,8 +36,9 @@ import com.google.common.cache.CacheBuilder;
  * @version 1.0
  * @since JDK 1.7 文件名称：AnnotationMapper.java 类说明：
  */
-public class AnnotationMapper {
+public class AnnotationMapper implements OrmMapper {
 
+	//属性转换器的缓存
 	private Cache<Class<?>, Map<List<Object>, FieldValueConverter>> converterCache = null;
 
 	private transient  ConversionMapper fieldMapper = new ConversionMapper();
@@ -44,8 +48,12 @@ public class AnnotationMapper {
 
 	public AnnotationMapper() {
 		converterCache = CacheBuilder.newBuilder().maximumSize(500)
-				.expireAfterWrite(10, TimeUnit.MINUTES).build();
+				.expireAfterWrite(5, TimeUnit.MINUTES).build();
 	}
+	/* (non-Javadoc)
+	 * @see com.bing.excel.mapper.OrmMapper#processAnnotations(java.lang.Class[])
+	 */
+	@Override
 	public  void processAnnotations(final Class[] initialTypes) {
         if (initialTypes == null || initialTypes.length == 0) {
             return;
@@ -58,7 +66,11 @@ public class AnnotationMapper {
         processTypes(types);
     }
 
-    public  void processAnnotations(final Class initialType) {
+    /* (non-Javadoc)
+	 * @see com.bing.excel.mapper.OrmMapper#processAnnotations(java.lang.Class)
+	 */
+    @Override
+	public  void processAnnotations(final Class initialType) {
         if (initialType == null) {
             return;
         }
@@ -67,9 +79,19 @@ public class AnnotationMapper {
         types.add(initialType);
         processTypes(types);
     }
-    public FieldValueConverter getLocalConverter( Class definedIn,  String fieldName) {
+    /* (non-Javadoc)
+	 * @see com.bing.excel.mapper.OrmMapper#getLocalConverter(java.lang.Class, java.lang.String)
+	 */
+    
+    @Override
+	public FieldValueConverter getLocalConverter( Class definedIn,  String fieldName) {
        
         return fieldMapper.getLocalConverter(definedIn, fieldName);
+    }
+    @Override
+    public FieldConverterMapper getLocalFieldConverterMapper( Class definedIn,  String fieldName) {
+    	
+    	return fieldMapper.getLocalConverterMapper(definedIn, fieldName);
     }
     private void processTypes(final Set<Class<?>> types) {
     	
