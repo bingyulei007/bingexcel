@@ -7,7 +7,7 @@ import java.io.InputStream;
 public interface ExcelBingEvent {
 
 	
-	<T> void readSheet(File file, Class<T> clazz, int startRowNum,BingReadListener listener) ;
+	<T> void readFile(File file, Class<T> clazz, int startRowNum,BingReadListener listener) ;
 	/**
 	 * 根据condition条件读取相应的sheet到list对象
 	 * @param file
@@ -15,7 +15,7 @@ public interface ExcelBingEvent {
 	 * @param condition
 	 * @return
 	 */
-	<T> void readSheet(File file, ReaderCondition<T> condition,BingReadListener listener) ;
+	<T> void readFile(File file, ReaderCondition<T> condition,BingReadListener listener) ;
 
 	
 	 /**
@@ -24,7 +24,7 @@ public interface ExcelBingEvent {
 	 * @param conditions 每个表格对应的condition
 	 * @return
 	 */
-	void readSheetsToList(File file,ReaderCondition[] conditions,BingReadListener listener) ;
+	void readFileToList(File file,ReaderCondition[] conditions,BingReadListener listener) ;
 	 
 	 
 	/**
@@ -34,7 +34,7 @@ public interface ExcelBingEvent {
 	 * @param startRowNum
 	 * @return
 	 */
-	<T> void readSheetsToList(File file, Class<T> clazz, int startRowNum,BingReadListener listener) ;
+	<T> void readFileToList(File file, Class<T> clazz, int startRowNum,BingReadListener listener) ;
 
 	/**
 	 * 读取第一个sheet到SheetVo
