@@ -1,13 +1,9 @@
 package com.bing.excel;
 
-import java.beans.ConstructorProperties;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -17,13 +13,14 @@ import org.junit.Test;
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.converter.FieldValueConverter;
+import com.bing.excel.converter.base.BooleanFieldConverter;
 import com.bing.excel.core.ExcelBing;
 import com.bing.excel.core.ExcelBingBuilder;
 import com.bing.excel.core.impl.ExcelBingImpl.SheetVo;
 import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
-public class ReadTest2 {
+public class ReadTest3 {
 
 	@Test
 	public void readExcelTest() throws URISyntaxException {
@@ -46,48 +43,49 @@ public class ReadTest2 {
 
 	}
 
+	enum Department {
+		develop, personnel, product;
+	}
+
 	public static class Salary {
-		
+
 		@CellConfig(index = 1)
 		private String employNum;
-		
+
 		@CellConfig(index = 0)
 		private String id;
+
+		@CellConfig(index = 8)
+		@BingConvertor(value = BooleanFieldConverter.class, strings = { "1","0" }, booleans = { false })
+		private boolean allDay;
+
+		@CellConfig(index=7)
+		private Department department;//枚举类型
 		
-		@CellConfig(index = 12)
-		private Double salary;
-		
-		@CellConfig(index = 11)
-		private double trueSalary;
-		
-		@CellConfig(index = 14)
-		private Date trueDate;
 		
 		@CellConfig(index = 13)
-		@BingConvertor(DateTestConverter.class)//自定义转换器
+		@BingConvertor(DateTestConverter.class)
+		// 自定义转换器
 		private Date atypiaDate;
 		@CellConfig(index = 15)
-		@BingConvertor(DateTestConverter.class)//自定义转换器
+		@BingConvertor(DateTestConverter.class)
+		// 自定义转换器
 		private Date entryTime;
-		
-		
-		
+
 		// 其他变量可以这样定义。
 		private transient String test;
 
 		public String toString() {
 			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
 					.add("id", id).add("employNum", employNum)
-					.add("salary", salary).add("trueSalary", trueSalary)
-					.add("trueDate", trueDate)
-					 .add("atypiaDate", atypiaDate)
-					 .add("entryTime", entryTime)
-					.toString();
+					.add("allDay", allDay)
+					.add("atypiaDate", atypiaDate)
+					.add("department", department)
+					.add("entryTime", entryTime).toString();
 		}
 	}
 
 	public static class DateTestConverter implements FieldValueConverter {
-
 
 		@Override
 		public void toObject(Object source) {
@@ -109,7 +107,7 @@ public class ReadTest2 {
 			try {
 				return StringParseUtil.convertYMDT2Date(cell);
 			} catch (ParseException e) {
-				
+
 				throw new RuntimeException(e);
 			}
 		}
