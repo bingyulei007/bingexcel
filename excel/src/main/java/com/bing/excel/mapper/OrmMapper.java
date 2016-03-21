@@ -14,5 +14,7 @@ public interface OrmMapper {
 
 	FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,
 			String fieldName);
+	FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,
+			int index);
 
 }

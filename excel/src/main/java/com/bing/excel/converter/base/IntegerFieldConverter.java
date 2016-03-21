@@ -6,14 +6,16 @@ public final class IntegerFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public boolean canConvert(Class<?> clz) {
-		// TODO Auto-generated method stub
-		return false;
+		 return clz.equals(int.class) || clz.equals(Integer.class);
 	}
 
 	@Override
 	public Object fromString(Object cell) {
-		// TODO Auto-generated method stub
-		return null;
+		long value = Long.valueOf(cell.toString()).longValue();
+    	if(value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
+    		throw new NumberFormatException("For input string: \"" + cell + '"');
+    	}
+        return new Integer((int)value);
 	}
 
 }

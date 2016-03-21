@@ -7,7 +7,7 @@ package com.bing.excel.core;
  * @date 2016-2-17 Description:
  */
 public class ReaderCondition<T>  {
-	private int startRow = 0;
+	private int startRow = 1;
 	private int endRow = Integer.MAX_VALUE;
 	private int sheetIndex = 0;
 	private Class<T> clazz;

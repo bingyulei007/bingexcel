@@ -3,6 +3,7 @@ package com.bing.excel.converter;
 
 import com.bing.excel.mapper.OrmMapper;
 import com.bing.excel.reader.vo.CellKV;
+import com.bing.excel.reader.vo.ListRow;
 
 
 
@@ -15,6 +16,6 @@ import com.bing.excel.reader.vo.CellKV;
  */
 public interface Converter  {
 	  void marshal(Object source);
-	  Object unmarshal(Iterable<CellKV> source,OrmMapper ormMapper);
+	Object unmarshal(ListRow source, OrmMapper ormMapper);
 }
  

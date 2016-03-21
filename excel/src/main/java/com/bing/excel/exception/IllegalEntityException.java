@@ -12,7 +12,12 @@ public class IllegalEntityException extends RuntimeException {
 	}
 
 	public IllegalEntityException(Class<?> clz,String message) {
-		super("转换实体类["+clz.getName()+"]："+message);
+		super("实体类["+clz.getName()+"]："+message);
 		
 	}
+
+	public IllegalEntityException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
 }

@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Ints;
 
@@ -45,7 +46,7 @@ public class StringParseUtil {
 	 */
 	public static boolean parseBoolean(String s) {
 
-		return (StringUtils.isNotBlank(s) && toBoolean(s));
+		return ((!Strings.isNullOrEmpty(s) )&& toBoolean(s));
 	}
 
 	private static boolean toBoolean(String name) {
@@ -245,7 +246,7 @@ public class StringParseUtil {
 	}
 
 	public static Long parseInteger(String string, int radix) {
-		if (StringUtils.isBlank(string)) {
+		if (Strings.isNullOrEmpty(string)) {
 			return null;
 		}
 		if (radix == 10) {

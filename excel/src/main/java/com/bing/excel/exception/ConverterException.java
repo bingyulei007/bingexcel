@@ -8,21 +8,21 @@ package com.bing.excel.exception;
  * 文件名称：ConvertorException.java  
  * 类说明：  
  */
-public class ConvertorException extends RuntimeException {
+public class ConverterException extends RuntimeException {
 
-	public ConvertorException() {
+	public ConverterException() {
 		super();
 	}
 
-	public ConvertorException(String message, Throwable cause) {
+	public ConverterException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ConvertorException(String message) {
+	public ConverterException(String message) {
 		super(message);
 	}
 
-	public ConvertorException(Throwable cause) {
+	public ConverterException(Throwable cause) {
 		super(cause);
 	}
 

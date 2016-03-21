@@ -19,7 +19,7 @@ public class ConversionMapper {
 				converter, targetType));
 	}
 
-	public void registerLocalConverter(Class definedIn,
+	private void registerLocalConverter(Class definedIn,
 			String fieldName, FieldConverterMapper mapper) {
 		fieldMapper.put(new FieldRelation(definedIn, fieldName), mapper);
 	}
@@ -27,7 +27,7 @@ public class ConversionMapper {
 	public FieldValueConverter getLocalConverter(Class definedIn,
 			String fieldName) {
 		return fieldMapper.get(new FieldRelation(definedIn, fieldName))
-				.getConverter();
+				.getFieldConverter();
 	}
 
 	public FieldConverterMapper getLocalConverterMapper(Class definedIn,
@@ -53,8 +53,12 @@ public class ConversionMapper {
 			return clazz;
 		}
 
-		public FieldValueConverter getConverter() {
+		public FieldValueConverter getFieldConverter() {
 			return converter;
+		}
+
+		public void setFieldConverter(FieldValueConverter converter) {
+			this.converter = converter;
 		}
 
 		public FieldConverterMapper(int index, FieldValueConverter converter, Class<?> clazz) {

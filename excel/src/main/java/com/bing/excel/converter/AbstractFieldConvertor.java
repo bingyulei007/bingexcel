@@ -4,7 +4,7 @@ public class AbstractFieldConvertor implements FieldValueConverter {
 
 	@Override
 	public boolean canConvert(Class<?> clz) {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -16,8 +16,10 @@ public class AbstractFieldConvertor implements FieldValueConverter {
 
 	@Override
 	public Object fromString(Object cell) {
-		// TODO Auto-generated method stub
-		return null;
+		if(cell==null){
+			return null;
+		}
+		return cell;
 	}
 
 }

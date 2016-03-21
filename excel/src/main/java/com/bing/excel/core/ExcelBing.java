@@ -3,10 +3,13 @@ package com.bing.excel.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.xml.sax.SAXException;
 
 import com.bing.excel.core.impl.ExcelBingImpl.SheetVo;
 
@@ -37,7 +40,7 @@ public interface ExcelBing {
 	 * @param file
 	 * @param clazz
 	 * @param startRowNum
-	 * @return
+	 * @return 
 	 * @throws Exception 
 	 */
 	<T> SheetVo<T> readSheet(File file, Class<T> clazz, int startRowNum) throws Exception ;
@@ -56,35 +59,25 @@ public interface ExcelBing {
 	  * 读取所condition 对应 sheet表格，到list
 	 * @param file
 	 * @param conditions 每个表格对应的condition，注：对于返回的条数，取conditions中 endNum的最小值
-	 * @return 
+	 * @return sheetVo的list对象，如果没有符合conditions的结果，返回empetyList对象
 	 * @throws Exception 
 	 */
 	List<SheetVo> readSheetsToList(File file,ReaderCondition[] conditions) throws Exception ;
 	 
 	 
-	/**
-	 * 读取所有sheet表格，到list
-	 * @param file
-	 * @param clazz 表格转换成的对象
-	 * @param startRowNum
-	 * @return
-	 */
-	<T> List<SheetVo<T>> readSheetsToList(File file, Class<T> clazz, int startRowNum) ;
+	<T> SheetVo<T> readStream(InputStream stream,ReaderCondition<T> condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;
 
 	/**
 	 * 读取第一个sheet到SheetVo
 	 * @param stream
 	 * @param condition
 	 * @return
+	 * @throws SQLException 
+	 * @throws IOException 
+	 * @throws InvalidFormatException 
+	 * @throws SAXException 
 	 */
-	<T> SheetVo<T> readStream(InputStream stream,ReaderCondition<T> condition) ;
+	<T> SheetVo<T> readStream(InputStream stream, Class<T> clazz, int startRowNum) throws InvalidFormatException, IOException, SQLException ,OpenXML4JException, SAXException;
 
-	 List<SheetVo> readStreamToList(InputStream stream,  ReaderCondition[] condition) ;
-	 /**
-	  * 适合所有sheet中数据结构一样的excel
-	 * @param stream
-	 * @param condition
-	 * @return
-	 */
-	<T> List<SheetVo<T>> readStreamToList(InputStream stream,  ReaderCondition<T> condition) ;
+	 List<SheetVo> readStreamToList(InputStream stream,  ReaderCondition[] condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;
 }

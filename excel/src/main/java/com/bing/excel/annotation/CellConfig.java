@@ -23,7 +23,7 @@ public @interface CellConfig {
 	 * <p>Description: 从0开始，转入时候必须有值，转出时用index值确定在excel中列数，如果没有则不能确定位置。</p>
 	 * @return 转换为orm模型中java的类，如果不能转换返回null，基本类型中为默认值。
 	 */
-	public int index() ;
+	public int index() default -1;
 	
 	/**
 	 * excel导出时候，字段是否忽略导出，default <code>false</code>。

@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -29,6 +27,7 @@ import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
 import com.bing.excel.reader.vo.CellKV;
 import com.bing.excel.reader.vo.ListRow;
+import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
@@ -358,7 +357,7 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 				String formattedValue, XSSFComment comment)
 				 {
 			
-			if (StringUtils.isNotEmpty(formattedValue)) {
+			if (!Strings.isNullOrEmpty(formattedValue)) {
 				int column = nameToColumn(cellReference);
 				rowList.add(new CellKV(column, formattedValue));
 			}

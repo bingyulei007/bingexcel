@@ -1,13 +1,12 @@
 package com.bing.excel.core.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.hamcrest.Condition;
+import org.xml.sax.SAXException;
+
 
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.ExcelBing;
@@ -31,6 +34,7 @@ import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.vo.ListRow;
+import com.google.common.collect.Lists;
 
 /**
  * 创建时间：2015-12-8上午11:56:30 项目名称：excel
@@ -41,10 +45,26 @@ import com.bing.excel.reader.vo.ListRow;
  */
 public class ExcelBingImpl implements ExcelBing {
 
+	/**
+	 * model entity Converter,the relationship is sheet-to-entity
+	 */
 	private final Map<Class<?>, TypeAdapterConverter<?>> typeTokenCache = new HashMap<Class<?>, TypeAdapterConverter<?>>();
+	/**
+	 * globe filed converter
+	 */
+	private final Map<Class<?>,FieldValueConverter> defaultLocalConverter;
 	private final Set<Class<?>> targetTypes = Collections
 			.synchronizedSet(new HashSet<Class<?>>());
 	private OrmMapper ormMapper = new AnnotationMapper();
+	private List<SheetVo> resultList;
+	
+	public ExcelBingImpl(Map<Class<?>, FieldValueConverter> defaultLocalConverter) {
+		this.defaultLocalConverter=defaultLocalConverter;
+	}
+	public ExcelBingImpl() {
+		this.defaultLocalConverter= Collections
+				.synchronizedMap(new HashMap<Class<?>,FieldValueConverter>());
+	}
 
 	@Override
 	public <T> SheetVo<T> readSheet(File file, Class<T> clazz, int startRowNum)
@@ -52,12 +72,15 @@ public class ExcelBingImpl implements ExcelBing {
 		return readSheet(file, new ReaderCondition<T>(0, startRowNum, clazz));
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public <T> SheetVo<T> readSheet(File file, ReaderCondition<T> condition)
 			throws Exception {
+		
 		ReaderCondition[] arr = new ReaderCondition[] { condition };
-
-		return readSheetsToList(file, arr).get(0);
+		List<SheetVo> list = readSheetsToList(file, arr);
+		
+		return list.size()==0?null:list.get(0);
 	}
 
 	/*
@@ -66,9 +89,11 @@ public class ExcelBingImpl implements ExcelBing {
 	 * @see com.bing.excel.core.ExcelBing#readSheetsToList(java.io.File,
 	 * com.bing.excel.core.ReaderCondition[])
 	 */
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public List<SheetVo> readSheetsToList(File file,
 			ReaderCondition[] conditions) throws Exception {
+		resultList=null;
 		BingExcelReaderListener listner = new BingExcelReaderListener(
 				conditions);
 		SaxHandler handler = ExcelReaderFactory.create(file, listner, true);
@@ -82,38 +107,49 @@ public class ExcelBingImpl implements ExcelBing {
 			}
 		}
 		handler.readSheet(indexArr, minNum);
-		return null;
+		return this.resultList;
 	}
+
+	
 
 	@Override
-	public <T> List<SheetVo<T>> readSheetsToList(File file, Class<T> clazz,
-			int startRowNum) {
-		return null;
+	public <T> SheetVo<T> readStream(InputStream stream, Class<T> clazz,
+			int startRowNum) throws IOException, SQLException, OpenXML4JException, SAXException {
+		return readStream(stream,new ReaderCondition<T>(0, startRowNum, clazz));
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public <T> SheetVo<T> readStream(InputStream stream,
-			ReaderCondition<T> condition) {
-		// TODO Auto-generated method stub
-		return null;
+			ReaderCondition<T> condition) throws IOException, SQLException, OpenXML4JException, SAXException {
+			ReaderCondition[] arr=new ReaderCondition[] { condition };
+			List<SheetVo> list=readStreamToList(stream,arr);
+		 return list.size()==0?null:list.get(0);
 	}
 
 	@Override
 	public List<SheetVo> readStreamToList(InputStream stream,
-			ReaderCondition[] condition) {
-		return null;
+			ReaderCondition[] conditions) throws IOException, SQLException, OpenXML4JException, SAXException {
+		resultList=null;
+		BingExcelReaderListener listner = new BingExcelReaderListener(
+				conditions);
+		SaxHandler handler = ExcelReaderFactory.create(stream, listner, true);
+		int[] indexArr = new int[conditions.length];
+		int minNum = 0;
+		for (int i = 0; i < conditions.length; i++) {
+			int sheetNum = conditions[i].getSheetIndex();
+			indexArr[i] = sheetNum;
+			if (minNum > conditions[i].getEndRow()) {
+				minNum = conditions[i].getEndRow();
+			}
+		}
+		handler.readSheet(indexArr, minNum);
+		return this.resultList;
 	}
 
-	@Override
-	public <T> List<SheetVo<T>> readStreamToList(InputStream stream,
-			ReaderCondition<T> condition) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
-	public void registerConvertor(FieldValueConverter convertor) {
-		// 如果是基本类型，
-	}
+	
 
 	private class BingExcelReaderListener extends AbstractExcelReadListener {
 
@@ -160,7 +196,7 @@ public class ExcelBingImpl implements ExcelBing {
 				if (conditions[i].getSheetIndex() == sheetIndex) {
 					tagertClazz = conditions[i].getTargetClazz();
 					registeAdapter(tagertClazz);
-					currentSheetVo=new SheetVo<>(sheetIndex, name);
+					currentSheetVo = new SheetVo<>(sheetIndex, name);
 					break;
 				}
 			}
@@ -195,6 +231,7 @@ public class ExcelBingImpl implements ExcelBing {
 						if (field.isSynthetic()) {
 							continue;
 						}
+						field.setAccessible(true);
 						tempConverterFields.add(field);
 
 					}
@@ -219,21 +256,33 @@ public class ExcelBingImpl implements ExcelBing {
 		private TypeAdapterConverter getTypeAdapterConverter(
 				Constructor<?> constructor, List<Field> tempConverterFields) {
 			Map<String, BoundField> boundFields = new HashMap<>();
-			TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
-					constructor, boundFields);
 			for (Field field : tempConverterFields) {
 				String name = field.getName();
 				boundFields.put(name, new BoundField(field, name));
 			}
+			TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
+					constructor, boundFields,defaultLocalConverter);
 			return adConverter;
 		}
 
 		@Override
 		public void endSheet(int sheetIndex, String name) {
+			if (currentSheetVo != null) {
+				if (list == null) {
+					list = Lists.newArrayList();
+				}
+				list.add(currentSheetVo);
+				currentSheetVo=null;
+			}
 		}
 
 		@Override
 		public void endWorkBook() {
+			if(list==null){
+				resultList=Collections.EMPTY_LIST;
+			}else{
+				resultList=this.list;
+			}
 		}
 
 	}
@@ -241,7 +290,7 @@ public class ExcelBingImpl implements ExcelBing {
 	public static class SheetVo<E> {
 		private int sheetIndex;
 		private String sheetName;
-		private List<E> list=new LinkedList<>();
+		private List<E> list = new LinkedList<>();
 
 		public SheetVo(int sheetIndex, String sheetName) {
 			super();

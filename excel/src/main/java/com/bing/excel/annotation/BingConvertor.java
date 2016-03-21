@@ -21,7 +21,7 @@ import com.bing.excel.converter.FieldValueConverter;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface BingConvertor {
-	Class<? extends FieldValueConverter> value();
+	Class<? extends FieldValueConverter> value() ;
 
 	// TODO 占时不支持带不同类型参数的构造方法，此处先预留吧
 	//单类型的构造方法可以支持，参数顺序就按照数组中元素的顺序
