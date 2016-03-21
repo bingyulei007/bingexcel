@@ -14,8 +14,6 @@ import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.usermodel.XSSFComment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -40,8 +38,6 @@ import com.google.common.collect.ImmutableSet;
  *       。可以痛痛set方法手动设置
  */
 public class DefaultXSSFSaxHandler implements SaxHandler {
-	public final static Logger logger = LoggerFactory
-			.getLogger(DefaultXSSFSaxHandler.class);
 	private OPCPackage pkg;
 	private XMLReader parser;
 	private ExcelReadListener excelReader;
@@ -137,12 +133,12 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 				String name = sheets.getSheetName();
 				excelReader.startSheet(sheetIndex, name);
 				InputSource sheetSource = new InputSource(sheet);
-				logger.debug("读取07excel第{}个sheet,名称为{}", sheetIndex, name);
+			
 				try {
 					getParser().parse(sheetSource);
 				} catch (SAXException e) {
 					if (e instanceof BingSaxReadStopException) {
-						logger.warn("SaxRead 方式通过抛出stop异常结束");
+						
 					} else {
 						throw e;
 					}
@@ -218,12 +214,12 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 				
 				excelReader.startSheet(sheetIndex, name);
 				InputSource sheetSource = new InputSource(sheet);
-				logger.debug("读取07excel第{}个sheet,名称为{}", sheetIndex, name);
+				
 				try {
 					getParser().parse(sheetSource);
 				} catch (SAXException e) {
 					if (e instanceof BingSaxReadStopException) {
-						logger.warn("SaxRead 方式通过抛出stop异常结束");
+						
 					} else {
 						throw e;
 					}
@@ -271,12 +267,10 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 				}
 				excelReader.startSheet(sheetIndex, name);
 				InputSource sheetSource = new InputSource(sheet);
-				logger.debug("读取07excel第{}个sheet,名称为{}", sheetIndex, sheetName);
 				try {
 					getParser().parse(sheetSource);
 				} catch (SAXException e) {
 					if (e instanceof BingSaxReadStopException) {
-						logger.warn("SaxRead 方式通过抛出stop异常结束");
 					} else {
 						throw e;
 					}

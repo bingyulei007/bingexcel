@@ -48,7 +48,7 @@ public class StringParesUtilTest {
 	}
 
 	@Test
-	public void testDoublePares() {
+	public void testDoublePares() throws ParseException {
 		System.out.println(StringParseUtil.parseDouble("假"));
 		System.out.println(StringParseUtil.parseDouble("12.36.35"));
 		System.out.println(StringParseUtil.parseDouble("12.56"));
@@ -100,7 +100,7 @@ public class StringParesUtilTest {
 		}
 	}
 	@Test
-	public void testInr(){
+	public void testInr() throws ParseException{
 //		System.out.println(StringParseUtil.parseDouble("0/-24"));
 //		System.out.println(StringParseUtil.parseDate("0/-24"));
 //		System.out.println(StringParseUtil.parseDate("23.35"));

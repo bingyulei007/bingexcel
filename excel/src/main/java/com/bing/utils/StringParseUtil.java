@@ -18,16 +18,13 @@ import javax.print.attribute.IntegerSyntax;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Ints;
 
 public class StringParseUtil {
-	public static Logger logger = LoggerFactory
-			.getLogger(StringParseUtil.class);
+	
 
 	/**
 	 * Parses the string argument as a boolean. The {@code boolean} returned
@@ -91,35 +88,30 @@ public class StringParseUtil {
 	 * @return the floating point value represented by {@code string}, or
 	 *         {@code null} if {@code string} has a length of zero or cannot be
 	 *         parsed as a {@code double} value
+	 * @throws ParseException 
 	 */
-	public static Double parseDouble(String string) {
+	public static Double parseDouble(String string) throws ParseException {
 		if (StringUtils.isBlank(string)) {
 			return null;
 		}
 		if (FLOATING_POINT_PATTERN.matcher(string).matches()) {
 			// TODO(user): could be potentially optimized, but only with
 			// extensive testing
-			try {
+			
 				return Double.parseDouble(string);
-			} catch (Exception e) {
-				// Double.parseDouble has changed specs several times, so fall
-				// through
-				logger.error(String.format("转换 %s为Double发生错误", string), e);
-			}
+			
 		}
 		// currency formater
 		Matcher matcher = CURRENCY_POINT_PATTERN.matcher(string);
 		if (matcher.find()) {
-			try {
+			
 				return Double.parseDouble(matcher.group());
-			} catch (Exception e) {
-				logger.error(String.format("转换 %s为Double发生错误", string), e);
-			}
+			
 		}
 		// percent formater
 		 matcher = PERCENT_POINT_PATTERN.matcher(string);
 		if (matcher.find()) {
-			try {
+			
 				char[] charArray = matcher.group().toCharArray();
 				int pIndex=charArray.length;
 				StringBuilder sb=new StringBuilder();
@@ -138,36 +130,26 @@ public class StringParseUtil {
 				}
 				sb.insert(pIndex,'.');
 				 return parseDouble(sb.toString());
-			} catch (Exception e) {
-				logger.error(String.format("转换 %s为Double发生错误", string), e);
-			}
+			
 		}
 		// fraction formater
 		if (FRACTION_POINT_PATTERN.matcher(string).matches()) {
-			try {
+			
 				return parseFraction2Double(string);
-			} catch (Exception e) {
-				logger.error(String.format("转换 %s为Double发生错误", string), e);
-			}
+			
 		}
 
 		if (DataTypeDetect.isDateType(string)) {
-			try {
+		
 				Date date = convertYMDT2Date(string);
 				return convertToDaouble(date);
-			} catch (Exception e) {
-				logger.error(String.format("转换 %s为Double发生错误", string), e);
-			}
+			
 		}
 
 		boolean b = FLOATING_POINT_PATTERN1.matcher(string).matches();
 		if (b) {
 			string += "p0";
-			try {
 				return Double.parseDouble(string);
-			} catch (Exception e) {
-				logger.error(String.format("转换 %s为Double发生错误", string), e);
-			}
 		}
 		return null;
 	}
@@ -179,8 +161,9 @@ public class StringParseUtil {
 	 *            a {@code String} containing the {@code int} representation to
 	 *            be parsed
 	 * @return Long or null if can't to be parsed;
+	 * @throws ParseException 
 	 */
-	public static Long parseInteger(String s) {
+	public static Long parseInteger(String s) throws ParseException {
 
 		return parseInteger(s, 10);
 	}
@@ -192,24 +175,17 @@ public class StringParseUtil {
 	 *            a {@code String} containing the {@code int} representation to
 	 *            be parsed
 	 * @return  Date or null if can't be parsed
+	 * @throws ParseException 
 	 */
-	public static Date parseDate(String s) {
+	public static Date parseDate(String s) throws ParseException {
 		if (DataTypeDetect.isDateType(s)) {
-			try {
 				Date date = convertYMDT2Date(s);
 				return date;
-			} catch (Exception e) {
-				logger.error(String.format("转换 %s为Date发生错误", s), e);
-			}
 		}
 		if(DataTypeDetect.isNumType(s)){
 			Double d = parseDouble(s);
-			try {
 				Date date=convertToDate(d);
 				return date;
-			} catch (Exception e) {
-				logger.error(String.format("转换 %s为Date发生错误", s), e);
-			}
 		}
 		return null;
 	}
@@ -245,7 +221,7 @@ public class StringParseUtil {
 
 	}
 
-	public static Long parseInteger(String string, int radix) {
+	public static Long parseInteger(String string, int radix) throws ParseException {
 		if (Strings.isNullOrEmpty(string)) {
 			return null;
 		}
