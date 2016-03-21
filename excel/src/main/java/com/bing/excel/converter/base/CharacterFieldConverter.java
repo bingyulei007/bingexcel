@@ -1,19 +1,31 @@
 package com.bing.excel.converter.base;
 
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.google.common.base.Strings;
 
+/**
+ * @author shizhongtao
+ *
+ * @date 2016-3-21
+ * Description:  
+ */
 public final class CharacterFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public boolean canConvert(Class<?> clz) {
-		// TODO Auto-generated method stub
-		return false;
+		 return clz.equals(char.class) || clz.equals(Character.class);
 	}
 
 	@Override
-	public Object fromString(Object cell) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object fromString(String cell) {
+		if (cell==null) {
+			return null;
+		}
+		 if (cell.length() == 0) {
+	            return new Character('\0');
+	        } else {
+	            return new Character(cell.charAt(0));
+	        }
 	}
 
 }

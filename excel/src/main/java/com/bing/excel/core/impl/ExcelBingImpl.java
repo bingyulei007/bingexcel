@@ -67,18 +67,18 @@ public class ExcelBingImpl implements ExcelBing {
 	}
 
 	@Override
-	public <T> SheetVo<T> readSheet(File file, Class<T> clazz, int startRowNum)
+	public <T> SheetVo<T> readFile(File file, Class<T> clazz, int startRowNum)
 			throws Exception {
-		return readSheet(file, new ReaderCondition<T>(0, startRowNum, clazz));
+		return readFile(file, new ReaderCondition<T>(0, startRowNum, clazz));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public <T> SheetVo<T> readSheet(File file, ReaderCondition<T> condition)
+	public <T> SheetVo<T> readFile(File file, ReaderCondition<T> condition)
 			throws Exception {
 		
 		ReaderCondition[] arr = new ReaderCondition[] { condition };
-		List<SheetVo> list = readSheetsToList(file, arr);
+		List<SheetVo> list = readFileToList(file, arr);
 		
 		return list.size()==0?null:list.get(0);
 	}
@@ -91,18 +91,20 @@ public class ExcelBingImpl implements ExcelBing {
 	 */
 	@SuppressWarnings({ "rawtypes" })
 	@Override
-	public List<SheetVo> readSheetsToList(File file,
+	public List<SheetVo> readFileToList(File file,
 			ReaderCondition[] conditions) throws Exception {
 		resultList=null;
 		BingExcelReaderListener listner = new BingExcelReaderListener(
 				conditions);
 		SaxHandler handler = ExcelReaderFactory.create(file, listner, true);
 		int[] indexArr = new int[conditions.length];
-		int minNum = 0;
+		int minNum = -1;
 		for (int i = 0; i < conditions.length; i++) {
 			int sheetNum = conditions[i].getSheetIndex();
 			indexArr[i] = sheetNum;
-			if (minNum > conditions[i].getEndRow()) {
+			if(minNum==-1){
+				minNum=conditions[i].getEndRow();
+			}else if (minNum > conditions[i].getEndRow()) {
 				minNum = conditions[i].getEndRow();
 			}
 		}
@@ -155,6 +157,7 @@ public class ExcelBingImpl implements ExcelBing {
 
 		private final ReaderCondition[] conditions;
 		private Class tagertClazz = null;
+		private int startRow=0;// start to read from first lines;
 		private List<SheetVo> list;
 		private SheetVo currentSheetVo;
 
@@ -163,14 +166,16 @@ public class ExcelBingImpl implements ExcelBing {
 			this.conditions = conditions;
 			Class[] arr = new Class[conditions.length];
 			for (int i = 0; i < conditions.length; i++) {
-				Class targetClazz = conditions[i].getTargetClazz();
-				arr[i] = targetClazz;
+				arr[i] = conditions[i].getTargetClazz();
 			}
 			ormMapper.processAnnotations(arr);
 		}
 
 		@Override
 		public void optRow(int curRow, ListRow rowList) {
+			if(curRow<startRow){
+				return;
+			}
 			if (tagertClazz != null) {
 				TypeAdapterConverter<?> typeAdapter = typeTokenCache
 						.get(tagertClazz);
@@ -192,10 +197,12 @@ public class ExcelBingImpl implements ExcelBing {
 		public void startSheet(int sheetIndex, String name) {
 
 			tagertClazz = null;
+			startRow=0;
 			for (int i = 0; i < conditions.length; i++) {
 				if (conditions[i].getSheetIndex() == sheetIndex) {
 					tagertClazz = conditions[i].getTargetClazz();
 					registeAdapter(tagertClazz);
+					startRow=conditions[i].getStartRow();
 					currentSheetVo = new SheetVo<>(sheetIndex, name);
 					break;
 				}
@@ -239,7 +246,7 @@ public class ExcelBingImpl implements ExcelBing {
 					try {
 						constructor = type.getDeclaredConstructor();
 					} catch (NoSuchMethodException | SecurityException e) {
-						throw new IllegalEntityException(type, "获取无参构造函数失败");
+						throw new IllegalEntityException(type, "Gets the default constructor failed");
 					}
 					TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
 							constructor, tempConverterFields);

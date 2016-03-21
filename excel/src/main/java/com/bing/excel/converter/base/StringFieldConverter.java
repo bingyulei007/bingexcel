@@ -6,14 +6,14 @@ public final class StringFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public boolean canConvert(Class<?> clz) {
-		// TODO Auto-generated method stub
-		return false;
+		 return clz.equals(String.class);
 	}
 
 	@Override
-	public Object fromString(Object cell) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object fromString(String cell) {
+		return super.fromString(cell);
 	}
+
+	
 
 }

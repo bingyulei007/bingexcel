@@ -67,11 +67,11 @@ public class TypeAdapterConverter<T> implements Converter {
 				}
 				
 				int index = converterMapper.getIndex();
-				String fieldValue = length > index + 1 ? fullArray[index] : null;
+				String fieldValue = length > index  ? fullArray[index] : null;
 				boundField.initializeValue(obj, fieldValue, converterMapper);
 			}
 		}
-		return null;
+		return (T) obj;
 	}
 
 	private void setLocalConverter(FieldConverterMapper converterMapper) {
@@ -90,6 +90,7 @@ public class TypeAdapterConverter<T> implements Converter {
 				keyType=keyFieldType;
 			}
 			fieldValueConverter=BaseGlobalConverterMapper.globalFieldConverterMapper.get(keyType);
+			defaultLocalConverter.put(keyFieldType, fieldValueConverter);
 		}
 		if(fieldValueConverter==null){
 			throw new IllegalEntityException(clazz, "can find the converter for fieldType ["+converterMapper.getClazz()+"]");

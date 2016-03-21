@@ -17,7 +17,7 @@ public class CollectionConverter implements FieldValueConverter {
 	}
 
 	@Override
-	public Object fromString(Object cell) {
+	public Object fromString(String cell) {
 		// TODO Auto-generated method stub
 		return null;
 	}

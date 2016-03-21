@@ -181,12 +181,12 @@ public class AnnotationMapper implements OrmMapper {
 		BingConvertor bingConvertor = field.getAnnotation(BingConvertor.class);
 		int index;
 		if (cellConfig == null) {
-			throw new MissingCellConfigException("转化类实体配置错误");
+			throw new MissingCellConfigException("Missing CellConfig annotation");
 		} else {
 			index = cellConfig.index();
 			if (index < 0) {
-				throw new IllegalCellConfigException("字段" + field.getName()
-						+ "配置信息错误，非法的index值");
+				throw new IllegalCellConfigException("field[" + field.getName()
+						+ "] has an error cellConfig,illegal index");
 			}
 		}
 		FieldValueConverter converter = null;
@@ -273,6 +273,7 @@ public class AnnotationMapper implements OrmMapper {
 			}
 
 			converterMapping.put(parameter, converter);
+			result=converter;
 		}
 		return result;
 	}

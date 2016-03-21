@@ -43,7 +43,7 @@ public interface ExcelBing {
 	 * @return 
 	 * @throws Exception 
 	 */
-	<T> SheetVo<T> readSheet(File file, Class<T> clazz, int startRowNum) throws Exception ;
+	<T> SheetVo<T> readFile(File file, Class<T> clazz, int startRowNum) throws Exception ;
 	/**
 	 * 根据condition条件读取相应的sheet到list对象
 	 * @param file
@@ -52,7 +52,7 @@ public interface ExcelBing {
 	 * @return
 	 * @throws Exception 
 	 */
-	<T> SheetVo<T> readSheet(File file, ReaderCondition<T> condition) throws Exception ;
+	<T> SheetVo<T> readFile(File file, ReaderCondition<T> condition) throws Exception ;
 
 	
 	 /**
@@ -62,7 +62,7 @@ public interface ExcelBing {
 	 * @return sheetVo的list对象，如果没有符合conditions的结果，返回empetyList对象
 	 * @throws Exception 
 	 */
-	List<SheetVo> readSheetsToList(File file,ReaderCondition[] conditions) throws Exception ;
+	List<SheetVo> readFileToList(File file,ReaderCondition[] conditions) throws Exception ;
 	 
 	 
 	<T> SheetVo<T> readStream(InputStream stream,ReaderCondition<T> condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;

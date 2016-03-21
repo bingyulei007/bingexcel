@@ -1,28 +1,25 @@
 package com.bing.utils;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.print.attribute.IntegerSyntax;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.DateUtil;
 
 import com.google.common.base.Strings;
-import com.google.common.primitives.Booleans;
-import com.google.common.primitives.Ints;
 
+/**
+ * @author shizhongtao
+ *
+ * @date 2016-3-21
+ * Description: MayBe is's useful 
+ */
 public class StringParseUtil {
 	
 
@@ -199,7 +196,7 @@ public class StringParseUtil {
 	 */
 	public static Date convertYMDT2Date(String arg) throws ParseException {
 		String temp;
-		temp = arg.replaceAll("[/\\\\年月_]", "-");
+		temp = arg.replaceAll("[/\\\\年月_.]", "-");
 		temp = temp.replaceAll("[日号]", " ");
 		temp = temp.replaceAll("[点时分秒]", ":");
 
@@ -213,9 +210,15 @@ public class StringParseUtil {
 				Date date = format.parse(temp);
 				return date;
 			} catch (ParseException e1) {
-				format = new SimpleDateFormat("yy-MM-dd");
-				Date date = format.parse(temp);
-				return date;
+				try {
+					format.applyPattern("yy-MM-dd HH");
+					Date date = format.parse(temp);
+					return date;
+				} catch (ParseException e2) {
+					format = new SimpleDateFormat("yy-MM-dd");
+					Date date = format.parse(temp);
+					return date;
+				}
 			}
 		}
 
@@ -242,22 +245,7 @@ public class StringParseUtil {
 	 * @return
 	 */
 	static double convertToDaouble(Date date) {
-		String startDate = "1899-12-31";
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd",
-				Locale.SIMPLIFIED_CHINESE);
-		Date firstDate;
-		try {
-			firstDate = format.parse(startDate);
-		} catch (ParseException e) {
-			throw new IllegalStateException("java 未知错误");
-		}
-
-		long diff = date.getTime() - firstDate.getTime();
-		double re = -1;
-		if (!(diff < (86400 * 1000))) {
-			re = diff / (86400d * 1000d);
-		}
-		return re;
+		return DateUtil.getExcelDate(date);
 	}
 
 	static Double parseFraction2Double(String string) {
@@ -307,61 +295,7 @@ public class StringParseUtil {
 	 * @return
 	 */
 	static Date convertToDate(double d) {
-		String startDate = "1889-12-30";
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd",
-				Locale.SIMPLIFIED_CHINESE);
-		Date firstDate;
-		try {
-			firstDate = format.parse(startDate);
-		} catch (ParseException e) {
-			throw new IllegalStateException("java 未知错误");
-		}
-		if (d < 1d) {
-			return firstDate;
-		} else {
-			try {
-				firstDate = format.parse("1899-12-31");
-			} catch (ParseException e) {
-				throw new IllegalStateException("java 未知错误");
-			}
-
-			Calendar c = Calendar.getInstance();
-			c.setTime(firstDate);
-			c.set(Calendar.HOUR_OF_DAY, 0);
-
-			long diff = ((Double) (d * 86400 * 1000)).longValue();
-			long nd = 1000 * 24 * 60 * 60;// 一天的毫秒数129600000
-			long nh = 1000 * 60 * 60;// 一小时的毫秒数
-			long nm = 1000 * 60;// 一分钟的毫秒数
-			long ns = 1000;// 一秒钟的毫秒数
-			int day = (int) (diff / nd);// 计算差多少天
-			c.add(Calendar.DATE, day);
-			long remaining = diff % nd;
-			int hour = (int) (remaining / nh);// 计算差多少小时
-			remaining %= nh;
-			int min = (int) (remaining / nm);// 计算差多少分钟
-			remaining %= nm;
-			int sec = (int) (remaining / ns);// 计算差多少秒
-			int milliSec = (int) (remaining % 1000);
-			if (hour > 0) {
-				c.roll(Calendar.HOUR_OF_DAY, hour);
-			}
-			c.set(Calendar.MINUTE, 0);
-
-			if (min > 0) {
-				c.roll(Calendar.MINUTE, min);
-			}
-			c.set(Calendar.SECOND, 0);
-
-			if (sec > 0) {
-				c.roll(Calendar.SECOND, sec);
-			}
-			c.set(Calendar.MILLISECOND, 0);
-			if (milliSec > 0) {
-				c.roll(Calendar.MILLISECOND, (int) milliSec);
-			}
-			return c.getTime();
-		}
+		return DateUtil.getJavaDate(d);
 	}
 
 	/**

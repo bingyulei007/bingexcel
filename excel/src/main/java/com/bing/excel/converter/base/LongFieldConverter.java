@@ -1,19 +1,25 @@
 package com.bing.excel.converter.base;
 
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.google.common.base.Strings;
 
 public final class LongFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public boolean canConvert(Class<?> clz) {
-		// TODO Auto-generated method stub
-		return false;
+		 return clz.equals(long.class) || clz.equals(Long.class);
 	}
 
 	@Override
-	public Object fromString(Object cell) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object fromString(String cell) {
+		if (Strings.isNullOrEmpty(cell)) {
+            return null;
+        }
+		  char c1 = cell.charAt(1);
+	        if (c1 == 'x' || c1 == 'X') {
+	            return Long.decode(cell);
+	        }
+		return Long.parseLong(cell);
 	}
 
 }

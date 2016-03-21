@@ -15,7 +15,7 @@ public class AbstractFieldConvertor implements FieldValueConverter {
 	}
 
 	@Override
-	public Object fromString(Object cell) {
+	public Object fromString(String cell) {
 		if(cell==null){
 			return null;
 		}
