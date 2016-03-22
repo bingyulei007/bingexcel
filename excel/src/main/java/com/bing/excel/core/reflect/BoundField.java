@@ -3,7 +3,7 @@ package com.bing.excel.core.reflect;
 import java.lang.reflect.Field;
 
 import com.bing.excel.converter.FieldValueConverter;
-import com.bing.excel.exception.ConverterException;
+import com.bing.excel.exception.ConversionException;
 import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 
 public class BoundField {
@@ -23,7 +23,7 @@ public class BoundField {
 				 }
 				 boolean canConvert = converter.canConvert(converterMapper.getClazz());
 				 if(!canConvert){
-					 throw new ConverterException ("the selected converter ["+converter.getClass()+"] cannot handle type ["+converterMapper.getClazz()+"]");
+					 throw new ConversionException ("the selected converter ["+converter.getClass()+"] cannot handle type ["+converterMapper.getClazz()+"]");
 				 }
 				 
 				 Object fieldValue = converter.fromString(value);

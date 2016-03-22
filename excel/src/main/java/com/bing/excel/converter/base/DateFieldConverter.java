@@ -10,7 +10,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 
 
 import com.bing.excel.converter.AbstractFieldConvertor;
-import com.bing.excel.exception.ConverterException;
+import com.bing.excel.exception.ConversionException;
 import com.bing.utils.StringParseUtil;
 
 /**
@@ -59,7 +59,7 @@ public final class DateFieldConverter extends AbstractFieldConvertor {
 			try {
 				return StringParseUtil.parseDate(cell);
 			} catch (ParseException e) {
-				throw new ConverterException("Cannot parse date" + cell, e);
+				throw new ConversionException("Cannot parse date" + cell, e);
 			}
 
 		} else {
@@ -80,7 +80,7 @@ public final class DateFieldConverter extends AbstractFieldConvertor {
 					date = inFormats.parse(temp);
 					return date;
 				} catch (ParseException e2) {
-					throw new ConverterException("Cannot parse date" + cell, e2);
+					throw new ConversionException("Cannot parse date" + cell, e2);
 				}
 			}
 

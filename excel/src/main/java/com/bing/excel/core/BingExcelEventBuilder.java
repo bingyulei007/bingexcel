@@ -10,7 +10,7 @@ import com.bing.common.Builder;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.impl.BingExcelEventImpl;
 import com.bing.excel.core.impl.BingExcelImpl;
-import com.bing.excel.exception.ConverterException;
+import com.bing.excel.exception.ConversionException;
 import com.google.common.primitives.Primitives;
 
 /**
@@ -57,7 +57,8 @@ public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
 
 	}
 
-	public void registerFieldConverter(Class<?> clazz,
+	@Override
+	public Builder<BingExcelEvent> registerFieldConverter(Class<?> clazz,
 			FieldValueConverter converter) {
 		if (converter.canConvert(clazz)) {
 
@@ -67,9 +68,10 @@ public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
 				defaultLocalConverter.put(clazz, converter);
 			}
 		} else {
-			throw new ConverterException("register converter for["
+			throw new ConversionException("register converter for["
 					+ clazz.getName() + "] failed!");
 		}
+		return this;
 	}
 
 	@Override

@@ -1,8 +1,8 @@
 package com.bing.excel.converter.base;
 
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.exception.ConversionException;
 import com.google.common.base.Strings;
-import com.thoughtworks.xstream.converters.ConversionException;
 
 /**
  * 
