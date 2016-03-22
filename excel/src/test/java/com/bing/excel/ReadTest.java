@@ -9,9 +9,9 @@ import java.net.URL;
 import org.junit.Test;
 
 import com.bing.excel.annotation.CellConfig;
-import com.bing.excel.core.ExcelBing;
-import com.bing.excel.core.ExcelBingBuilder;
-import com.bing.excel.core.impl.ExcelBingImpl.SheetVo;
+import com.bing.excel.core.BingExcel;
+import com.bing.excel.core.BingExcelBuilder;
+import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
@@ -23,7 +23,7 @@ public class ReadTest {
 		URL url = Person.class.getResource("/person.xlsx");
 		File f = new File(url.toURI());
 
-		ExcelBing bing = ExcelBingBuilder.toBuilder().builder();
+		BingExcel bing = BingExcelBuilder.toBuilder().builder();
 		try {
 			SheetVo<Person> vo = bing.readFile(f, Person.class, 1);
 			System.out.println(vo.getSheetIndex());
@@ -38,7 +38,7 @@ public class ReadTest {
 	public void readExcelTest2() throws URISyntaxException {
 		InputStream in = Person.class.getResourceAsStream("/person.xls");
 		
-		ExcelBing bing = ExcelBingBuilder.toBuilder().builder();
+		BingExcel bing = BingExcelBuilder.toBuilder().builder();
 		try {
 			SheetVo<Person> vo = bing.readStream(in, Person.class, 1);
 			System.out.println(vo.getSheetIndex());

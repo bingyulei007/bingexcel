@@ -17,9 +17,9 @@ import org.junit.Test;
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.converter.FieldValueConverter;
-import com.bing.excel.core.ExcelBing;
-import com.bing.excel.core.ExcelBingBuilder;
-import com.bing.excel.core.impl.ExcelBingImpl.SheetVo;
+import com.bing.excel.core.BingExcel;
+import com.bing.excel.core.BingExcelBuilder;
+import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
@@ -31,7 +31,7 @@ public class ReadTest2 {
 		URL url = Salary.class.getResource("/salary.xlsx");
 		File f = new File(url.toURI());
 
-		ExcelBing bing = ExcelBingBuilder.toBuilder().builder();
+		BingExcel bing = BingExcelBuilder.toBuilder().builder();
 		try {
 			SheetVo<Salary> vo = bing.readFile(f, Salary.class, 1);
 			System.out.println(vo.getSheetIndex());
