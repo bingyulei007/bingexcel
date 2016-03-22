@@ -11,8 +11,8 @@ public interface BingExcelEvent {
 	/**
 	 * 根据condition条件读取相应的sheet到list对象
 	 * @param file
-	 * @param clazz
 	 * @param condition
+	 * @param listener
 	 * @return
 	 */
 	<T> void readFile(File file, ReaderCondition<T> condition,BingReadListener listener) throws Exception ;
