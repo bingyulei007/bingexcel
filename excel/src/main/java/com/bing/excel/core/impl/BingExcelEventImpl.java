@@ -1,27 +1,6 @@
 package com.bing.excel.core.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.hamcrest.Condition;
-import org.xml.sax.SAXException;
-
 import com.bing.excel.converter.FieldValueConverter;
-import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingReadListener;
 import com.bing.excel.core.ReaderCondition;
@@ -35,7 +14,17 @@ import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.vo.ListRow;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.Lists;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * 创建时间：2015-12-8上午11:56:30 项目名称：excel
