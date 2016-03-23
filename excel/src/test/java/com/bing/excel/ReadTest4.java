@@ -21,6 +21,12 @@ import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
+/**
+ * @author shizhongtao
+ *
+ * @date 2016-3-23
+ * Description:  
+ */
 public class ReadTest4 {
 
 	@Test
