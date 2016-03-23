@@ -28,37 +28,7 @@ import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
 public class ReadTestGlobalConverter6 {
-	@Test
-	public void testme() throws Exception{
-		URL url = Salary.class.getResource("/salary6.xlsx");
-		File f = new File(url.toURI());
-		SaxHandler saxHandler = ExcelReaderFactory.create(f, new ExcelReadListener() {
-			
-			@Override
-			public void startSheet(int sheetIndex, String name) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void optRow(int curRow, ListRow rowList) {
-				System.out.println(rowList);
-			}
-			
-			@Override
-			public void endWorkBook() {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void endSheet(int sheetIndex, String name) {
-				// TODO Auto-generated method stub
-				
-			}
-		}, true);
-		saxHandler.readSheets();
-	}
+	
 
 	@Test
 	public void readExcelTest() throws URISyntaxException {
