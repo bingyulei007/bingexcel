@@ -27,6 +27,12 @@ import com.bing.excel.reader.vo.ListRow;
 import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
+/**
+ * @author shizhongtao
+ *
+ * @date 2016-3-23
+ * Description:  
+ */
 public class ReadTestGlobalConverter6 {
 	
 
