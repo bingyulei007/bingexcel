@@ -8,6 +8,8 @@ import java.util.Set;
 
 import com.bing.common.Builder;
 import com.bing.excel.converter.FieldValueConverter;
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.impl.BingExcelEventImpl;
 import com.bing.excel.core.impl.BingExcelImpl;
 import com.bing.excel.exception.ConversionException;
@@ -36,8 +38,7 @@ import com.google.common.primitives.Primitives;
  * @date 2015-12-8
  */
 public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
-	private final Map<Class<?>, FieldValueConverter> defaultLocalConverter = Collections
-			.synchronizedMap(new HashMap<Class<?>, FieldValueConverter>());
+	private final ConverterHandler defaultLocalConverterHandler = new LocalConverterHandler();
 
 	private BingExcelEvent bingExcelEvent;
 
@@ -60,24 +61,16 @@ public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
 	@Override
 	public Builder<BingExcelEvent> registerFieldConverter(Class<?> clazz,
 			FieldValueConverter converter) {
-		if (converter.canConvert(clazz)) {
-
-			if (clazz.isPrimitive()) {
-				defaultLocalConverter.put(Primitives.wrap(clazz), converter);
-			} else {
-				defaultLocalConverter.put(clazz, converter);
-			}
-		} else {
-			throw new ConversionException("register converter for["
-					+ clazz.getName() + "] failed!");
-		}
+		
+		defaultLocalConverterHandler.registerConverter(clazz, converter);
+			
 		return this;
 	}
 
 	@Override
 	public BingExcelEvent builder() {
 		if (bingExcelEvent == null) {
-			bingExcelEvent = new BingExcelEventImpl(defaultLocalConverter);
+			bingExcelEvent = new BingExcelEventImpl(defaultLocalConverterHandler);
 		}
 
 		return this.bingExcelEvent;

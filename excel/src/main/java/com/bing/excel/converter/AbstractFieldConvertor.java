@@ -1,5 +1,7 @@
 package com.bing.excel.converter;
 
+import com.bing.excel.core.handler.ConverterHandler;
+
 public class AbstractFieldConvertor implements FieldValueConverter {
 
 	@Override
@@ -15,7 +17,7 @@ public class AbstractFieldConvertor implements FieldValueConverter {
 	}
 
 	@Override
-	public Object fromString(String cell) {
+	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {
 		if(cell==null){
 			return null;
 		}

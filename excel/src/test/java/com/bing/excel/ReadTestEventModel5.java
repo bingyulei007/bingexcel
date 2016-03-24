@@ -19,6 +19,7 @@ import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingExcelEventBuilder;
 import com.bing.excel.core.BingReadListener;
+import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelEventImpl.ModelInfo;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.utils.StringParseUtil;
@@ -70,8 +71,7 @@ public class ReadTestEventModel5 {
 		// 自定义转换器
 		private Date entryTime;
 
-		// 其他变量可以这样定义。
-		private transient String test;
+		
 
 		public String toString() {
 			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
@@ -95,7 +95,7 @@ public class ReadTestEventModel5 {
 		}
 
 		@Override
-		public Object fromString(String cell) {
+		public Object fromString(String cell, ConverterHandler converterHandler,Class type) {
 
 			if (StringUtils.isBlank(cell)) {
 				return null;

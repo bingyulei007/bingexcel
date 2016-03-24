@@ -1,6 +1,7 @@
 package com.bing.excel.converter.base;
 
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.core.handler.ConverterHandler;
 import com.google.common.base.Strings;
 
 /**
@@ -23,7 +24,7 @@ public final class ByteFieldConverter extends AbstractFieldConvertor {
 	}
 
 	@Override
-	public Object fromString(String cell) {
+	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {
 		if (Strings.isNullOrEmpty(cell)) {
 			return null;
 		}

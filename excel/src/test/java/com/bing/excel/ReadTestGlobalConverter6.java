@@ -19,6 +19,7 @@ import com.bing.excel.converter.base.BooleanFieldConverter;
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.ReaderCondition;
+import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
@@ -42,7 +43,7 @@ public class ReadTestGlobalConverter6 {
 		URL url = Salary.class.getResource("/salary6.xlsx");
 		File f = new File(url.toURI());
 
-		 BingExcel bing = BingExcelBuilder.toBuilder().registerFieldConverter(EmploryAttribute.class, new tempConverter()).builder();
+		 BingExcel bing = BingExcelBuilder.toBuilder().registerFieldConverter(EmploryAttribute.class, new MyDateConverter()).builder();
 		 ReaderCondition<Salary> condition=new ReaderCondition<>(1,Salary.class);
 		 condition.setStartRow(2);
 		try {
@@ -88,7 +89,7 @@ public class ReadTestGlobalConverter6 {
 
 	}
 	
-	public static class tempConverter extends AbstractFieldConvertor{
+	public static class MyDateConverter extends AbstractFieldConvertor{
 
 		@Override
 		public boolean canConvert(Class<?> clz) {
@@ -97,7 +98,7 @@ public class ReadTestGlobalConverter6 {
 		}
 
 		@Override
-		public Object fromString(String cell) {
+		public Object fromString(String cell, ConverterHandler converterHandler,Class type) {
 			if(StringUtils.isBlank(cell)){
 				return null;
 			}else{

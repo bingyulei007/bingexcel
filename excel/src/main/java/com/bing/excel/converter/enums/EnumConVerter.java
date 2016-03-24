@@ -1,6 +1,7 @@
 package com.bing.excel.converter.enums;
 
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.core.handler.ConverterHandler;
 
 /**
  * @author shizhongtao
@@ -10,10 +11,8 @@ import com.bing.excel.converter.AbstractFieldConvertor;
  */
 public class EnumConVerter extends AbstractFieldConvertor {
 
-	private Class targetType;
 	@Override
 	public boolean canConvert(Class<?> clz) {
-			targetType=clz;
 		 return clz.isEnum() || Enum.class.isAssignableFrom(clz);
 	}
 
@@ -23,7 +22,10 @@ public class EnumConVerter extends AbstractFieldConvertor {
 	}
 
 	@Override
-	public Object fromString(String cell) {
+	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {
+			if(targetType==null){
+				return null;
+			}
 		  if (targetType.getSuperclass() != Enum.class) {
 			  targetType = targetType.getSuperclass(); // polymorphic enums
 	        }

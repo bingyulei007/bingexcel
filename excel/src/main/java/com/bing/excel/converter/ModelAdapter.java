@@ -1,7 +1,7 @@
 package com.bing.excel.converter;
 
 
-import com.bing.excel.mapper.OrmMapper;
+import com.bing.excel.mapper.FieldMapperHandler;
 import com.bing.excel.reader.vo.ListRow;
 
 
@@ -13,8 +13,8 @@ import com.bing.excel.reader.vo.ListRow;
  * @version 1.0   
  * 文件名称：Convertor.java  
  */
-public interface Converter  {
+public interface ModelAdapter  {
 	  void marshal(Object source);
-	Object unmarshal(ListRow source, OrmMapper ormMapper);
+	Object unmarshal(ListRow source, FieldMapperHandler handler);
 }
  

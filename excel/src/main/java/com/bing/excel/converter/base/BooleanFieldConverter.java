@@ -1,6 +1,7 @@
 package com.bing.excel.converter.base;
 
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
 import com.google.common.base.Strings;
 
@@ -35,7 +36,7 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 	 * in other case ,return false?FIXME
 	 */
 	@Override
-	public Object fromString(String cell) {
+	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {
 		if (Strings.isNullOrEmpty(cell)) {
 			return null;
 		}

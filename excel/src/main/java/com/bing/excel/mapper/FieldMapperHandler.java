@@ -3,7 +3,7 @@ package com.bing.excel.mapper;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 
-public interface OrmMapper {
+public interface FieldMapperHandler {
 
 	 abstract void processAnnotations(final Class[] initialTypes);
 

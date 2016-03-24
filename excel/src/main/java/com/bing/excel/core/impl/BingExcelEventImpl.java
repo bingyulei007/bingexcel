@@ -15,27 +15,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.hamcrest.Condition;
 import org.xml.sax.SAXException;
 
-import com.bing.excel.converter.FieldValueConverter;
-import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingReadListener;
 import com.bing.excel.core.ReaderCondition;
-import com.bing.excel.core.reflect.BoundField;
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.reflect.TypeAdapterConverter;
 import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.mapper.AnnotationMapper;
-import com.bing.excel.mapper.OrmMapper;
+import com.bing.excel.mapper.FieldMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.vo.ListRow;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.Lists;
 
 /**
  * 创建时间：2015-12-8上午11:56:30 项目名称：excel
@@ -53,20 +49,19 @@ public class BingExcelEventImpl implements BingExcelEvent {
 	/**
 	 * globe filed converter
 	 */
-	private final Map<Class<?>, FieldValueConverter> defaultLocalConverter;
+	private final ConverterHandler defaultLocalConverterHandler;
 	private final Set<Class<?>> targetTypes = Collections
 			.synchronizedSet(new HashSet<Class<?>>());
-	private OrmMapper ormMapper = new AnnotationMapper();
+	private FieldMapperHandler ormMapper = new AnnotationMapper();
 	private BingReadListener listener = null;
 
 	public BingExcelEventImpl(
-			Map<Class<?>, FieldValueConverter> defaultLocalConverter) {
-		this.defaultLocalConverter = defaultLocalConverter;
+			ConverterHandler converterHandler) {
+		this.defaultLocalConverterHandler = converterHandler;
 	}
 
 	public BingExcelEventImpl() {
-		this.defaultLocalConverter = Collections
-				.synchronizedMap(new HashMap<Class<?>, FieldValueConverter>());
+		this.defaultLocalConverterHandler = new LocalConverterHandler();
 	}
 
 	@Override
@@ -261,13 +256,9 @@ public class BingExcelEventImpl implements BingExcelEvent {
 
 		private TypeAdapterConverter getTypeAdapterConverter(
 				Constructor<?> constructor, List<Field> tempConverterFields) {
-			Map<String, BoundField> boundFields = new HashMap<>();
-			for (Field field : tempConverterFields) {
-				String name = field.getName();
-				boundFields.put(name, new BoundField(field, name));
-			}
+			
 			TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
-					constructor, boundFields, defaultLocalConverter);
+					constructor, tempConverterFields, defaultLocalConverterHandler);
 			return adConverter;
 		}
 
