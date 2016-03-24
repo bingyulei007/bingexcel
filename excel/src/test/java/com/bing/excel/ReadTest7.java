@@ -10,33 +10,44 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
+import com.bing.excel.ReadTestGlobalConverter6.EmploryAttribute;
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.converter.base.BooleanFieldConverter;
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
+import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
-public class ReadTest3 {
+/**
+ * @author shizhongtao
+ * 
+ * @date 2016-3-23 Description:
+ */
+public class ReadTest7 {
 
 	@Test
 	public void readExcelTest() throws URISyntaxException {
 		// InputStream in = Person.class.getResourceAsStream("/person.xlsx");
-		URL url = Salary.class.getResource("/salary.xlsx");
+		URL url = Salary.class.getResource("/salary7.xlsx");
 		File f = new File(url.toURI());
 
-		BingExcel bing = BingExcelBuilder.toBuilder().builder();
+		BingExcel bing = BingExcelBuilder.toBuilder().registerFieldConverter(Date.class, new MyDateConverter()).builder();
 		try {
-			SheetVo<Salary> vo = bing.readFile(f, Salary.class, 1);
-			System.out.println(vo.getSheetIndex());
-			System.out.println(vo.getSheetName());
-			List<Salary> objectList = vo.getObjectList();
-			for (Salary salary : objectList) {
-				System.out.println(salary);
+			ReaderCondition<Salary> condition = new ReaderCondition<>(0, 1,
+					Salary.class);
+			SheetVo vo = bing.readFile(f, condition);
+			List objectList = vo.getObjectList();
+			for (Object object : objectList) {
+				System.out.println(object);
+				for (Date item : ((Salary)object).workingTime) {
+					System.out.println(item);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -44,64 +55,32 @@ public class ReadTest3 {
 
 	}
 
-	enum Department {
-		develop, personnel, product;
-	}
-
 	public static class Salary {
 
 		@CellConfig(index = 1)
 		private String employNum;
-
-		@CellConfig(index = 0)
-		private String id;
-
-		@CellConfig(index = 8)
-		@BingConvertor(value = BooleanFieldConverter.class, strings = { "1","0" }, booleans = { false })
-		private boolean allDay;
-
-		@CellConfig(index=7)
-		private Department department;//枚举类型
-		
-		
-		@CellConfig(index = 13)
-		@BingConvertor(DateTestConverter.class)
-		// 自定义转换器
-		private Date atypiaDate;
-		@CellConfig(index = 15)
-		@BingConvertor(DateTestConverter.class)
-		// 自定义转换器
-		private Date entryTime;
-
-		// 其他变量可以这样定义。
-		private transient String test;
+		@CellConfig(index = 10)
+		private Date[] workingTime;
+		@CellConfig(index = 11)
+		private String[] team;
 
 		public String toString() {
 			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
-					.add("id", id).add("employNum", employNum)
-					.add("allDay", allDay)
-					.add("atypiaDate", atypiaDate)
-					.add("department", department)
-					.add("entryTime", entryTime).toString();
+					.add("employNum", employNum)
+					.add("workingTime", workingTime).add("team", team)
+					.toString();
 		}
 	}
-
-	public static class DateTestConverter implements FieldValueConverter {
-
-		@Override
-		public void toObject(Object source) {
-			// TODO Auto-generated method stub
-
-		}
+	public static class MyDateConverter extends AbstractFieldConvertor{
 
 		@Override
 		public boolean canConvert(Class<?> clz) {
-			return clz.equals(Date.class);
+			
+			return Date.class.isAssignableFrom(clz);
 		}
 
 		@Override
 		public Object fromString(String cell, ConverterHandler converterHandler,Class type) {
-
 			if (StringUtils.isBlank(cell)) {
 				return null;
 			}
@@ -112,6 +91,6 @@ public class ReadTest3 {
 				throw new RuntimeException(e);
 			}
 		}
-
+		
 	}
 }

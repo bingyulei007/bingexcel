@@ -19,6 +19,7 @@ import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
+import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
@@ -101,8 +102,7 @@ public class ReadTest2 {
 		}
 
 		@Override
-		public Object fromString(String cell) {
-
+		public Object fromString(String cell, ConverterHandler converterHandler,Class type) {
 			if (StringUtils.isBlank(cell)) {
 				return null;
 			}
@@ -113,6 +113,8 @@ public class ReadTest2 {
 				throw new RuntimeException(e);
 			}
 		}
+
+		
 
 	}
 }

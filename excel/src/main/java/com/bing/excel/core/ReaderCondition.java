@@ -12,15 +12,22 @@ public class ReaderCondition<T>  {
 	private int sheetIndex = 0;
 	private Class<T> clazz;
 
+	/**
+	 * @param sheetIndex index of sheet,started 0;
+	 * @param clazz
+	 */
 	public ReaderCondition(int sheetIndex, Class<T> clazz) {
 		this.sheetIndex = sheetIndex;
 		this.clazz = clazz;
 	}
 
-	public ReaderCondition(Class<T> clazz) {
-		this.clazz = clazz;
-	}
+	
 
+	/**
+	 * @param sheetIndex
+	 * @param startRow from which line to read.started 0;default 1;
+	 * @param clazz
+	 */
 	public ReaderCondition(int sheetIndex, int startRow, Class<T> clazz) {
 		this.startRow = startRow;
 		this.sheetIndex = sheetIndex;

@@ -43,7 +43,7 @@ import com.google.common.primitives.Primitives;
  * @version 1.0
  * @since JDK 1.7 文件名称：AnnotationMapper.java 类说明：
  */
-public class AnnotationMapper implements OrmMapper {
+public class AnnotationMapper implements FieldMapperHandler {
 
 	// 属性转换器的缓存
 	private Cache<Class<?>, Map<List<Object>, FieldValueConverter>> converterCache = null;
@@ -181,7 +181,7 @@ public class AnnotationMapper implements OrmMapper {
 		BingConvertor bingConvertor = field.getAnnotation(BingConvertor.class);
 		int index;
 		if (cellConfig == null) {
-			throw new MissingCellConfigException("Missing CellConfig annotation");
+			throw new MissingCellConfigException("["+field.getDeclaringClass()+"#"+field.getName()+"]Missing CellConfig annotation");
 		} else {
 			index = cellConfig.index();
 			if (index < 0) {

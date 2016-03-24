@@ -15,21 +15,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.hamcrest.Condition;
 import org.xml.sax.SAXException;
 
 
-import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.ReaderCondition;
-import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
-import com.bing.excel.core.reflect.BoundField;
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.reflect.TypeAdapterConverter;
 import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.mapper.AnnotationMapper;
-import com.bing.excel.mapper.OrmMapper;
+import com.bing.excel.mapper.FieldMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.SaxHandler;
@@ -52,18 +49,17 @@ public class BingExcelImpl implements BingExcel {
 	/**
 	 * globe filed converter
 	 */
-	private final Map<Class<?>,FieldValueConverter> defaultLocalConverter;
+	private final  ConverterHandler localConverterHandler ;
 	private final Set<Class<?>> targetTypes = Collections
 			.synchronizedSet(new HashSet<Class<?>>());
-	private OrmMapper ormMapper = new AnnotationMapper();
+	private FieldMapperHandler ormMapper = new AnnotationMapper();
 	private List<SheetVo> resultList;
 	
-	public BingExcelImpl(Map<Class<?>, FieldValueConverter> defaultLocalConverter) {
-		this.defaultLocalConverter=defaultLocalConverter;
+	public BingExcelImpl(ConverterHandler localConverterHandler) {
+		this.localConverterHandler=localConverterHandler;
 	}
 	public BingExcelImpl() {
-		this.defaultLocalConverter= Collections
-				.synchronizedMap(new HashMap<Class<?>,FieldValueConverter>());
+		this.localConverterHandler= new LocalConverterHandler();
 	}
 
 	@Override
@@ -262,13 +258,9 @@ public class BingExcelImpl implements BingExcel {
 
 		private TypeAdapterConverter getTypeAdapterConverter(
 				Constructor<?> constructor, List<Field> tempConverterFields) {
-			Map<String, BoundField> boundFields = new HashMap<>();
-			for (Field field : tempConverterFields) {
-				String name = field.getName();
-				boundFields.put(name, new BoundField(field, name));
-			}
+		
 			TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
-					constructor, boundFields,defaultLocalConverter);
+					constructor, tempConverterFields,localConverterHandler);
 			return adConverter;
 		}
 

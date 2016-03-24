@@ -1,6 +1,7 @@
 package com.bing.excel.converter.base;
 
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.core.handler.ConverterHandler;
 import com.google.common.base.Strings;
 
 /**
@@ -19,7 +20,7 @@ public final class IntegerFieldConverter extends AbstractFieldConvertor {
 	 * @return return the long value; return Long.decode(str),only in this case  the str start with "0x"
 	 */
 	@Override
-	public Object fromString(String cell) {
+	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {
 
 		if (Strings.isNullOrEmpty(cell)) {
 			return null;

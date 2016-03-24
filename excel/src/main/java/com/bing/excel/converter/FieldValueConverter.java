@@ -1,5 +1,7 @@
 package com.bing.excel.converter;
 
+import com.bing.excel.core.handler.ConverterHandler;
+
 
 
 /**  
@@ -12,5 +14,5 @@ package com.bing.excel.converter;
  */
 public interface FieldValueConverter extends ConverterMatcher {
 	  void toObject(Object source);
-	  Object fromString(String cell);
+	  Object fromString(String cell,ConverterHandler converterHandler,Class targetType);
 }

@@ -49,7 +49,7 @@ public class ConversionMapper {
 			return isPrimitive;
 		}
 
-		public Class<?> getClazz() {
+		public Class<?> getFieldClass() {
 			return clazz;
 		}
 

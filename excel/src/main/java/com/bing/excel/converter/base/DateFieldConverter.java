@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 
 
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
 import com.bing.utils.StringParseUtil;
 
@@ -51,7 +52,7 @@ public final class DateFieldConverter extends AbstractFieldConvertor {
 	}
 
 	@Override
-	public Object fromString(String cell) {
+	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {
 		
 		
 		String temp;

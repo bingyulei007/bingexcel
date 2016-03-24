@@ -8,6 +8,8 @@ import java.util.Set;
 
 import com.bing.common.Builder;
 import com.bing.excel.converter.FieldValueConverter;
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl;
 import com.bing.excel.exception.ConversionException;
 import com.google.common.primitives.Primitives;
@@ -35,8 +37,7 @@ import com.google.common.primitives.Primitives;
  * @date 2015-12-8
  */
 public class BingExcelBuilder implements Builder<BingExcel> {
-	private final Map<Class<?>, FieldValueConverter> defaultLocalConverter = Collections
-			.synchronizedMap(new HashMap<Class<?>, FieldValueConverter>());
+	private final ConverterHandler localConverterHandler = new LocalConverterHandler();
 	/**
 	 * bingExcel:对应的excel工具类。
 	 */
@@ -60,24 +61,14 @@ public class BingExcelBuilder implements Builder<BingExcel> {
 	@Override
 	public Builder<BingExcel> registerFieldConverter(Class<?> clazz,
 			FieldValueConverter converter) {
-		if (converter.canConvert(clazz)) {
-
-			if (clazz.isPrimitive()) {
-				defaultLocalConverter.put(Primitives.wrap(clazz), converter);
-			} else {
-				defaultLocalConverter.put(clazz, converter);
-			}
-		} else {
-			throw new ConversionException("register converter for["
-					+ clazz.getName() + "] failed!");
-		}
+		localConverterHandler.registerConverter(clazz, converter);
 		return this;
 	}
 
 	@Override
 	public BingExcel builder() {
 		if (bingExcel == null) {
-			bingExcel = new BingExcelImpl(defaultLocalConverter);
+			bingExcel = new BingExcelImpl(localConverterHandler);
 		}
 
 		return this.bingExcel;
