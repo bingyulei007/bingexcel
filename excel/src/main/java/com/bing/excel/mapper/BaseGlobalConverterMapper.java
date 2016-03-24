@@ -34,7 +34,7 @@ public class BaseGlobalConverterMapper {
 		builder.put(Date.class,new DateFieldConverter());
 		builder.put(Enum.class,new EnumConVerter());
 		builder.put(Array.class,new ArrayConverter());
-		builder.put(Collections.class,new ArrayConverter());
+		//builder.put(Collections.class,new ArrayConverter());
 		
 		
 		builder.put(Integer.class,new IntegerFieldConverter());
