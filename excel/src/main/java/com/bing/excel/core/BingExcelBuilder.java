@@ -1,18 +1,11 @@
 package com.bing.excel.core;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import com.bing.common.Builder;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl;
-import com.bing.excel.exception.ConversionException;
-import com.google.common.primitives.Primitives;
 
 /**
  * <p>

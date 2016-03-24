@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
