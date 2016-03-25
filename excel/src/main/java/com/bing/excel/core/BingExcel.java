@@ -3,6 +3,7 @@ package com.bing.excel.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -67,7 +68,7 @@ public interface BingExcel {
 	<T> SheetVo<T> readStream(InputStream stream,ReaderCondition<T> condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;
 
 	/**
-	 * 读取第一个sheet到SheetVo
+	 * read sheet witch index equal 0
 	 * @param stream
 	 * @param condition
 	 * @return
@@ -78,5 +79,30 @@ public interface BingExcel {
 	 */
 	<T> SheetVo<T> readStream(InputStream stream, Class<T> clazz, int startRowNum) throws InvalidFormatException, IOException, SQLException ,OpenXML4JException, SAXException;
 
-	 List<SheetVo> readStreamToList(InputStream stream,  ReaderCondition[] condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;
+	 /**
+	  * read sheets 
+	 * @param stream
+	 * @param condition
+	 * @return
+	 * @throws InvalidFormatException
+	 * @throws IOException
+	 * @throws SQLException
+	 * @throws OpenXML4JException
+	 * @throws SAXException
+	 */
+	List<SheetVo> readStreamToList(InputStream stream,  ReaderCondition[] condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;
+	
+	/**
+	 * 输出model集合到excel 文件。
+	 * @param iterable 要输出到文件的集合对象，
+	 * @param file 文件对象
+	 */
+	 void writeExcel(File file,Iterable... iterable);
+	/**
+	 * 输出model集合到excel 文件。
+	 * @param iterable
+	 * @param path 文件路径
+	 */
+	 void writeExcel(String path,Iterable... iterable);
+	 void writeExcel(OutputStream stream,Iterable... iterable);
 }

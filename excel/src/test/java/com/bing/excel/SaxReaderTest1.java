@@ -1,6 +1,7 @@
 package com.bing.excel;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 
 import org.junit.Test;
@@ -9,7 +10,7 @@ import com.bing.excel.ReadTestGlobalConverter6.Salary;
 import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.SaxHandler;
-import com.bing.excel.reader.vo.ListRow;
+import com.bing.excel.vo.ListRow;
 
 /**
  * @author shizhongtao
@@ -21,10 +22,9 @@ public class SaxReaderTest1 {
 	//如果以上都不能满足你的需求 你也可以自己去处理数据。
 	@Test
 	public void testme() throws Exception{
-		URL url = Salary.class.getResource("/salary6.xlsx");
-		File f = new File(url.toURI());
+		InputStream stream = Salary.class.getResourceAsStream("/salary6.xls");
 		//
-		SaxHandler saxHandler = ExcelReaderFactory.create(f, new ExcelReadListener() {
+		SaxHandler saxHandler = ExcelReaderFactory.create(stream, new ExcelReadListener() {
 			
 			@Override
 			public void startSheet(int sheetIndex, String name) {
@@ -51,5 +51,9 @@ public class SaxReaderTest1 {
 			}
 		}, true);
 		saxHandler.readSheets();
+		if(stream!=null){
+			
+			stream.close();
+		}
 	}
 }

@@ -1,9 +1,10 @@
-package com.bing.excel.reader.vo;
+package com.bing.excel.vo;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 
 /**
  * listrow 对象
@@ -12,8 +13,8 @@ import java.util.List;
  * 
  * @date 2016-2-17 Description:
  */
-public class ListRow implements Iterable<CellKV> {
-	private List<CellKV> list = null;
+public class ListRow implements Iterable<CellKV<String>> {
+	private List<CellKV<String>> list = null;
 	private int minIndex = -1;
 	private int maxIndex = -1;
 
@@ -23,13 +24,13 @@ public class ListRow implements Iterable<CellKV> {
 	 * @return 返回新的list对象
 	 */
 	@Deprecated
-	public List<CellKV> getList() {
+	public List<CellKV<String>> getList() {
 		if (list == null)
 			return Collections.emptyList();
 		return new ArrayList<>(list);
 	}
 
-	public ListRow add(CellKV kv) {
+	public ListRow add(CellKV<String> kv) {
 		if (list == null) {
 			list = new ArrayList<>();
 		}
@@ -80,7 +81,7 @@ public class ListRow implements Iterable<CellKV> {
 
 		String[] arr = new String[length];
 		if (maxIndex != -1) {
-			for (CellKV kv : list) {
+			for (CellKV<String> kv : list) {
 				if (kv.getIndex() < length) {
 					arr[kv.getIndex()] = kv.getValue();
 				}
@@ -94,7 +95,7 @@ public class ListRow implements Iterable<CellKV> {
 		if (maxIndex != -1) {
 			String[] arr = new String[list.size()];
 			int i=0;
-			for (CellKV temp : list) {
+			for (CellKV<String> temp : list) {
 				arr[i]=temp.getValue();
 				i++;
 			}
@@ -112,10 +113,10 @@ public class ListRow implements Iterable<CellKV> {
 	}
 
 	@Override
-	public Iterator<CellKV> iterator() {
+	public Iterator<CellKV<String>> iterator() {
 
 		if (maxIndex == -1) {
-			list = new ArrayList<CellKV>();
+			list = new ArrayList<CellKV<String>>();
 		}
 		return list.iterator();
 	}

@@ -32,8 +32,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 import com.bing.excel.reader.ExcelReadListener;
-import com.bing.excel.reader.vo.CellKV;
-import com.bing.excel.reader.vo.ListRow;
+import com.bing.excel.vo.CellKV;
+import com.bing.excel.vo.ListRow;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 
@@ -153,6 +153,14 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			}
 			if(boundSheetRecords.size()==(sheetIndex+1)){
 				excelReader.endWorkBook();
+				if(fs!=null){
+					try {
+						fs.close();
+					} catch (IOException e) {
+						//TODO something
+						//e.printStackTrace();
+					}
+				}
 			}
 		}else if (BOFRecord.sid == sid) {
 			BOFRecord br = (BOFRecord) record;
@@ -249,7 +257,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			thisColumn = lrec.getColumn();
 			value = lrec.getValue().trim();
 			if(!Strings.isNullOrEmpty(value)){
-				rowlist.add(new CellKV(thisColumn, value));
+				rowlist.add(new CellKV<String>(thisColumn, value));
 				}
 		} else if (LabelSSTRecord.sid == sid) {
 			LabelSSTRecord lsrec = (LabelSSTRecord) record;
@@ -262,7 +270,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 				value = sstRecord.getString(lsrec.getSSTIndex()).toString()
 						.trim();
 				if(!Strings.isNullOrEmpty(value)){
-					rowlist.add(new CellKV(thisColumn, value));
+					rowlist.add(new CellKV<String>(thisColumn, value));
 					}
 			}
 		} else if (NoteRecord.sid == sid) {
@@ -280,7 +288,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			value = formatListener.formatNumberDateCell(numrec).trim();
 			// Format
 			if(!Strings.isNullOrEmpty(value)){
-			rowlist.add(new CellKV(thisColumn, value));
+			rowlist.add(new CellKV<String>(thisColumn, value));
 			}
 		} else if (RKRecord.sid == sid) {
 			RKRecord rkrec = (RKRecord) record;
@@ -305,7 +313,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 		}
 		// 如果str非空
 			if(!Strings.isNullOrEmpty(thisStr)){
-				rowlist.add(new CellKV(thisColumn, thisStr));
+				rowlist.add(new CellKV<String>(thisColumn, thisStr));
 				}
 
 		// 更新行和列的值

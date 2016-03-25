@@ -13,8 +13,8 @@ import org.xml.sax.SAXException;
 
 import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.SaxHandler;
-import com.bing.excel.reader.vo.CellKV;
-import com.bing.excel.reader.vo.ListRow;
+import com.bing.excel.vo.CellKV;
+import com.bing.excel.vo.ListRow;
 
 /**
  * @author shizhongtao

@@ -23,8 +23,8 @@ import com.bing.excel.exception.BingSaxReadStopException;
 import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.SaxHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
-import com.bing.excel.reader.vo.CellKV;
-import com.bing.excel.reader.vo.ListRow;
+import com.bing.excel.vo.CellKV;
+import com.bing.excel.vo.ListRow;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableCollection;
@@ -229,7 +229,7 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 			}
 		}
 		excelReader.endWorkBook();
-		
+		pkg.revert();
 	}
 
 	@Override
@@ -353,7 +353,7 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 			
 			if (!Strings.isNullOrEmpty(formattedValue)) {
 				int column = nameToColumn(cellReference);
-				rowList.add(new CellKV(column, formattedValue));
+				rowList.add(new CellKV<String>(column, formattedValue));
 			}
 			
 		}

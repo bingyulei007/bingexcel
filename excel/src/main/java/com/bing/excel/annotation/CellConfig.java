@@ -35,5 +35,5 @@ public @interface CellConfig {
 	 * 输出时候的title名称
 	 * @return
 	 */
-	public String aliasOutputName() default "";
+	public String aliasName() default "";
 }
