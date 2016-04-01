@@ -92,8 +92,8 @@ import org.apache.poi.util.LocaleUtil;
 public class ExcelDataFormatter implements Observer{
 
 	private boolean ignoreNumFormat=false;
-	private static final DateFormat defaultDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
+	private static ThreadLocal<SimpleDateFormat> localFormat=new ThreadLocal<>();
 	
     private static final String defaultFractionWholePartFormat = "#";
     private static final String defaultFractionFractionPartFormat = "#/##";
@@ -462,7 +462,7 @@ public class ExcelDataFormatter implements Observer{
           */
         //start shizhongtao bing
        
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         char[] chars = formatStr.toCharArray();
         boolean mIsMonth = true;
         List<Integer> ms = new ArrayList<Integer>();
@@ -585,7 +585,7 @@ public class ExcelDataFormatter implements Observer{
     }
 
     private String cleanFormatForNumber(String formatStr) {
-        StringBuffer sb = new StringBuffer(formatStr);
+        StringBuilder sb = new StringBuilder(formatStr);
 
         if (emulateCsv) {
             // Requested spacers with "_" are replaced by a single space.
@@ -778,7 +778,7 @@ public class ExcelDataFormatter implements Observer{
             if(ExcelDateUtil.isValidExcelDate(value)) {
             	Format dateFormat ;
             	if(ignoreNumFormat){
-            		dateFormat = defaultDateFormat;
+            		dateFormat = getDateFormat();
             	}else{
             		dateFormat = getFormat(value, formatIndex, formatString);
             	}
@@ -845,7 +845,17 @@ public class ExcelDataFormatter implements Observer{
         return result;
     }
 
-    /**
+    private Format getDateFormat() {
+    	SimpleDateFormat dateFormat = localFormat.get();
+    	if (dateFormat==null) {
+			
+    		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    		localFormat.set(dateFormat);
+		}
+		return dateFormat;
+	}
+
+	/**
      * <p>
      * Returns the formatted value of a cell as a <tt>String</tt> regardless
      * of the cell type. If the Excel format pattern cannot be parsed then the
