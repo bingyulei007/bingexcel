@@ -2,7 +2,7 @@ package com.bing.excel.converter;
 
 
 import com.bing.excel.mapper.FieldMapperHandler;
-import com.bing.excel.reader.vo.ListRow;
+import com.bing.excel.vo.ListRow;
 
 
 

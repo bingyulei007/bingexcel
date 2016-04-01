@@ -1,7 +1,7 @@
 package com.bing.excel.reader;
 
 
-import com.bing.excel.reader.vo.ListRow;
+import com.bing.excel.vo.ListRow;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.bing.excel.reader.vo;
+package com.bing.excel.vo;
 
 import javax.management.RuntimeOperationsException;
 
@@ -10,7 +10,7 @@ import com.google.common.base.MoreObjects;
  * @date 2016-3-1
  * Description:  
  */
-public class CellKV {
+public class CellKV <T>{
 
 	/**
 	 * @serial Attribute name.
@@ -20,7 +20,7 @@ public class CellKV {
 	/**
 	 * @serial Attribute value
 	 */
-	private String value = null;
+	private T value = null;
 
 	/**
 	 * Constructs an CellKV object which associates the given attribute name
@@ -34,7 +34,7 @@ public class CellKV {
 	 *            must be of the same type as the attribute.
 	 * 
 	 */
-	public CellKV(int index, String value) {
+	public CellKV(int index, T value) {
 
 		if (index < 0) {
 			throw new RuntimeOperationsException(new IllegalArgumentException(
@@ -59,7 +59,7 @@ public class CellKV {
 	 * 
 	 * @return the value of the attribute.
 	 */
-	public String getValue() {
+	public T getValue() {
 		return value;
 	}
 

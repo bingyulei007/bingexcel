@@ -23,8 +23,7 @@ import com.bing.excel.converter.FieldValueConverter;
 public @interface BingConvertor {
 	Class<? extends FieldValueConverter> value() ;
 
-	// TODO 占时不支持带不同类型参数的构造方法，此处先预留吧
-	//单类型的构造方法可以支持，参数顺序就按照数组中元素的顺序
+	
 	Class<?>[] types() default {};
 
 	String[] strings() default {};

@@ -3,6 +3,7 @@ package com.bing.excel.core.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -18,7 +19,6 @@ import java.util.Set;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
-
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.handler.ConverterHandler;
@@ -30,7 +30,7 @@ import com.bing.excel.mapper.FieldMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.SaxHandler;
-import com.bing.excel.reader.vo.ListRow;
+import com.bing.excel.vo.ListRow;
 import com.google.common.collect.Lists;
 
 /**
@@ -49,17 +49,18 @@ public class BingExcelImpl implements BingExcel {
 	/**
 	 * globe filed converter
 	 */
-	private final  ConverterHandler localConverterHandler ;
+	private final ConverterHandler localConverterHandler;
 	private final Set<Class<?>> targetTypes = Collections
 			.synchronizedSet(new HashSet<Class<?>>());
 	private FieldMapperHandler ormMapper = new AnnotationMapper();
 	private List<SheetVo> resultList;
-	
+
 	public BingExcelImpl(ConverterHandler localConverterHandler) {
-		this.localConverterHandler=localConverterHandler;
+		this.localConverterHandler = localConverterHandler;
 	}
+
 	public BingExcelImpl() {
-		this.localConverterHandler= new LocalConverterHandler();
+		this.localConverterHandler = new LocalConverterHandler();
 	}
 
 	@Override
@@ -72,11 +73,11 @@ public class BingExcelImpl implements BingExcel {
 	@Override
 	public <T> SheetVo<T> readFile(File file, ReaderCondition<T> condition)
 			throws Exception {
-		
+
 		ReaderCondition[] arr = new ReaderCondition[] { condition };
 		List<SheetVo> list = readFileToList(file, arr);
-		
-		return list.size()==0?null:list.get(0);
+
+		return list.size() == 0 ? null : list.get(0);
 	}
 
 	/*
@@ -87,9 +88,9 @@ public class BingExcelImpl implements BingExcel {
 	 */
 	@SuppressWarnings({ "rawtypes" })
 	@Override
-	public List<SheetVo> readFileToList(File file,
-			ReaderCondition[] conditions) throws Exception {
-		resultList=null;
+	public List<SheetVo> readFileToList(File file, ReaderCondition[] conditions)
+			throws Exception {
+		resultList = null;
 		BingExcelReaderListener listner = new BingExcelReaderListener(
 				conditions);
 		SaxHandler handler = ExcelReaderFactory.create(file, listner, true);
@@ -98,9 +99,9 @@ public class BingExcelImpl implements BingExcel {
 		for (int i = 0; i < conditions.length; i++) {
 			int sheetNum = conditions[i].getSheetIndex();
 			indexArr[i] = sheetNum;
-			if(minNum==-1){
-				minNum=conditions[i].getEndRow();
-			}else if (minNum > conditions[i].getEndRow()) {
+			if (minNum == -1) {
+				minNum = conditions[i].getEndRow();
+			} else if (minNum > conditions[i].getEndRow()) {
 				minNum = conditions[i].getEndRow();
 			}
 		}
@@ -108,27 +109,28 @@ public class BingExcelImpl implements BingExcel {
 		return this.resultList;
 	}
 
-	
-
 	@Override
 	public <T> SheetVo<T> readStream(InputStream stream, Class<T> clazz,
-			int startRowNum) throws IOException, SQLException, OpenXML4JException, SAXException {
-		return readStream(stream,new ReaderCondition<T>(0, startRowNum, clazz));
+			int startRowNum) throws IOException, SQLException,
+			OpenXML4JException, SAXException {
+		return readStream(stream, new ReaderCondition<T>(0, startRowNum, clazz));
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public <T> SheetVo<T> readStream(InputStream stream,
-			ReaderCondition<T> condition) throws IOException, SQLException, OpenXML4JException, SAXException {
-			ReaderCondition[] arr=new ReaderCondition[] { condition };
-			List<SheetVo> list=readStreamToList(stream,arr);
-		 return list.size()==0?null:list.get(0);
+			ReaderCondition<T> condition) throws IOException, SQLException,
+			OpenXML4JException, SAXException {
+		ReaderCondition[] arr = new ReaderCondition[] { condition };
+		List<SheetVo> list = readStreamToList(stream, arr);
+		return list.size() == 0 ? null : list.get(0);
 	}
 
 	@Override
 	public List<SheetVo> readStreamToList(InputStream stream,
-			ReaderCondition[] conditions) throws IOException, SQLException, OpenXML4JException, SAXException {
-		resultList=null;
+			ReaderCondition[] conditions) throws IOException, SQLException,
+			OpenXML4JException, SAXException {
+		resultList = null;
 		BingExcelReaderListener listner = new BingExcelReaderListener(
 				conditions);
 		SaxHandler handler = ExcelReaderFactory.create(stream, listner, true);
@@ -147,13 +149,31 @@ public class BingExcelImpl implements BingExcel {
 
 	
 
-	
+	@Override
+	public void writeExcel(File file, Iterable... iterable) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void writeExcel(String path, Iterable... iterable) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void writeExcel(OutputStream stream, Iterable... iterable) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 	private class BingExcelReaderListener extends AbstractExcelReadListener {
 
 		private final ReaderCondition[] conditions;
 		private Class tagertClazz = null;
-		private int startRow=0;// start to read from first lines;
+		private int startRow = 0;// start to read from first lines;
 		private List<SheetVo> list;
 		private SheetVo currentSheetVo;
 
@@ -169,7 +189,7 @@ public class BingExcelImpl implements BingExcel {
 
 		@Override
 		public void optRow(int curRow, ListRow rowList) {
-			if(curRow<startRow){
+			if (curRow < startRow) {
 				return;
 			}
 			if (tagertClazz != null) {
@@ -193,12 +213,12 @@ public class BingExcelImpl implements BingExcel {
 		public void startSheet(int sheetIndex, String name) {
 
 			tagertClazz = null;
-			startRow=0;
+			startRow = 0;
 			for (int i = 0; i < conditions.length; i++) {
 				if (conditions[i].getSheetIndex() == sheetIndex) {
 					tagertClazz = conditions[i].getTargetClazz();
 					registeAdapter(tagertClazz);
-					startRow=conditions[i].getStartRow();
+					startRow = conditions[i].getStartRow();
 					currentSheetVo = new SheetVo<>(sheetIndex, name);
 					break;
 				}
@@ -242,7 +262,8 @@ public class BingExcelImpl implements BingExcel {
 					try {
 						constructor = type.getDeclaredConstructor();
 					} catch (NoSuchMethodException | SecurityException e) {
-						throw new IllegalEntityException(type, "Gets the default constructor failed");
+						throw new IllegalEntityException(type,
+								"Gets the default constructor failed");
 					}
 					TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
 							constructor, tempConverterFields);
@@ -258,9 +279,9 @@ public class BingExcelImpl implements BingExcel {
 
 		private TypeAdapterConverter getTypeAdapterConverter(
 				Constructor<?> constructor, List<Field> tempConverterFields) {
-		
+
 			TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
-					constructor, tempConverterFields,localConverterHandler);
+					constructor, tempConverterFields, localConverterHandler);
 			return adConverter;
 		}
 
@@ -271,16 +292,16 @@ public class BingExcelImpl implements BingExcel {
 					list = Lists.newArrayList();
 				}
 				list.add(currentSheetVo);
-				currentSheetVo=null;
+				currentSheetVo = null;
 			}
 		}
 
 		@Override
 		public void endWorkBook() {
-			if(list==null){
-				resultList=Collections.EMPTY_LIST;
-			}else{
-				resultList=this.list;
+			if (list == null) {
+				resultList = Collections.EMPTY_LIST;
+			} else {
+				resultList = this.list;
 			}
 		}
 

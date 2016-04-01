@@ -3,6 +3,7 @@ package com.bing.excel.core.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -20,6 +21,7 @@ import org.xml.sax.SAXException;
 
 import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingReadListener;
+import com.bing.excel.core.BingWriterHandler;
 import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.handler.LocalConverterHandler;
@@ -30,7 +32,7 @@ import com.bing.excel.mapper.FieldMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.SaxHandler;
-import com.bing.excel.reader.vo.ListRow;
+import com.bing.excel.vo.ListRow;
 import com.google.common.base.MoreObjects;
 
 /**
@@ -55,8 +57,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
 	private FieldMapperHandler ormMapper = new AnnotationMapper();
 	private BingReadListener listener = null;
 
-	public BingExcelEventImpl(
-			ConverterHandler converterHandler) {
+	public BingExcelEventImpl(ConverterHandler converterHandler) {
 		this.defaultLocalConverterHandler = converterHandler;
 	}
 
@@ -146,6 +147,20 @@ public class BingExcelEventImpl implements BingExcelEvent {
 		handler.readSheet(indexArr, minNum);
 	}
 
+	@Override
+	public BingWriterHandler writeFile(File file) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BingWriterHandler writeFile(String path) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+
 	private class BingExcelReaderListener extends AbstractExcelReadListener {
 
 		private final ReaderCondition[] conditions;
@@ -180,7 +195,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
 				} else {
 					Object object = typeAdapter.unmarshal(rowList, ormMapper);
 					modelInfo.setRow(curRow);
-					listener.writeModel(object, modelInfo);
+					listener.readModel(object, modelInfo);
 				}
 
 			}
@@ -256,9 +271,10 @@ public class BingExcelEventImpl implements BingExcelEvent {
 
 		private TypeAdapterConverter getTypeAdapterConverter(
 				Constructor<?> constructor, List<Field> tempConverterFields) {
-			
+
 			TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
-					constructor, tempConverterFields, defaultLocalConverterHandler);
+					constructor, tempConverterFields,
+					defaultLocalConverterHandler);
 			return adConverter;
 		}
 
@@ -322,10 +338,8 @@ public class BingExcelEventImpl implements BingExcelEvent {
 		public String toString() {
 
 			return MoreObjects.toStringHelper(getClass()).omitNullValues()
-					.add("sheetName", sheetName)
-					.add("sheetIndex", sheetIndex)
-					.add("row", row)
-					.toString();
+					.add("sheetName", sheetName).add("sheetIndex", sheetIndex)
+					.add("row", row).toString();
 		}
 
 	}

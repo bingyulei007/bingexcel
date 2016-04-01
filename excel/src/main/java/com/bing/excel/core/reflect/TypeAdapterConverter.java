@@ -14,7 +14,7 @@ import com.bing.excel.exception.ConversionException;
 import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 import com.bing.excel.mapper.FieldMapperHandler;
-import com.bing.excel.reader.vo.ListRow;
+import com.bing.excel.vo.ListRow;
 import com.google.common.primitives.Primitives;
 
 public class TypeAdapterConverter<T> implements ModelAdapter {

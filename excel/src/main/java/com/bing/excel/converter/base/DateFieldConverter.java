@@ -2,12 +2,14 @@ package com.bing.excel.converter.base;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.poi.ss.usermodel.DateUtil;
-
 
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
@@ -20,30 +22,29 @@ import com.bing.utils.StringParseUtil;
  * @date 2016-3-21 Description:
  */
 public final class DateFieldConverter extends AbstractFieldConvertor {
-	
-	private final static SimpleDateFormat DEFAULT_FORMATS = new SimpleDateFormat(
-			"yyyy-MM-dd HH:mm:ss");
-	private final SimpleDateFormat inFormats;
-	private final SimpleDateFormat outFormats;
-	private final boolean smartConversion;
+
+	private static ThreadLocal<Map<Object, Object>> localFormat = new ThreadLocal<>();
+	private final String inFormatStr;
+	private final String outFormatStr;
+	private final String inFormatKey = "inKey";
+	private final String outFormatKey = "outKey";
 
 	public DateFieldConverter(boolean smartConversion) {
-		this(DEFAULT_FORMATS, smartConversion);
+		this("yyyy-MM-dd HH:mm:ss", smartConversion);
 	}
 
 	public DateFieldConverter() {
 		this(false);
 	}
 
-	public DateFieldConverter(SimpleDateFormat formats, boolean smartConversion) {
+	public DateFieldConverter(String formats, boolean smartConversion) {
 		this(formats, formats, smartConversion);
 	}
 
-	public DateFieldConverter(SimpleDateFormat inFormats,
-			SimpleDateFormat outFormats, boolean smartConversion) {
-		this.inFormats = inFormats;
-		this.outFormats = outFormats;
-		this.smartConversion = smartConversion;
+	public DateFieldConverter(String inFormats, String outFormats,
+			boolean smartConversion) {
+		this.inFormatStr = inFormats;
+		this.outFormatStr = outFormats;
 	}
 
 	@Override
@@ -52,33 +53,28 @@ public final class DateFieldConverter extends AbstractFieldConvertor {
 	}
 
 	@Override
-	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {
+	public   Object  fromString(String cell,ConverterHandler converterHandler,Class targetType) {
 		
 		
-		String temp;
-		if (smartConversion) {
-			try {
-				return StringParseUtil.parseDate(cell);
-			} catch (ParseException e) {
-				throw new ConversionException("Cannot parse date" + cell, e);
-			}
-
-		} else {
-			temp = cell;
+		String temp=cell;
+		SimpleDateFormat inFormat=getFormat(outFormatKey);
+		
+		if(inFormat==null){
+			throw new NullPointerException("inFormat[SimpleDateFormat] is null");
 		}
 		Date date;
 		try {
-			date = inFormats.parse(temp);
+			date = inFormat.parse(temp);
 			return date;
 		} catch (ParseException e) {
 			try {
-				inFormats.applyPattern("yy-MM-dd HH:mm");
-				date = inFormats.parse(temp);
+				inFormat.applyPattern("yy-MM-dd HH:mm");
+				date = inFormat.parse(temp);
 				return date;
 			} catch (ParseException e1) {
 				try {
-					inFormats.applyPattern("yy-MM-dd");
-					date = inFormats.parse(temp);
+					inFormat.applyPattern("yy-MM-dd");
+					date = inFormat.parse(temp);
 					return date;
 				} catch (ParseException e2) {
 					throw new ConversionException("Cannot parse date" + cell, e2);
@@ -89,4 +85,35 @@ public final class DateFieldConverter extends AbstractFieldConvertor {
 
 	}
 
+	public SimpleDateFormat getFormat(String key) {
+		if (key.equals(inFormatKey)) {
+			Map<Object, Object> map = localFormat.get();
+			if (map == null) {
+				map = Collections.synchronizedMap(new HashMap<>());
+				localFormat.set(map);
+			}
+			Object object = map.get(key);
+			if (object == null) {
+				SimpleDateFormat format = new SimpleDateFormat(inFormatStr);
+				map.put(key, format);
+				object = format;
+				
+			}
+			return (SimpleDateFormat) object;
+		} else if (key.equals(outFormatKey)) {
+			Map<Object, Object> map = localFormat.get();
+			if (map == null) {
+				map = Collections.synchronizedMap(new HashMap<>());
+				localFormat.set(map);
+			}
+			Object object = map.get(key);
+			if (object == null) {
+				SimpleDateFormat format = new SimpleDateFormat(outFormatStr);
+				map.put(key, format);
+				object = format;
+			}
+			return (SimpleDateFormat) object;
+		}
+		return null;
+	}
 }

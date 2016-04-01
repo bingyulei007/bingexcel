@@ -113,7 +113,7 @@ public class ReadTestEventModel5 {
 	public static class tempListener implements BingReadListener{
 
 		@Override
-		public void writeModel(Object object, ModelInfo modelInfo) {
+		public void readModel(Object object, ModelInfo modelInfo) {
 			
 			System.out.println(modelInfo+":"+object);
 		}
