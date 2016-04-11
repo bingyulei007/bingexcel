@@ -3,9 +3,6 @@ package com.bing.excel.reader.sax;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -21,13 +18,11 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.bing.excel.exception.BingSaxReadStopException;
 import com.bing.excel.reader.ExcelReadListener;
-import com.bing.excel.reader.SaxHandler;
+import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListRow;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -37,7 +32,7 @@ import com.google.common.collect.ImmutableSet;
  *       读取07excel的sax方法，解析器默认使用org.apache.xerces.parsers.SAXParser
  *       。可以痛痛set方法手动设置
  */
-public class DefaultXSSFSaxHandler implements SaxHandler {
+public class DefaultXSSFSaxHandler implements ReadHandler {
 	private OPCPackage pkg;
 	private XMLReader parser;
 	private ExcelReadListener excelReader;
@@ -179,13 +174,13 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 	public void readSheet(int[] indexs) throws IOException, OpenXML4JException,
 			SAXException {
 		if (pkg == null) {
-			throw new NullPointerException("OPCPackage 对象为空");
+			throw new NullPointerException("OPCPackage is null");
 		}
 		//ImmutableCollection<Integer> sheetSelect=
 		ImmutableSet.Builder<Integer> build =ImmutableSet.builder();
 		for (int i : indexs) {
 			if(i<0){
-				throw new IllegalArgumentException("sheet 表的下标不能为负数");
+				throw new IllegalArgumentException("index of sheet is a number greater than 0");
 			}else{
 				build.add(i);
 			}
@@ -280,6 +275,8 @@ public class DefaultXSSFSaxHandler implements SaxHandler {
 				break;
 			}
 		}
+		excelReader.endWorkBook();
+		this.pkg.revert();
 	}
 
 	public XMLReader getParser() throws SAXException {

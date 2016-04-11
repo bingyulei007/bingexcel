@@ -8,10 +8,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +31,7 @@ import com.bing.excel.mapper.AnnotationMapper;
 import com.bing.excel.mapper.FieldMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
-import com.bing.excel.reader.SaxHandler;
+import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.vo.ListRow;
 import com.google.common.base.MoreObjects;
 
@@ -47,13 +47,13 @@ public class BingExcelEventImpl implements BingExcelEvent {
 	/**
 	 * model entity Converter,the relationship is sheet-to-entity
 	 */
-	private final Map<Class<?>, TypeAdapterConverter<?>> typeTokenCache = new HashMap<Class<?>, TypeAdapterConverter<?>>();
+	private final Map<Class<?>, TypeAdapterConverter<?>> typeTokenCache = Collections
+			.synchronizedMap(new HashMap<Class<?>, TypeAdapterConverter<?>>());
 	/**
 	 * globe filed converter
 	 */
 	private final ConverterHandler defaultLocalConverterHandler;
-	private final Set<Class<?>> targetTypes = Collections
-			.synchronizedSet(new HashSet<Class<?>>());
+	private final Set<Class<?>> targetTypes = Collections.synchronizedSet(new HashSet<Class<?>>());
 	private FieldMapperHandler ormMapper = new AnnotationMapper();
 	private BingReadListener listener = null;
 
@@ -94,7 +94,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
 		this.listener = listener;
 		BingExcelReaderListener excelListener = new BingExcelReaderListener(
 				conditions);
-		SaxHandler handler = ExcelReaderFactory.create(file, excelListener,
+		ReadHandler handler = ExcelReaderFactory.create(file, excelListener,
 				true);
 		int[] indexArr = new int[conditions.length];
 		int minNum = -1;
@@ -134,7 +134,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
 		this.listener = listener;
 		BingExcelReaderListener listner = new BingExcelReaderListener(
 				conditions);
-		SaxHandler handler = ExcelReaderFactory.create(stream, listner, true);
+		ReadHandler handler = ExcelReaderFactory.create(stream, listner, true);
 		int[] indexArr = new int[conditions.length];
 		int minNum = 0;
 		for (int i = 0; i < conditions.length; i++) {
@@ -234,7 +234,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
 						return;
 					}
 					final Field[] fields = type.getDeclaredFields();
-					List<Field> tempConverterFields = new LinkedList<>();
+					List<Field> tempConverterFields = new ArrayList<>();
 					for (int i = 0; i < fields.length; i++) {
 						final Field field = fields[i];
 

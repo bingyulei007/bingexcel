@@ -1,24 +1,25 @@
 package com.bing.other;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
-
-import com.thoughtworks.xstream.XStream;
 
 public class MyTest {
 	@Test
@@ -70,24 +71,54 @@ public class MyTest {
     	    Row row = sheet.createRow(1);
 
     	    // Create a cell and put a value in it.
-    	    Cell cell = row.createCell(1);
-    	    cell.setCellValue(4);
+    	    
 
     	    // Style the cell with borders all around.
     	    CellStyle style = wb.createCellStyle();
-    	    style.setBorderBottom(CellStyle.BORDER_THIN);
-    	    style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
-    	    style.setBorderLeft(CellStyle.BORDER_THIN);
-    	    style.setLeftBorderColor(IndexedColors.GREEN.getIndex());
-    	    style.setBorderRight(CellStyle.BORDER_THIN);
-    	    style.setRightBorderColor(IndexedColors.BLUE.getIndex());
-    	    style.setBorderTop(CellStyle.BORDER_MEDIUM_DASHED);
-    	    style.setTopBorderColor(IndexedColors.BLACK.getIndex());
-    	    cell.setCellStyle(style);
-
+    	    
+    	    //     style.setFillBackgroundColor(IndexedColors.AUTOMATIC.getIndex());
+    	   style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+    	   style.setFillForegroundColor(IndexedColors.LIGHT_ORANGE.index);
+    	   
+    	    Font font = wb.createFont();
+    	    font.setFontHeightInPoints((short)24);
+    	    font.setFontName("Courier New");
+    	    font.setItalic(true);
+    	    font.setStrikeout(true);
+    	    style.setFont(font);
+    	    CellUtil.createCell(row, 1, "nihao",style);
+    	    //style.setFont(font);
     	    // Write the output to a file
     	    FileOutputStream fileOut = new FileOutputStream("workbook.xls");
     	    wb.write(fileOut);
     	    fileOut.close();
+    }
+    private Map<String, String> map=new HashMap<String, String>();
+    @Test
+    public void before(){
+    	map.put("a", "aa");
+    }
+    
+    @Test
+    public void testLong() throws EncryptedDocumentException, InvalidFormatException, IOException{
+    	 Workbook wb = new HSSFWorkbook();
+    	    Sheet sheet = wb.createSheet("new sheet");
+
+    	    Row row = sheet.createRow((short) 1);
+    	    Cell cell = row.createCell((short) 1);
+    	    cell.setCellValue("This is a test of merging");
+
+    	    sheet.addMergedRegion(new CellRangeAddress(
+    	            1, //first row (0-based)
+    	            1, //last row  (0-based)
+    	            1, //first column (0-based)
+    	            2  //last column  (0-based)
+    	    ));
+
+    	    // Write the output to a file
+    	    FileOutputStream fileOut = new FileOutputStream(new File("E:/test/gzb.xls"));
+    	    wb.write(fileOut);
+    	    fileOut.close();
+    	 
     }
 }

@@ -23,7 +23,7 @@ import com.bing.utils.StringParseUtil;
  */
 public final class DateFieldConverter extends AbstractFieldConvertor {
 
-	private static ThreadLocal<Map<Object, Object>> localFormat = new ThreadLocal<>();
+	private static final ThreadLocal<Map<Object, Object>> localFormat = new ThreadLocal<>();
 	private final String inFormatStr;
 	private final String outFormatStr;
 	private final String inFormatKey = "inKey";

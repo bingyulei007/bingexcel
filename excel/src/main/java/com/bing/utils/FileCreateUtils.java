@@ -37,8 +37,7 @@ public class FileCreateUtils {
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				
 			}
 			return file;
 		}
@@ -77,8 +76,7 @@ public class FileCreateUtils {
 
 			file.createNewFile();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 			return null;
 		}
 		return file;

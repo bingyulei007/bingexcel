@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +29,7 @@ import com.bing.excel.mapper.AnnotationMapper;
 import com.bing.excel.mapper.FieldMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
-import com.bing.excel.reader.SaxHandler;
+import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.vo.ListRow;
 import com.google.common.collect.Lists;
 
@@ -45,7 +45,8 @@ public class BingExcelImpl implements BingExcel {
 	/**
 	 * model entity Converter,the relationship is sheet-to-entity
 	 */
-	private final Map<Class<?>, TypeAdapterConverter<?>> typeTokenCache = new HashMap<Class<?>, TypeAdapterConverter<?>>();
+	private final Map<Class<?>, TypeAdapterConverter<?>> typeTokenCache = Collections
+			.synchronizedMap(new HashMap<Class<?>, TypeAdapterConverter<?>>());
 	/**
 	 * globe filed converter
 	 */
@@ -93,7 +94,7 @@ public class BingExcelImpl implements BingExcel {
 		resultList = null;
 		BingExcelReaderListener listner = new BingExcelReaderListener(
 				conditions);
-		SaxHandler handler = ExcelReaderFactory.create(file, listner, true);
+		ReadHandler handler = ExcelReaderFactory.create(file, listner, true);
 		int[] indexArr = new int[conditions.length];
 		int minNum = -1;
 		for (int i = 0; i < conditions.length; i++) {
@@ -133,7 +134,7 @@ public class BingExcelImpl implements BingExcel {
 		resultList = null;
 		BingExcelReaderListener listner = new BingExcelReaderListener(
 				conditions);
-		SaxHandler handler = ExcelReaderFactory.create(stream, listner, true);
+		ReadHandler handler = ExcelReaderFactory.create(stream, listner, true);
 		int[] indexArr = new int[conditions.length];
 		int minNum = 0;
 		for (int i = 0; i < conditions.length; i++) {
@@ -242,7 +243,7 @@ public class BingExcelImpl implements BingExcel {
 						return;
 					}
 					final Field[] fields = type.getDeclaredFields();
-					List<Field> tempConverterFields = new LinkedList<>();
+					List<Field> tempConverterFields = new ArrayList<>();
 					for (int i = 0; i < fields.length; i++) {
 						final Field field = fields[i];
 
@@ -310,7 +311,7 @@ public class BingExcelImpl implements BingExcel {
 	public static class SheetVo<E> {
 		private int sheetIndex;
 		private String sheetName;
-		private List<E> list = new LinkedList<>();
+		private List<E> list = new ArrayList<>();
 
 		public SheetVo(int sheetIndex, String sheetName) {
 			super();

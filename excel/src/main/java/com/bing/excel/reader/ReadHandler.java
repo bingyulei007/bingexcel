@@ -11,7 +11,7 @@ import org.xml.sax.SAXException;
  * @date 2016-3-1
  * Description:  
  */
-public interface SaxHandler {
+public interface ReadHandler {
 	/**
 	 * 处理所用数据对象
 	 */

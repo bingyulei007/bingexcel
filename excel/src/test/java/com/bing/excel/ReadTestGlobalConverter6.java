@@ -23,7 +23,7 @@ import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
-import com.bing.excel.reader.SaxHandler;
+import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.vo.ListRow;
 import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
