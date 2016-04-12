@@ -1,6 +1,7 @@
 package com.bing.excel.core.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,6 +32,8 @@ import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.vo.ListRow;
+import com.bing.excel.writer.ExcelWriterFactory;
+import com.bing.excel.writer.WriteHandler;
 import com.google.common.collect.Lists;
 
 /**
@@ -148,28 +151,118 @@ public class BingExcelImpl implements BingExcel {
 		return this.resultList;
 	}
 
-	
+	@Override
+	public void writeExcel(File file, Iterable... iterable)
+			throws FileNotFoundException {
+		WriteHandler handler = ExcelWriterFactory.createXSSF(file);
+
+	}
 
 	@Override
-	public void writeExcel(File file, Iterable... iterable) {
-		// TODO Auto-generated method stub
-		
+	public void writeOldExcel(File file, Iterable... iterable)
+			throws FileNotFoundException {
+		WriteHandler handler = ExcelWriterFactory.createHSSF(file);
 	}
 
 	@Override
 	public void writeExcel(String path, Iterable... iterable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void writeExcel(OutputStream stream, Iterable... iterable) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
+	public void writeOldExcel(String path, Iterable... iterable) {
+		// TODO Auto-generated method stub
 
+	}
 
+	@Override
+	public void writeOldExcel(OutputStream stream, Iterable... iterable) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void writeToExcel(WriteHandler handler,Iterable... iterable) {
+		for (Iterable list : iterable) {
+			for (Object object : list) {
+				
+			}
+		}
+	}
+
+	private void registeAdapter(Class type) {
+
+		synchronized (type) {
+			if (targetTypes.contains(type)) {
+				return;
+			}
+			try {
+				// 转换的类型不可能对应的是基本类型
+				if (type.isPrimitive()) {
+					return;
+				}
+				// 目前先不考虑model的接口继承问题 TODO
+				if (type.isInterface()
+						|| (type.getModifiers() & Modifier.ABSTRACT) > 0) {
+					return;
+				}
+				final Field[] fields = type.getDeclaredFields();
+				List<Field> tempConverterFields = new ArrayList<>();
+				for (int i = 0; i < fields.length; i++) {
+					final Field field = fields[i];
+
+					if (field.isEnumConstant()
+							|| (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
+						continue;
+					}
+					// 应该不会出现
+					if (field.isSynthetic()) {
+						continue;
+					}
+					field.setAccessible(true);
+					tempConverterFields.add(field);
+
+				}
+				Constructor<?> constructor;
+				try {
+					constructor = type.getDeclaredConstructor();
+				} catch (NoSuchMethodException | SecurityException e) {
+					throw new IllegalEntityException(type,
+							"Gets the default constructor failed");
+				}
+				TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
+						constructor, tempConverterFields);
+				typeTokenCache.put(type, typeAdapterConverter);
+
+			} finally {
+				targetTypes.add(type);
+			}
+
+		}
+
+	}
+
+	private TypeAdapterConverter getTypeAdapterConverter(
+			Constructor<?> constructor, List<Field> tempConverterFields) {
+
+		TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
+				constructor, tempConverterFields, localConverterHandler);
+		return adConverter;
+	}
+
+	/**
+	 * reade Class
+	 * 
+	 * @author shizhongtao
+	 * 
+	 * @date 2016-4-12 Description:
+	 */
 	private class BingExcelReaderListener extends AbstractExcelReadListener {
 
 		private final ReaderCondition[] conditions;
@@ -224,66 +317,6 @@ public class BingExcelImpl implements BingExcel {
 					break;
 				}
 			}
-		}
-
-		private void registeAdapter(Class type) {
-
-			synchronized (type) {
-				if (targetTypes.contains(type)) {
-					return;
-				}
-				try {
-					// 转换的类型不可能对应的是基本类型
-					if (type.isPrimitive()) {
-						return;
-					}
-					// 目前先不考虑model的接口继承问题 TODO
-					if (type.isInterface()
-							|| (type.getModifiers() & Modifier.ABSTRACT) > 0) {
-						return;
-					}
-					final Field[] fields = type.getDeclaredFields();
-					List<Field> tempConverterFields = new ArrayList<>();
-					for (int i = 0; i < fields.length; i++) {
-						final Field field = fields[i];
-
-						if (field.isEnumConstant()
-								|| (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
-							continue;
-						}
-						// 应该不会出现
-						if (field.isSynthetic()) {
-							continue;
-						}
-						field.setAccessible(true);
-						tempConverterFields.add(field);
-
-					}
-					Constructor<?> constructor;
-					try {
-						constructor = type.getDeclaredConstructor();
-					} catch (NoSuchMethodException | SecurityException e) {
-						throw new IllegalEntityException(type,
-								"Gets the default constructor failed");
-					}
-					TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
-							constructor, tempConverterFields);
-					typeTokenCache.put(type, typeAdapterConverter);
-
-				} finally {
-					targetTypes.add(type);
-				}
-
-			}
-
-		}
-
-		private TypeAdapterConverter getTypeAdapterConverter(
-				Constructor<?> constructor, List<Field> tempConverterFields) {
-
-			TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
-					constructor, tempConverterFields, localConverterHandler);
-			return adConverter;
 		}
 
 		@Override
