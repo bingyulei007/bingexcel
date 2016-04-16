@@ -42,6 +42,10 @@ public class ListLine {
 		return addValue(index, (double) value);
 		
 	}
+	public ListLine addValue(int index, long value) {
+		return addValue(index, (double) value);
+		
+	}
 
 	public ListLine addValue(int index, double value) {
 		if (listDouble == null) {
