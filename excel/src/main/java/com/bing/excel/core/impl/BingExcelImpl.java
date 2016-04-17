@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
@@ -27,10 +28,12 @@ import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.reflect.TypeAdapterConverter;
 import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.mapper.AnnotationMapper;
-import com.bing.excel.mapper.FieldMapperHandler;
+import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.ReadHandler;
+import com.bing.excel.vo.CellKV;
+import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.ListRow;
 import com.bing.excel.writer.ExcelWriterFactory;
 import com.bing.excel.writer.WriteHandler;
@@ -48,15 +51,14 @@ public class BingExcelImpl implements BingExcel {
 	/**
 	 * model entity Converter,the relationship is sheet-to-entity
 	 */
-	private final Map<Class<?>, TypeAdapterConverter<?>> typeTokenCache = Collections
-			.synchronizedMap(new HashMap<Class<?>, TypeAdapterConverter<?>>());
+	private final Map<Class<?>, TypeAdapterConverter<?>> typeTokenCache = new ConcurrentHashMap<Class<?>, TypeAdapterConverter<?>>();
 	/**
 	 * globe filed converter
 	 */
 	private final ConverterHandler localConverterHandler;
 	private final Set<Class<?>> targetTypes = Collections
 			.synchronizedSet(new HashSet<Class<?>>());
-	private FieldMapperHandler ormMapper = new AnnotationMapper();
+	private ExcelConverterMapperHandler ormMapper = new AnnotationMapper();
 	private List<SheetVo> resultList;
 
 	public BingExcelImpl(ConverterHandler localConverterHandler) {
@@ -190,10 +192,32 @@ public class BingExcelImpl implements BingExcel {
 
 	private void writeToExcel(WriteHandler handler,Iterable... iterable) {
 		for (Iterable list : iterable) {
+			boolean isAdd=false;
+			TypeAdapterConverter<?> typeAdapter=null;
 			for (Object object : list) {
-				
+				if (!isAdd) {
+					if (object != null) {
+						isAdd = true;
+						//registeAdapter(object.getClass());
+						Class clazz=object.getClass();
+						ormMapper.processAnnotations(clazz);
+						registeAdapter(clazz);
+						//create sheet
+						handler.createSheet(ormMapper.getModelName(clazz));
+						 typeAdapter = typeTokenCache
+								.get(clazz);
+						List<CellKV<String>> header = typeAdapter.getHeader( ormMapper);
+						handler.writeHeader(header);
+					}
+					
+				}else{
+					ListLine listLine = typeAdapter.marshal(object, ormMapper);
+					handler.writeLine(listLine);
+				}
 			}
 		}
+		handler.flush();
+		
 	}
 
 	private void registeAdapter(Class type) {

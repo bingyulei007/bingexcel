@@ -16,10 +16,7 @@ public class EnumConVerter extends AbstractFieldConvertor {
 		 return clz.isEnum() || Enum.class.isAssignableFrom(clz);
 	}
 
-	@Override
-	public void toObject(Object source) {
-		
-	}
+	
 
 	@Override
 	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {

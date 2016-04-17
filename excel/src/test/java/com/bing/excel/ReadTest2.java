@@ -21,6 +21,7 @@ import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
+import com.bing.excel.vo.OutValue;
 import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
@@ -90,10 +91,12 @@ public class ReadTest2 {
 	public static class DateTestConverter implements FieldValueConverter {
 
 
-		@Override
-		public void toObject(Object source) {
-			// TODO Auto-generated method stub
+		
 
+		@Override
+		public OutValue toObject(Object source) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 		@Override

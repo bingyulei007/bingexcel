@@ -1,6 +1,5 @@
 package com.bing.excel.converter;
 
-import java.lang.reflect.Type;
 
 /**
  * <p>Title: ConverterMatcher</p>
@@ -14,7 +13,7 @@ public interface ConverterMatcher {
 
     /**
      * Determines whether the converter can marshall a particular type.
-     * @param type the Class representing the object type to be converted
+     * @param clz the Class representing the object type to be converted
      */
     boolean canConvert(Class<?> clz);
 

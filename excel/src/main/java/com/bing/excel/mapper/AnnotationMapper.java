@@ -31,6 +31,7 @@ import com.bing.excel.exception.MissingCellConfigException;
 import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 import com.bing.utils.ReflectDependencyFactory;
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
@@ -43,11 +44,11 @@ import com.google.common.primitives.Primitives;
  * @version 1.0
  * @since JDK 1.7 文件名称：AnnotationMapper.java 类说明：
  */
-public class AnnotationMapper implements FieldMapperHandler {
+public class AnnotationMapper implements ExcelConverterMapperHandler {
 
 	// 属性转换器的缓存
 	private Cache<Class<?>, Map<List<Object>, FieldValueConverter>> converterCache = null;
-	private transient ConversionMapper fieldMapper = new ConversionMapper();
+	private  ConversionMapper fieldMapper = new ConversionMapper();
 	private final Set<Class<?>> annotatedTypes = Collections
 			.synchronizedSet(new HashSet<Class<?>>());
 
@@ -55,7 +56,7 @@ public class AnnotationMapper implements FieldMapperHandler {
 
 	public AnnotationMapper() {
 		converterCache = CacheBuilder.newBuilder().maximumSize(500)
-				.expireAfterWrite(5, TimeUnit.MINUTES).build();
+				.expireAfterAccess(2, TimeUnit.MINUTES).build();
 	}
 
 	/*
@@ -114,11 +115,11 @@ public class AnnotationMapper implements FieldMapperHandler {
 		return fieldMapper.getLocalConverterMapper(definedIn, fieldName);
 	}
 
+	
+
 	@Override
-	public FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,
-			int index) {
-		
-		return null;
+	public String getModelName(Class<?> key) {
+		return fieldMapper.getModelName(key);
 	}
 
 	private void processTypes(final Set<Class<?>> types) {
@@ -154,7 +155,7 @@ public class AnnotationMapper implements FieldMapperHandler {
 							continue;
 						}
 
-						addMapper(field);
+						addMapper(type,field);
 					}
 
 				} finally {
@@ -176,14 +177,21 @@ public class AnnotationMapper implements FieldMapperHandler {
 	 * @param key
 	 * @param cls
 	 */
-	private void addMapper(Field field) {
+	private void addMapper(Class<?>  clazz,Field field) {
 		CellConfig cellConfig = field.getAnnotation(CellConfig.class);
 		BingConvertor bingConvertor = field.getAnnotation(BingConvertor.class);
 		int index;
+		String alias;
+		boolean omitOutput;
 		if (cellConfig == null) {
-			throw new MissingCellConfigException("["+field.getDeclaringClass()+"#"+field.getName()+"]Missing CellConfig annotation");
+			throw new MissingCellConfigException("["+clazz+"#"+field.getName()+"]Missing CellConfig annotation");
 		} else {
 			index = cellConfig.index();
+			omitOutput=cellConfig.omitOutput();
+			alias=cellConfig.aliasName();
+			if(Strings.isNullOrEmpty(alias)){
+				alias=field.getName();
+			}
 			if (index < 0) {
 				throw new IllegalCellConfigException("field[" + field.getName()
 						+ "] has an error cellConfig,illegal index");
@@ -201,8 +209,8 @@ public class AnnotationMapper implements FieldMapperHandler {
 				}
 			} 
 		} 
-		fieldMapper.registerLocalConverter(field.getDeclaringClass(),
-				field.getName(), index, field.getType(), converter);
+		fieldMapper.registerLocalConverter(clazz,
+				field.getName(), index,alias,omitOutput, field.getType(), converter);
 	}
 
 	private FieldValueConverter cacheConverter(final BingConvertor annotation,

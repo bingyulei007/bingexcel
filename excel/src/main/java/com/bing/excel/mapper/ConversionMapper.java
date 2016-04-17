@@ -1,26 +1,41 @@
 package com.bing.excel.mapper;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.common.FieldRelation;
+import com.bing.other.AnotationTest;
+import com.google.common.base.Strings;
 
 public class ConversionMapper {
 	private final Map<FieldRelation, FieldConverterMapper> fieldMapper = new HashMap<>();
+	private final Map<Class<?>, String> modelAlias = new HashMap<>();
 
 	public ConversionMapper() {
 	}
 
-	public void registerLocalConverter(Class definedIn,
-			String fieldName, int index, Class<?> targetType,
+	public void registerLocalConverter(Class definedIn, String fieldName,
+			int index, String alias, boolean omitOutput, Class<?> fieldType,
 			FieldValueConverter converter) {
-		registerLocalConverter(definedIn, fieldName, new FieldConverterMapper(index,
-				converter, targetType));
+
+		registerLocalConverter(definedIn, fieldName, new FieldConverterMapper(
+				index, converter, alias, omitOutput, fieldType));
 	}
 
-	private void registerLocalConverter(Class definedIn,
-			String fieldName, FieldConverterMapper mapper) {
+	private void registerLocalConverter(Class definedIn, String fieldName,
+			FieldConverterMapper mapper) {
+		Annotation annotation = definedIn.getAnnotation(OutAlias.class);
+		if (annotation != null) {
+			String value = ((OutAlias) annotation).value();
+			if (Strings.isNullOrEmpty(value)) {
+				value = definedIn.getSimpleName();
+			}
+			modelAlias.put(definedIn, value);
+		}
+
 		fieldMapper.put(new FieldRelation(definedIn, fieldName), mapper);
 	}
 
@@ -35,11 +50,17 @@ public class ConversionMapper {
 		return fieldMapper.get(new FieldRelation(definedIn, fieldName));
 	}
 
+	public String getModelName(Class<?> key) {
+        return modelAlias.get(key);
+	}
+
 	public static class FieldConverterMapper {
 		private int index;
 		private boolean isPrimitive = true;
 		private Class<?> clazz;
 		private FieldValueConverter converter;
+		private String alias;
+		private boolean omitOutput = false;
 
 		public int getIndex() {
 			return index;
@@ -53,6 +74,14 @@ public class ConversionMapper {
 			return clazz;
 		}
 
+		public String getAlias() {
+			return alias;
+		}
+
+		public boolean isOmitOutput() {
+			return omitOutput;
+		}
+
 		public FieldValueConverter getFieldConverter() {
 			return converter;
 		}
@@ -61,12 +90,15 @@ public class ConversionMapper {
 			this.converter = converter;
 		}
 
-		public FieldConverterMapper(int index, FieldValueConverter converter, Class<?> clazz) {
+		public FieldConverterMapper(int index, FieldValueConverter converter,
+				String alias, boolean omitOutput, Class<?> clazz) {
 			super();
 			this.index = index;
 			this.isPrimitive = clazz.isPrimitive();
 			this.clazz = clazz;
+			this.alias = alias;
 			this.converter = converter;
+			this.omitOutput = omitOutput;
 		}
 
 	}

@@ -22,6 +22,7 @@ import com.bing.excel.core.BingReadListener;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelEventImpl.ModelInfo;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
+import com.bing.excel.vo.OutValue;
 import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
@@ -83,11 +84,7 @@ public class ReadTestEventModel5 {
 
 	public static class DateTestConverter implements FieldValueConverter {
 
-		@Override
-		public void toObject(Object source) {
-			// TODO Auto-generated method stub
-
-		}
+		
 
 		@Override
 		public boolean canConvert(Class<?> clz) {
@@ -106,6 +103,12 @@ public class ReadTestEventModel5 {
 
 				throw new RuntimeException(e);
 			}
+		}
+
+		@Override
+		public OutValue toObject(Object source) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 	}
