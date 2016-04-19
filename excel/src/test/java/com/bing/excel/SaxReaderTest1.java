@@ -24,7 +24,8 @@ public class SaxReaderTest1 {
 	public void testme() throws Exception{
 		//InputStream stream = Salary.class.getResourceAsStream("/salary6.xls");
 		//File f = new File("E:/test/gzb.xls");
-		File f = new File("E:/test/bc.xlsx");
+		//File f = new File("E:/test/bc.xlsx");
+		File f = new File("E:/test/b.xlsx");
 		//
 		System.out.println(System.currentTimeMillis());
 		ReadHandler saxHandler = ExcelReaderFactory.create(f, new ExcelReadListener() {
@@ -38,7 +39,7 @@ public class SaxReaderTest1 {
 			@Override
 			public void optRow(int curRow, ListRow rowList) {
 				//输出读取的数据列表。这里数据全部是string类型
-				//System.out.println(rowList);
+				System.out.println(rowList);
 			}
 			
 			@Override

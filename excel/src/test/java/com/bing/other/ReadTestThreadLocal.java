@@ -16,6 +16,10 @@ import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingExcelEventBuilder;
 import com.bing.excel.core.BingReadListener;
 import com.bing.excel.core.impl.BingExcelEventImpl.ModelInfo;
+import com.bing.excel.reader.ExcelReadListener;
+import com.bing.excel.reader.ExcelReaderFactory;
+import com.bing.excel.reader.ReadHandler;
+import com.bing.excel.vo.ListRow;
 import com.google.common.base.MoreObjects;
 
 public class ReadTestThreadLocal {
@@ -41,7 +45,7 @@ public class ReadTestThreadLocal {
 
 		@Override
 		public void run() {
-			BingExcelEvent builder = BingExcelEventBuilder.toBuilder()
+			/*BingExcelEvent builder = BingExcelEventBuilder.toBuilder()
 					.builder();
 			try {
 				File f = new File("E:/test/bc.xlsx");
@@ -57,6 +61,39 @@ public class ReadTestThreadLocal {
 				});
 				System.out.println(System.currentTimeMillis());
 			} catch (Exception e) {
+				e.printStackTrace();
+			}*/
+			File f = new File("E:/test/bc.xlsx");
+			try {
+				ReadHandler handler = ExcelReaderFactory.create(f, new ExcelReadListener() {
+					
+					@Override
+					public void startSheet(int sheetIndex, String name) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void optRow(int curRow, ListRow rowList) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void endWorkBook() {
+						// TODO Auto-generated method stub
+						System.out.println(System.currentTimeMillis());
+					}
+					
+					@Override
+					public void endSheet(int sheetIndex, String name) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
+				handler.readSheets();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

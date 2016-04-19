@@ -1,6 +1,7 @@
 package com.bing.excel;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
@@ -13,6 +14,7 @@ import org.junit.Test;
 import com.bing.excel.ReadTestGlobalConverter6.EmploryAttribute;
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.converter.base.BooleanFieldConverter;
@@ -55,6 +57,7 @@ public class ReadTest7 {
 
 	}
 
+	@OutAlias("hghg")
 	public static class Salary {
 
 		@CellConfig(index = 1)
@@ -80,7 +83,7 @@ public class ReadTest7 {
 		}
 
 		@Override
-		public Object fromString(String cell, ConverterHandler converterHandler,Class type) {
+		public Object fromString(String cell, ConverterHandler converterHandler,Type type) {
 			if (StringUtils.isBlank(cell)) {
 				return null;
 			}

@@ -19,6 +19,7 @@ public class WriteHandlertest1 {
 		ArrayList<CellKV<String>> list = Lists.newArrayList();
 		list.add(new CellKV<String>(0,	 "日期nihao"));
 		list.add(new CellKV<String>(1,	 "数字2"));
+		list.add(new CellKV<String>(2,	 "真假"));
 		list.add(new CellKV<String>(3,	 "日期3"));
 		handler.writeHeader(list);
 		ListLine line=new ListLine();

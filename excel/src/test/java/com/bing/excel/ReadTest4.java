@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.converter.base.BooleanFieldConverter;
 import com.bing.excel.core.BingExcel;
@@ -58,7 +59,6 @@ public class ReadTest4 {
 	enum Department {
 		develop, personnel, product;
 	}
-
 	public static class Salary {
 
 		@CellConfig(index = 1)

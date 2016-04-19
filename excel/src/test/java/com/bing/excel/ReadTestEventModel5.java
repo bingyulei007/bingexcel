@@ -1,6 +1,7 @@
 package com.bing.excel;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
@@ -12,6 +13,7 @@ import org.junit.Test;
 
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.converter.base.BooleanFieldConverter;
 import com.bing.excel.core.BingExcel;
@@ -82,7 +84,7 @@ public class ReadTestEventModel5 {
 		}
 	}
 
-	public static class DateTestConverter implements FieldValueConverter {
+	public static class DateTestConverter  extends AbstractFieldConvertor {
 
 		
 
@@ -92,7 +94,7 @@ public class ReadTestEventModel5 {
 		}
 
 		@Override
-		public Object fromString(String cell, ConverterHandler converterHandler,Class type) {
+		public Object fromString(String cell, ConverterHandler converterHandler,Type type) {
 
 			if (StringUtils.isBlank(cell)) {
 				return null;
@@ -105,11 +107,7 @@ public class ReadTestEventModel5 {
 			}
 		}
 
-		@Override
-		public OutValue toObject(Object source) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+		
 
 	}
 	

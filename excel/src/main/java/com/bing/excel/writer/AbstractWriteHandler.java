@@ -96,9 +96,11 @@ public abstract class AbstractWriteHandler implements WriteHandler{
 	
 	@Override
 	public void writeLine(ListLine line) {
-		currentRowIndex++;
-		Row currentRow = currentSheet.createRow(currentRowIndex);
-		writeDataToRow(line, currentRow);
+		if (line!=null) {
+			currentRowIndex++;
+			Row currentRow = currentSheet.createRow(currentRowIndex);
+			writeDataToRow(line, currentRow);
+		}
 	}
 
 	@Override

@@ -57,7 +57,6 @@ public class ReadTest {
 		}
 		
 	}
-
 	public static class Person {
 		@CellConfig(index = 1)
 		private int age;

@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,8 @@ import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.ListRow;
+import com.bing.excel.vo.OutValue;
+import com.bing.excel.vo.OutValue.OutType;
 import com.google.common.primitives.Primitives;
 
 public class TypeAdapterConverter<T> implements ModelAdapter,
@@ -51,25 +54,29 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 		for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
 			FieldConverterMapper fieldConverterMapper = handler
 					.getLocalFieldConverterMapper(clazz, kv.getKey());
-			list.add(new CellKV<String>(fieldConverterMapper.getIndex(),
-					fieldConverterMapper.getAlias()));
+			if (!fieldConverterMapper.isOmitOutput()) {
+				list.add(new CellKV<String>(fieldConverterMapper.getIndex(),
+						fieldConverterMapper.getAlias()));
+			}
 		}
 		return list;
 	}
 
 	@Override
 	public ListLine marshal(Object source, ExcelConverterMapperHandler handler) {
-		ListLine line=new ListLine();
+		ListLine line = new ListLine();
 		for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
-			FieldConverterMapper converterMapper = handler
+			FieldConverterMapper fieldConverterMapper = handler
 					.getLocalFieldConverterMapper(clazz, kv.getKey());
-			BoundField boundField = kv.getValue();
-			if (converterMapper.getFieldConverter() == null) {
+			if (!fieldConverterMapper.isOmitOutput()) {
+				BoundField boundField = kv.getValue();
+				if (fieldConverterMapper.getFieldConverter() == null) {
 
-				setLocalConverter(converterMapper);
+					setLocalConverter(fieldConverterMapper);
+				}
+
+				boundField.serializeValue(source, fieldConverterMapper, line);
 			}
-			//TODO 写出部分 2016年4月17日21:37:36
-			//line.addValue(converterMapper.hashCode(), value)
 		}
 		return line;
 	}
@@ -131,6 +138,73 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 			this.name = name;
 		}
 
+		/**
+		 * Get listline from object
+		 * 
+		 * @return
+		 */
+		protected ListLine serializeValue(Object entity,
+				FieldConverterMapper converterMapper, ListLine line) {
+			if (entity == null) {
+				return line;
+			} else {
+				if (converterMapper == null) {
+					throw new NullPointerException("the converterMapper for ["
+							+ name + "] is null");
+				} else {
+					FieldValueConverter converter = converterMapper
+							.getFieldConverter();
+					if (converter == null) {
+						throw new NullPointerException("the converter for ["
+								+ name + "] is null");
+					}
+					boolean canConvert = converter.canConvert(converterMapper
+							.getFieldClass());
+					if (!canConvert) {
+						throw new ConversionException(
+								"the selected converter ["
+										+ converter.getClass()
+										+ "] cannot handle type ["
+										+ converterMapper.getFieldClass() + "]");
+					}
+					Object obj;
+					try {
+						obj = field.get(entity);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						throw new IllegalArgumentException(
+								"It happened an error when get the value of the Entity !",
+								e);
+					}
+					OutValue outValue = converter.toObject(obj,
+							defaultLocalConverterHandler);
+					if (outValue != null) {
+						if (outValue.getOutType().equals(OutType.DATE)) {
+							line.addValue(converterMapper.getIndex(),
+									(Date) outValue.getValue());
+						} else if (outValue.getOutType().equals(OutType.DOUBLE)) {
+							line.addValue(converterMapper.getIndex(),
+									(double) outValue.getValue());
+						} else if (outValue.getOutType()
+								.equals(OutType.INTEGER)) {
+							line.addValue(converterMapper.getIndex(),
+									(int) outValue.getValue());
+						} else if (outValue.getOutType().equals(OutType.LONG)) {
+							line.addValue(converterMapper.getIndex(),
+									(long) outValue.getValue());
+						} else if (outValue.getOutType().equals(OutType.STRING)) {
+							line.addValue(converterMapper.getIndex(), outValue
+									.getValue().toString());
+						} else if (outValue.getOutType().equals(
+								OutType.UNDEFINED)) {
+							line.addValue(converterMapper.getIndex(), outValue
+									.getValue().toString());
+						}
+					}
+				}
+				return line;
+			}
+		}
+
 		protected Object initializeValue(Object obj, String value,
 				FieldConverterMapper converterMapper) {
 			// field.set(obj, value);
@@ -167,8 +241,8 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 					}
 
 				} else {
-					throw new NullPointerException("the converter for [" + name
-							+ "] is null");
+					throw new NullPointerException("the converterMapper for ["
+							+ name + "] is null");
 				}
 			}
 			return obj;

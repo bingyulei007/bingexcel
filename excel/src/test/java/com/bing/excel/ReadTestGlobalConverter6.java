@@ -1,6 +1,7 @@
 package com.bing.excel;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
@@ -98,7 +99,7 @@ public class ReadTestGlobalConverter6 {
 		}
 
 		@Override
-		public Object fromString(String cell, ConverterHandler converterHandler,Class type) {
+		public Object fromString(String cell, ConverterHandler converterHandler,Type type) {
 			if(StringUtils.isBlank(cell)){
 				return null;
 			}else{

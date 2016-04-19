@@ -1,5 +1,7 @@
 package com.bing.excel.converter;
 
+import java.lang.reflect.Type;
+
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.vo.OutValue;
 
@@ -14,6 +16,6 @@ import com.bing.excel.vo.OutValue;
  * 类说明：  这里面convertor是针对实体类的filed。主要用于扩展转换,目前版本中，convertor中必须有无参的构造方法。
  */
 public interface FieldValueConverter extends ConverterMatcher {
-	  OutValue toObject(Object source);
-	  Object fromString(String cell,ConverterHandler converterHandler,Class targetType);
+	  OutValue toObject(Object source,ConverterHandler converterHandler);
+	  Object fromString(String cell,ConverterHandler converterHandler,Type targetType);
 }
