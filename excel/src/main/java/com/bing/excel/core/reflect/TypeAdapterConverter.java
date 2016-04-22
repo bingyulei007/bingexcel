@@ -54,10 +54,8 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 		for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
 			FieldConverterMapper fieldConverterMapper = handler
 					.getLocalFieldConverterMapper(clazz, kv.getKey());
-			if (!fieldConverterMapper.isOmitOutput()) {
 				list.add(new CellKV<String>(fieldConverterMapper.getIndex(),
 						fieldConverterMapper.getAlias()));
-			}
 		}
 		return list;
 	}
@@ -68,7 +66,6 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 		for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
 			FieldConverterMapper fieldConverterMapper = handler
 					.getLocalFieldConverterMapper(clazz, kv.getKey());
-			if (!fieldConverterMapper.isOmitOutput()) {
 				BoundField boundField = kv.getValue();
 				if (fieldConverterMapper.getFieldConverter() == null) {
 
@@ -76,7 +73,6 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 				}
 
 				boundField.serializeValue(source, fieldConverterMapper, line);
-			}
 		}
 		return line;
 	}

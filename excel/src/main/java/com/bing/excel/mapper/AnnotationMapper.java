@@ -187,7 +187,7 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 			throw new MissingCellConfigException("["+clazz+"#"+field.getName()+"]Missing CellConfig annotation");
 		} else {
 			index = cellConfig.index();
-			omitOutput=cellConfig.omitOutput();
+			//omitOutput=cellConfig.omitOutput();
 			alias=cellConfig.aliasName();
 			if(Strings.isNullOrEmpty(alias)){
 				alias=field.getName();
@@ -210,7 +210,7 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 			} 
 		} 
 		fieldMapper.registerLocalConverter(clazz,
-				field.getName(), index,alias,omitOutput, field.getType(), converter);
+				field.getName(), index,alias, field.getType(), converter);
 	}
 
 	private FieldValueConverter cacheConverter(final BingConvertor annotation,

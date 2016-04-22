@@ -168,8 +168,8 @@ public class BingExcelImpl implements BingExcel {
 
 	@Override
 	public void writeExcel(String path, Iterable... iterable) {
-		// TODO Auto-generated method stub
-
+		WriteHandler handler=ExcelWriterFactory.createXSSF(path);
+		writeToExcel(handler, iterable);
 	}
 
 	@Override
@@ -258,7 +258,7 @@ public class BingExcelImpl implements BingExcel {
 					constructor = type.getDeclaredConstructor();
 				} catch (NoSuchMethodException | SecurityException e) {
 					throw new IllegalEntityException(type,
-							"Gets the default constructor failed");
+							"Gets the default constructor failed",e);
 				}
 				TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
 						constructor, tempConverterFields);

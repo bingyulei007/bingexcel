@@ -18,11 +18,11 @@ public class ConversionMapper {
 	}
 
 	public void registerLocalConverter(Class definedIn, String fieldName,
-			int index, String alias, boolean omitOutput, Class<?> fieldType,
+			int index, String alias,Class<?> fieldType,
 			FieldValueConverter converter) {
 
 		registerLocalConverter(definedIn, fieldName, new FieldConverterMapper(
-				index, converter, alias, omitOutput, fieldType));
+				index, converter, alias, fieldType));
 	}
 
 	private void registerLocalConverter(Class definedIn, String fieldName,
@@ -60,7 +60,6 @@ public class ConversionMapper {
 		private Class<?> clazz;
 		private FieldValueConverter converter;
 		private String alias;
-		private boolean omitOutput = false;
 
 		public int getIndex() {
 			return index;
@@ -78,9 +77,6 @@ public class ConversionMapper {
 			return alias;
 		}
 
-		public boolean isOmitOutput() {
-			return omitOutput;
-		}
 
 		public FieldValueConverter getFieldConverter() {
 			return converter;
@@ -91,14 +87,13 @@ public class ConversionMapper {
 		}
 
 		public FieldConverterMapper(int index, FieldValueConverter converter,
-				String alias, boolean omitOutput, Class<?> clazz) {
+				String alias,  Class<?> clazz) {
 			super();
 			this.index = index;
 			this.isPrimitive = clazz.isPrimitive();
 			this.clazz = clazz;
 			this.alias = alias;
 			this.converter = converter;
-			this.omitOutput = omitOutput;
 		}
 
 	}

@@ -6,8 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -23,15 +26,13 @@ import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListLine;
 import com.bing.utils.FileCreateUtils;
 
-public abstract class AbstractWriteHandler implements WriteHandler{
+public abstract class AbstractWriteHandler implements WriteHandler {
 	private Sheet currentSheet;
 	private final Workbook wb;
-	 transient OutputStream os;
-	
-	
-	
-	public AbstractWriteHandler(Workbook wb, OutputStream outStream)
-			 {
+	transient OutputStream os;
+	private Set<String> names = new HashSet<>();
+
+	public AbstractWriteHandler(Workbook wb, OutputStream outStream) {
 		this.wb = wb;
 		os = outStream;
 	}
@@ -46,17 +47,17 @@ public abstract class AbstractWriteHandler implements WriteHandler{
 			f.deleteOnExit();
 			throw new UnknownException(e);
 		}
-		
-		
+
 	}
-	
+
 	private int currentRowIndex = -1;
-	 CellStyle  createHeadStyle(){
+
+	CellStyle createHeadStyle() {
 		CellStyle style = wb.createCellStyle();
 		// 设置这些样式
 		style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
 		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
-		
+
 		style.setAlignment(CellStyle.ALIGN_CENTER);
 		// 生成一个字体
 		Font font = wb.createFont();
@@ -67,10 +68,11 @@ public abstract class AbstractWriteHandler implements WriteHandler{
 		style.setFont(font);
 		return style;
 	}
-	void writeDataToRow(ListLine line,Row row){
-		 CellStyle cellStyle = wb.createCellStyle();
-		 DataFormat format = wb.createDataFormat();
-		 
+
+	void writeDataToRow(ListLine line, Row row) {
+		CellStyle cellStyle = wb.createCellStyle();
+		DataFormat format = wb.createDataFormat();
+
 		for (CellKV<String> kv : line.getListStr()) {
 			Cell cell = row.createCell(kv.getIndex());
 			cell.setCellValue(kv.getValue());
@@ -81,7 +83,7 @@ public abstract class AbstractWriteHandler implements WriteHandler{
 		}
 		for (CellKV<Date> kv : line.getListDate()) {
 			Cell cell = row.createCell(kv.getIndex());
-			if(currentRowIndex<2){
+			if (currentRowIndex < 2) {
 				currentSheet.setColumnWidth((short) (kv.getIndex()), (short) 5000);
 			}
 			cellStyle.setDataFormat(format.getFormat("m/d/yy h:mm"));
@@ -93,10 +95,10 @@ public abstract class AbstractWriteHandler implements WriteHandler{
 			cell.setCellValue(kv.getValue());
 		}
 	}
-	
+
 	@Override
 	public void writeLine(ListLine line) {
-		if (line!=null) {
+		if (line != null) {
 			currentRowIndex++;
 			Row currentRow = currentSheet.createRow(currentRowIndex);
 			writeDataToRow(line, currentRow);
@@ -105,7 +107,8 @@ public abstract class AbstractWriteHandler implements WriteHandler{
 
 	@Override
 	public void writeHeader(List<CellKV<String>> listStr) {
-		currentRowIndex++;
+		
+		currentRowIndex=0;
 		CellStyle style = createHeadStyle();
 		Row currentRow = currentSheet.createRow(currentRowIndex);
 		currentRow.setHeight((short) 0x180);
@@ -113,17 +116,17 @@ public abstract class AbstractWriteHandler implements WriteHandler{
 			Cell cell = currentRow.createCell(cellKV.getIndex());
 			cell.setCellValue(cellKV.getValue());
 			cell.setCellStyle(style);
-			
-			int size=cellKV.getValue().length();
-			if(size>10){
-				size=10;
+
+			int size = cellKV.getValue().length();
+			if (size > 10) {
+				size = 10;
 			}
-			if(size<4){
-				size=4;
+			if (size < 4) {
+				size = 4;
 			}
-			currentSheet.setColumnWidth((short) (cellKV.getIndex()), (short) ((25 *size )*20));
+			currentSheet.setColumnWidth((short) (cellKV.getIndex()), (short) ((25 * size) * 20));
 		}
-		
+
 	}
 
 	@Override
@@ -131,22 +134,25 @@ public abstract class AbstractWriteHandler implements WriteHandler{
 		if (StringUtils.isBlank(name)) {
 			currentSheet = wb.createSheet();
 		} else {
-			currentSheet = wb.createSheet(name);
+			Sheet sheet = wb.getSheet(name);
+			if (sheet == null) {
+				currentSheet = wb.createSheet(name);
+			}else{
+				createSheet(name+RandomStringUtils.randomAscii(1));
+			}
 		}
 	}
 
 	@Override
 	public void flush() {
-		
+
 		try {
 			wb.write(os);
 			wb.close();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
 	}
-
-	
 
 }

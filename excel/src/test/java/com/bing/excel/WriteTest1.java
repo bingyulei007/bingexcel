@@ -5,24 +5,46 @@ import java.util.List;
 import org.junit.Test;
 
 import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.annotation.OutAlias;
+import com.bing.excel.core.BingExcel;
+import com.bing.excel.core.BingExcelBuilder;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 
 public class WriteTest1 {
-	
+
 	@Test
-	public void testWrite(){
-		List<Person> list=Lists.newArrayList();
+	public void testWrite() {
+		List<Person> list = Lists.newArrayList();
+		list.add(new Person(12, "nihoa", 23434.9));
+		list.add(new Person(23, "nihoa", 234.9));
+		list.add(new Person(122, "nihoa", 23434.9));
+
+		BingExcel bing = BingExcelBuilder.toBuilder().builder();
+		bing.writeExcel("E:/test/adb.xlsx", list,list);
 	}
-	
-	
+
+	@OutAlias("xiaoshou")
 	public static class Person {
-		@CellConfig(index = 1)
+
+		public Person(int age, String name, Double salary) {
+			super();
+			this.age = age;
+			this.name = name;
+			this.salary = salary;
+		}
+
+		public Person() {
+			super();
+		}
+
+		@CellConfig(index = 1, aliasName = "年龄")
 		private int age;
 		@CellConfig(index = 0)
 		private String name;
 		@CellConfig(index = 3)
 		private Double salary;
+		private transient boolean testProperty = false;
 
 		public String getName() {
 			return name;
@@ -41,9 +63,8 @@ public class WriteTest1 {
 		}
 
 		public String toString() {
-			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
-					.add("name", name).add("age", age).add("salary", salary)
-					.toString();
+			return MoreObjects.toStringHelper(this.getClass()).omitNullValues().add("name", name).add("age", age)
+					.add("salary", salary).toString();
 		}
 	}
 }
