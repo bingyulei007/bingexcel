@@ -2,6 +2,7 @@ package com.bing.excel;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.bing.excel.annotation.CellConfig;
@@ -12,7 +13,11 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 
 public class WriteTest1 {
-
+	BingExcel bing;
+	@Before
+	public void before(){
+		bing = BingExcelBuilder.toBuilder().builder();
+	}
 	@Test
 	public void testWrite() {
 		List<Person> list = Lists.newArrayList();
@@ -20,7 +25,7 @@ public class WriteTest1 {
 		list.add(new Person(23, "nihoa", 234.9));
 		list.add(new Person(122, "nihoa", 23434.9));
 
-		BingExcel bing = BingExcelBuilder.toBuilder().builder();
+		
 		bing.writeExcel("E:/test/adb.xlsx", list,list);
 	}
 

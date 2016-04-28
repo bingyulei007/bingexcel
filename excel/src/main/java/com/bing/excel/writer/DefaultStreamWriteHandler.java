@@ -8,6 +8,11 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Workbook;
 import com.bing.excel.writer.exception.ExcelOutException;
 
+/**
+ * 不是线程安全的
+ * @author shizhongtao
+ *
+ */
 public class DefaultStreamWriteHandler extends AbstractWriteHandler {
 	private transient OutputStream os;
 

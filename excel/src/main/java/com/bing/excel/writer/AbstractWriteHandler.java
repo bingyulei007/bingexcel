@@ -31,6 +31,8 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 	private final Workbook wb;
 	transient OutputStream os;
 	private Set<String> names = new HashSet<>();
+	private CellStyle headerCellStyle;
+	private CellStyle dateCellStyle;
 
 	public AbstractWriteHandler(Workbook wb, OutputStream outStream) {
 		this.wb = wb;
@@ -53,6 +55,9 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 	private int currentRowIndex = -1;
 
 	CellStyle createHeadStyle() {
+		if (headerCellStyle != null) {
+			return headerCellStyle;
+		}
 		CellStyle style = wb.createCellStyle();
 		// 设置这些样式
 		style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
@@ -66,13 +71,24 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
 		// 把字体应用到当前的样式
 		style.setFont(font);
+		headerCellStyle = style;
 		return style;
 	}
 
-	void writeDataToRow(ListLine line, Row row) {
+	CellStyle createDateStyle() {
+		if (dateCellStyle != null) {
+			return dateCellStyle;
+		}
 		CellStyle cellStyle = wb.createCellStyle();
 		DataFormat format = wb.createDataFormat();
+		cellStyle.setDataFormat(format.getFormat("m/d/yy h:mm"));
+		dateCellStyle = cellStyle;
+		return cellStyle;
+	}
 
+	void writeDataToRow(ListLine line, Row row) {
+
+		CellStyle cellStyle = createDateStyle();
 		for (CellKV<String> kv : line.getListStr()) {
 			Cell cell = row.createCell(kv.getIndex());
 			cell.setCellValue(kv.getValue());
@@ -84,9 +100,10 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		for (CellKV<Date> kv : line.getListDate()) {
 			Cell cell = row.createCell(kv.getIndex());
 			if (currentRowIndex < 2) {
-				currentSheet.setColumnWidth((short) (kv.getIndex()), (short) 5000);
+				currentSheet.setColumnWidth((short) (kv.getIndex()),
+						(short) 5000);
 			}
-			cellStyle.setDataFormat(format.getFormat("m/d/yy h:mm"));
+
 			cell.setCellStyle(cellStyle);
 			cell.setCellValue(kv.getValue());
 		}
@@ -107,8 +124,8 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 
 	@Override
 	public void writeHeader(List<CellKV<String>> listStr) {
-		
-		currentRowIndex=0;
+
+		currentRowIndex = 0;
 		CellStyle style = createHeadStyle();
 		Row currentRow = currentSheet.createRow(currentRowIndex);
 		currentRow.setHeight((short) 0x180);
@@ -124,7 +141,8 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			if (size < 4) {
 				size = 4;
 			}
-			currentSheet.setColumnWidth((short) (cellKV.getIndex()), (short) ((25 * size) * 20));
+			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
+					(short) ((25 * size) * 20));
 		}
 
 	}
@@ -137,8 +155,8 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			Sheet sheet = wb.getSheet(name);
 			if (sheet == null) {
 				currentSheet = wb.createSheet(name);
-			}else{
-				createSheet(name+RandomStringUtils.randomAscii(1));
+			} else {
+				createSheet(name +"-"+ RandomStringUtils.randomNumeric(2));
 			}
 		}
 	}

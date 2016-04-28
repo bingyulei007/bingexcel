@@ -7,7 +7,6 @@ import java.util.Map;
 import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.common.FieldRelation;
-import com.bing.other.AnotationTest;
 import com.google.common.base.Strings;
 
 public class ConversionMapper {

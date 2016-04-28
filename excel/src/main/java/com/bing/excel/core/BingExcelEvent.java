@@ -1,6 +1,7 @@
 package com.bing.excel.core;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -41,7 +42,7 @@ public interface BingExcelEvent {
 	 void readStreamToList(InputStream stream,  ReaderCondition[] condition,BingReadListener listener) throws Exception;
 	
 	 
-	 BingWriterHandler writeFile(File file);
+	 BingWriterHandler writeFile(File file)throws FileNotFoundException;
 		
 	 BingWriterHandler  writeFile(String path);
 	// BingWriterHandler  writeFile(OutputStream stream);

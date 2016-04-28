@@ -1,6 +1,7 @@
 package com.bing.excel.core.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.omg.CORBA.portable.UnknownException;
 import org.xml.sax.SAXException;
 
 import com.bing.excel.core.BingExcelEvent;
@@ -32,7 +34,11 @@ import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.ReadHandler;
+import com.bing.excel.vo.CellKV;
+import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.ListRow;
+import com.bing.excel.writer.ExcelWriterFactory;
+import com.bing.excel.writer.WriteHandler;
 import com.google.common.base.MoreObjects;
 
 /**
@@ -53,7 +59,8 @@ public class BingExcelEventImpl implements BingExcelEvent {
 	 * globe filed converter
 	 */
 	private final ConverterHandler defaultLocalConverterHandler;
-	private final Set<Class<?>> targetTypes = Collections.synchronizedSet(new HashSet<Class<?>>());
+	private final Set<Class<?>> targetTypes = Collections
+			.synchronizedSet(new HashSet<Class<?>>());
 	private ExcelConverterMapperHandler ormMapper = new AnnotationMapper();
 	private BingReadListener listener = null;
 
@@ -148,18 +155,131 @@ public class BingExcelEventImpl implements BingExcelEvent {
 	}
 
 	@Override
-	public BingWriterHandler writeFile(File file) {
-		// TODO Auto-generated method stub
-		return null;
+	public BingWriterHandler writeFile(File file) throws FileNotFoundException {
+		WriteHandler handler = ExcelWriterFactory.createSXSSF(file);
+		return new  BingWriterHandlerImpl(handler, ormMapper, this);
 	}
 
 	@Override
 	public BingWriterHandler writeFile(String path) {
-		// TODO Auto-generated method stub
-		return null;
+		WriteHandler handler = ExcelWriterFactory.createSXSSF(path);
+		return new  BingWriterHandlerImpl(handler, ormMapper, this);
+	}
+	private void registeAdapter(Class type) {
+
+		synchronized (type) {
+			if (targetTypes.contains(type)) {
+				return;
+			}
+			try {
+				// 转换的类型不可能对应的是基本类型
+				if (type.isPrimitive()) {
+					return;
+				}
+				// 目前先不考虑model的接口继承问题 TODO
+				if (type.isInterface()
+						|| (type.getModifiers() & Modifier.ABSTRACT) > 0) {
+					return;
+				}
+				final Field[] fields = type.getDeclaredFields();
+				List<Field> tempConverterFields = new ArrayList<>();
+				for (int i = 0; i < fields.length; i++) {
+					final Field field = fields[i];
+
+					if (field.isEnumConstant()
+							|| (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
+						continue;
+					}
+					// 应该不会出现
+					if (field.isSynthetic()) {
+						continue;
+					}
+					field.setAccessible(true);
+					tempConverterFields.add(field);
+
+				}
+				Constructor<?> constructor;
+				try {
+					constructor = type.getDeclaredConstructor();
+				} catch (NoSuchMethodException | SecurityException e) {
+					throw new IllegalEntityException(type,
+							"Gets the default constructor failed");
+				}
+				TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
+						constructor, tempConverterFields);
+				typeTokenCache.put(type, typeAdapterConverter);
+
+			} finally {
+				targetTypes.add(type);
+			}
+
+		}
+
 	}
 
-	
+	private TypeAdapterConverter getTypeAdapterConverter(
+			Constructor<?> constructor, List<Field> tempConverterFields) {
+
+		TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
+				constructor, tempConverterFields,
+				defaultLocalConverterHandler);
+		return adConverter;
+	}
+	public static class BingWriterHandlerImpl implements BingWriterHandler {
+
+		private Set<Class<?>> objectSetClass=Collections.synchronizedSet(new HashSet<Class<?>>());
+		private final ExcelConverterMapperHandler ormMapper;
+		private final BingExcelEventImpl bingExcelEventImpl;
+		private WriteHandler handler;
+		TypeAdapterConverter<?> typeAdapter=null;
+		private BingWriterHandlerImpl(WriteHandler handler,ExcelConverterMapperHandler ormMapper,BingExcelEventImpl bingExcelEventImpl) {
+			this.ormMapper=ormMapper;
+			this.bingExcelEventImpl=bingExcelEventImpl;
+				this.handler = handler;
+			
+		}
+
+		@Override
+		public void writeLine(Object obj) {
+			if(!writeHeader(obj)){
+				ListLine listLine = typeAdapter.marshal(obj, ormMapper);
+				handler.writeLine(listLine);
+			}
+			
+		}
+
+		private boolean writeHeader(Object obj) {
+			Class<?> clazz=Object.class;
+			synchronized (clazz) {
+				if(objectSetClass.contains(clazz)){
+					return false;
+				}
+			}
+			preHandle(clazz);
+			synchronized (clazz) {
+				if(objectSetClass.contains(clazz)){
+					return false;
+				}
+				handler.createSheet(ormMapper.getModelName(clazz));
+				typeAdapter = bingExcelEventImpl.typeTokenCache.get(clazz);
+				List<CellKV<String>> header = typeAdapter.getHeader(ormMapper);
+				handler.writeHeader(header);
+				objectSetClass.add(clazz);
+				return true;
+			}
+		}
+		private void preHandle(Class clazz){
+			ormMapper.processAnnotations(clazz);
+			bingExcelEventImpl.registeAdapter(clazz);
+		}
+		@Override
+		public void close() {
+			handler.flush();
+			
+		}
+		
+
+	}
 
 	private class BingExcelReaderListener extends AbstractExcelReadListener {
 
@@ -217,66 +337,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
 			}
 		}
 
-		private void registeAdapter(Class type) {
-
-			synchronized (type) {
-				if (targetTypes.contains(type)) {
-					return;
-				}
-				try {
-					// 转换的类型不可能对应的是基本类型
-					if (type.isPrimitive()) {
-						return;
-					}
-					// 目前先不考虑model的接口继承问题 TODO
-					if (type.isInterface()
-							|| (type.getModifiers() & Modifier.ABSTRACT) > 0) {
-						return;
-					}
-					final Field[] fields = type.getDeclaredFields();
-					List<Field> tempConverterFields = new ArrayList<>();
-					for (int i = 0; i < fields.length; i++) {
-						final Field field = fields[i];
-
-						if (field.isEnumConstant()
-								|| (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
-							continue;
-						}
-						// 应该不会出现
-						if (field.isSynthetic()) {
-							continue;
-						}
-						field.setAccessible(true);
-						tempConverterFields.add(field);
-
-					}
-					Constructor<?> constructor;
-					try {
-						constructor = type.getDeclaredConstructor();
-					} catch (NoSuchMethodException | SecurityException e) {
-						throw new IllegalEntityException(type,
-								"Gets the default constructor failed");
-					}
-					TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
-							constructor, tempConverterFields);
-					typeTokenCache.put(type, typeAdapterConverter);
-
-				} finally {
-					targetTypes.add(type);
-				}
-
-			}
-
-		}
-
-		private TypeAdapterConverter getTypeAdapterConverter(
-				Constructor<?> constructor, List<Field> tempConverterFields) {
-
-			TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
-					constructor, tempConverterFields,
-					defaultLocalConverterHandler);
-			return adConverter;
-		}
+		
 
 		@Override
 		public void endSheet(int sheetIndex, String name) {

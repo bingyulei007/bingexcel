@@ -13,6 +13,11 @@ import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListLine;
 import com.bing.excel.writer.exception.ExcelOutException;
 
+/**
+ * 不是线程安全的
+ * @author shizhongtao
+ *
+ */
 public class DefaultFileWriteHandler extends AbstractWriteHandler {
 	
 	private transient OutputStream os;

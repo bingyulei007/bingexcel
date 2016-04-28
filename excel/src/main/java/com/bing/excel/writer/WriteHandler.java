@@ -5,6 +5,11 @@ import java.util.List;
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListLine;
 
+/**
+ * 目前的三个实现不是线程安全的
+ * @author shizhongtao
+ *
+ */
 public interface WriteHandler {
 
 	/**

@@ -157,6 +157,7 @@ public class BingExcelImpl implements BingExcel {
 	public void writeExcel(File file, Iterable... iterable)
 			throws FileNotFoundException {
 		WriteHandler handler = ExcelWriterFactory.createXSSF(file);
+		writeToExcel(handler, iterable);
 
 	}
 
@@ -164,6 +165,7 @@ public class BingExcelImpl implements BingExcel {
 	public void writeOldExcel(File file, Iterable... iterable)
 			throws FileNotFoundException {
 		WriteHandler handler = ExcelWriterFactory.createHSSF(file);
+		writeToExcel(handler, iterable);
 	}
 
 	@Override
@@ -173,21 +175,22 @@ public class BingExcelImpl implements BingExcel {
 	}
 
 	@Override
-	public void writeExcel(OutputStream stream, Iterable... iterable) {
-		// TODO Auto-generated method stub
-
+	public void writeExcel(OutputStream stream, Iterable... iterable)  {
+		WriteHandler handler=ExcelWriterFactory.createXSSF(stream);
+		writeToExcel(handler, iterable);
 	}
 
 	@Override
 	public void writeOldExcel(String path, Iterable... iterable) {
-		// TODO Auto-generated method stub
+		WriteHandler handler = ExcelWriterFactory.createHSSF(path);
+		writeToExcel(handler, iterable);
 
 	}
 
 	@Override
 	public void writeOldExcel(OutputStream stream, Iterable... iterable) {
-		// TODO Auto-generated method stub
-
+		WriteHandler handler = ExcelWriterFactory.createHSSF(stream);
+		writeToExcel(handler, iterable);
 	}
 
 	private void writeToExcel(WriteHandler handler,Iterable... iterable) {
@@ -198,7 +201,6 @@ public class BingExcelImpl implements BingExcel {
 				if (!isAdd) {
 					if (object != null) {
 						isAdd = true;
-						//registeAdapter(object.getClass());
 						Class clazz=object.getClass();
 						ormMapper.processAnnotations(clazz);
 						registeAdapter(clazz);
@@ -258,7 +260,7 @@ public class BingExcelImpl implements BingExcel {
 					constructor = type.getDeclaredConstructor();
 				} catch (NoSuchMethodException | SecurityException e) {
 					throw new IllegalEntityException(type,
-							"Gets the default constructor failed",e);
+							"Gets the default constructor failed,the Objet must contains a  [no-args constructor] ",e);
 				}
 				TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
 						constructor, tempConverterFields);
