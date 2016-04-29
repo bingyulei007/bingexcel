@@ -15,13 +15,12 @@ import java.util.Vector;
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.exception.ConversionException;
 import com.bing.excel.vo.OutValue;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.thoughtworks.xstream.converters.ConversionException;
-import com.thoughtworks.xstream.core.JVM;
 
 /**
  * @author shizhongtao

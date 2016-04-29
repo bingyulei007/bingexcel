@@ -22,6 +22,10 @@ public interface ExcelReadListener {
 	 */
 	void optRow(int curRow, ListRow rowList);
 	void startSheet(int sheetIndex, String name);
+	/**
+	 * @param sheetIndex 工作表下标 从0开始
+	 * @param name 工作表名称
+	 */
 	void endSheet(int sheetIndex, String name);
 	void endWorkBook();
 }
