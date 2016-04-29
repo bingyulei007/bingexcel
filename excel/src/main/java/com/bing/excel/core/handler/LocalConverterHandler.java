@@ -48,7 +48,9 @@ public class LocalConverterHandler implements ConverterHandler {
 				keyType=keyFieldType;
 			}
 			fieldValueConverter=BaseGlobalConverterMapper.globalFieldConverterMapper.get(keyType);
-			defaultLocalConverter.put(keyFieldType, fieldValueConverter);
+			if (fieldValueConverter!=null) {
+				defaultLocalConverter.put(keyFieldType, fieldValueConverter);
+			}
 		}
 		return fieldValueConverter;
 	}

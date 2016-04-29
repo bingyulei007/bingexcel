@@ -12,7 +12,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.xml.sax.SAXException;
 
 import com.bing.excel.reader.ExcelReadListener;
-import com.bing.excel.reader.SaxHandler;
+import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListRow;
 
@@ -22,7 +22,7 @@ import com.bing.excel.vo.ListRow;
  * @date 2016-2-17 Description:
  */
 public class DefaultHSSFHandler extends HSSFListenerAbstract implements
-		SaxHandler {
+		ReadHandler {
 
 	private ExcelReadListener excelReader;
 

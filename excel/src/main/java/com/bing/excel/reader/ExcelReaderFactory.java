@@ -33,7 +33,7 @@ public class ExcelReaderFactory {
 	 * @return
 	 * @throws Exception
 	 */
-	public static SaxHandler create(File file, ExcelReadListener excelReader,
+	public static ReadHandler create(File file, ExcelReadListener excelReader,
 			boolean ignoreNumFormat) throws Exception {
 		if (!file.exists()) {
 			throw new FileNotFoundException(file.toString());
@@ -59,7 +59,7 @@ public class ExcelReaderFactory {
 	 * @return
 	 * @throws Exception
 	 */
-	public static SaxHandler create(File file, ExcelReadListener excelReader)
+	public static ReadHandler create(File file, ExcelReadListener excelReader)
 			throws Exception {
 		return create(file, excelReader, false);
 
@@ -75,7 +75,7 @@ public class ExcelReaderFactory {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static SaxHandler create(InputStream inp,
+	public static ReadHandler create(InputStream inp,
 			ExcelReadListener excelReader) throws InvalidFormatException, IOException, SQLException {
 		  return create(inp, excelReader, false);
 	}
@@ -89,7 +89,7 @@ public class ExcelReaderFactory {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public static SaxHandler create(InputStream inp,
+	public static ReadHandler create(InputStream inp,
 			ExcelReadListener excelReader, boolean ignoreNumFormat) throws InvalidFormatException, IOException, SQLException {
 		 // If clearly doesn't do mark/reset, wrap up
         if (! inp.markSupported()) {
@@ -121,7 +121,7 @@ public class ExcelReaderFactory {
 	 * @throws InvalidFormatException
 	 * @throws IOException
 	 */
-	public static SaxHandler create(OPCPackage pkg,
+	public static ReadHandler create(OPCPackage pkg,
 			ExcelReadListener excelReader) throws SQLException,
 			InvalidFormatException, IOException {
 		return create(pkg, excelReader, false);
@@ -136,7 +136,7 @@ public class ExcelReaderFactory {
 	 * ignoreNumFormat) throws SQLException, InvalidFormatException,
 	 * IOException{ return create(pkg,excelReader,ignoreNumFormat,null); }
 	 */
-	public static SaxHandler create(OPCPackage pkg,
+	public static ReadHandler create(OPCPackage pkg,
 			ExcelReadListener excelReader, boolean ignoreNumFormat) throws SQLException,
 			InvalidFormatException, IOException {
 		DefaultXSSFSaxHandler handler = new DefaultXSSFSaxHandler(pkg,
@@ -145,7 +145,7 @@ public class ExcelReaderFactory {
 		return handler;
 	}
 
-	public static SaxHandler create(POIFSFileSystem fs,
+	public static ReadHandler create(POIFSFileSystem fs,
 			ExcelReadListener excelReader) throws SQLException {
 		return create(fs, excelReader, false);
 	}
@@ -158,7 +158,7 @@ public class ExcelReaderFactory {
 	 * ignoreNumFormat) throws SQLException{ return
 	 * create(fs,excelReader,ignoreNumFormat,null); }
 	 */
-	public static SaxHandler create(POIFSFileSystem fs,
+	public static ReadHandler create(POIFSFileSystem fs,
 			ExcelReadListener excelReader, boolean ignoreNumFormat) throws SQLException {
 		DefaultHSSFHandler handler = new DefaultHSSFHandler(fs, excelReader,
 				ignoreNumFormat);

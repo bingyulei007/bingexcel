@@ -29,7 +29,7 @@ public @interface CellConfig {
 	 * excel导出时候，字段是否忽略导出，default <code>false</code>。
 	 * @return
 	 */
-	public boolean omitOutput() default false;
+	//public boolean omitOutput() default false;
 	
 	/**
 	 * 输出时候的title名称

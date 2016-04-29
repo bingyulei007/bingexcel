@@ -525,7 +525,7 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 	public void ignoreNumFormat(boolean b) {
 		this.formatter.setIgnoreNumFormat(b);
 	}
-
+	
 	/**
 	 * You need to implement this to handle the results of the sheet parsing.
 	 */
@@ -547,4 +547,6 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 		/** A header or footer has been encountered */
 		public void headerFooter(String text, boolean isHeader, String tagName);
 	}
+
+	
 }

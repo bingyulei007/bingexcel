@@ -1,6 +1,7 @@
 package com.bing.excel.core;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -97,12 +98,15 @@ public interface BingExcel {
 	 * @param iterable 要输出到文件的集合对象，
 	 * @param file 文件对象
 	 */
-	 void writeExcel(File file,Iterable... iterable);
+	 void writeExcel(File file,Iterable... iterable)throws FileNotFoundException;
+	 void writeOldExcel(File file,Iterable... iterable)throws FileNotFoundException;
 	/**
 	 * 输出model集合到excel 文件。
 	 * @param iterable
 	 * @param path 文件路径
 	 */
 	 void writeExcel(String path,Iterable... iterable);
+	 void writeOldExcel(String path,Iterable... iterable);
 	 void writeExcel(OutputStream stream,Iterable... iterable);
+	 void writeOldExcel(OutputStream stream,Iterable... iterable);
 }

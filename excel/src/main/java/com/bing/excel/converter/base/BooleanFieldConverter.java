@@ -1,8 +1,11 @@
 package com.bing.excel.converter.base;
 
+import java.lang.reflect.Type;
+
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
+import com.bing.excel.vo.OutValue;
 import com.google.common.base.Strings;
 
 /**
@@ -24,7 +27,7 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 	}
 
 	public BooleanFieldConverter() {
-		this("true", "false", false);
+		this("TRUE", "FALSE", false);
 	}
 
 	@Override
@@ -32,11 +35,25 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 		return clz.equals(boolean.class) || clz.equals(Boolean.class);
 	}
 
+	@Override
+	public OutValue toObject(Object source,ConverterHandler converterHandler) {
+		if(source==null){
+			return null;
+		}
+		String re;
+		if((boolean)source){
+			re=trueCaseStr;
+		}else{
+			re=falseCaseStr;
+		}
+		return OutValue.stringValue(re);
+	}
+
 	/*
 	 * in other case ,return false?FIXME
 	 */
 	@Override
-	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {
+	public Object fromString(String cell,ConverterHandler converterHandler,Type targetType) {
 		if (Strings.isNullOrEmpty(cell)) {
 			return null;
 		}

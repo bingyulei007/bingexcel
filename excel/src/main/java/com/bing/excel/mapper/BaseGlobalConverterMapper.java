@@ -1,6 +1,7 @@
 package com.bing.excel.mapper;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
@@ -16,6 +17,7 @@ import com.bing.excel.converter.base.LongFieldConverter;
 import com.bing.excel.converter.base.ShortFieldConverter;
 import com.bing.excel.converter.base.StringFieldConverter;
 import com.bing.excel.converter.collections.ArrayConverter;
+import com.bing.excel.converter.collections.CollectionConverter;
 import com.bing.excel.converter.enums.EnumConVerter;
 import com.google.common.collect.ImmutableMap;
 
@@ -45,6 +47,7 @@ public class BaseGlobalConverterMapper {
 		builder.put(Double.class,new DoubleFieldConverter());
 		builder.put(Float.class,new FloatFieldConverter());
 		builder.put(Short.class,new ShortFieldConverter());
+		builder.put(Collection.class,new CollectionConverter());
 	}
 	public final static ImmutableMap<Class<?>, FieldValueConverter> globalFieldConverterMapper=builder.build();
 	

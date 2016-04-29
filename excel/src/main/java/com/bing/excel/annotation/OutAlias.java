@@ -18,11 +18,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface SheetConfig {
+public @interface OutAlias {
 	
 	/**
 	 * 输出时候的sheet名称
 	 * @return
 	 */
-	public String aliasName() default "";
+	public String value() default "";
 }

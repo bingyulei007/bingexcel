@@ -1,5 +1,7 @@
 package com.bing.excel.converter.base;
 
+import java.lang.reflect.Type;
+
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
 
@@ -11,7 +13,7 @@ public final class StringFieldConverter extends AbstractFieldConvertor {
 	}
 
 	@Override
-	public Object fromString(String cell,ConverterHandler converterHandler,Class targetType) {
+	public Object fromString(String cell,ConverterHandler converterHandler,Type targetType) {
 		return cell;
 	}
 

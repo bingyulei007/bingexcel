@@ -93,7 +93,7 @@ public class ExcelDataFormatter implements Observer{
 
 	private boolean ignoreNumFormat=false;
 	
-	private static ThreadLocal<SimpleDateFormat> localFormat=new ThreadLocal<>();
+	private static final ThreadLocal<SimpleDateFormat> localFormat=new ThreadLocal<>();
 	
     private static final String defaultFractionWholePartFormat = "#";
     private static final String defaultFractionFractionPartFormat = "#/##";
@@ -1208,7 +1208,7 @@ public class ExcelDataFormatter implements Observer{
 		this.ignoreNumFormat = ignoreNumFormat;
 	}
     
-  
+	
 
 
 }

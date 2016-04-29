@@ -1,5 +1,6 @@
 package com.bing.excel.converter.base;
 
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
+import com.bing.excel.vo.OutValue;
 import com.bing.utils.StringParseUtil;
 
 /**
@@ -23,7 +25,7 @@ import com.bing.utils.StringParseUtil;
  */
 public final class DateFieldConverter extends AbstractFieldConvertor {
 
-	private static ThreadLocal<Map<Object, Object>> localFormat = new ThreadLocal<>();
+	private static final ThreadLocal<Map<Object, Object>> localFormat = new ThreadLocal<>();
 	private final String inFormatStr;
 	private final String outFormatStr;
 	private final String inFormatKey = "inKey";
@@ -53,7 +55,15 @@ public final class DateFieldConverter extends AbstractFieldConvertor {
 	}
 
 	@Override
-	public   Object  fromString(String cell,ConverterHandler converterHandler,Class targetType) {
+	public OutValue toObject(Object source,ConverterHandler converterHandler) {
+		if(source==null){
+			return null;
+		}
+		return OutValue.dateValue(source);
+	}
+
+	@Override
+	public   Object  fromString(String cell,ConverterHandler converterHandler,Type targetType) {
 		
 		
 		String temp=cell;
