@@ -122,7 +122,7 @@ public class DefaultHSSFHandler extends HSSFListenerAbstract implements
 
 	@Override
 	public void optRows(int sheetIndex, int curRow, ListRow rowlist)
-			throws SQLException {
+			 {
 		excelReader.optRow(curRow, rowlist);
 	}
 

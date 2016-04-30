@@ -156,7 +156,7 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			if (sheet == null) {
 				currentSheet = wb.createSheet(name);
 			} else {
-				createSheet(name +"-"+ RandomStringUtils.randomNumeric(2));
+				createSheet(name + "-" + RandomStringUtils.randomNumeric(2));
 			}
 		}
 	}
@@ -168,8 +168,8 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			wb.write(os);
 			wb.close();
 		} catch (IOException e) {
-
-			e.printStackTrace();
+			throw new IllegalStateException(e); 
+			// e.printStackTrace();
 		}
 	}
 
