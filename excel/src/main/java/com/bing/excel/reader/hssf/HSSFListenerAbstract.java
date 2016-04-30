@@ -107,7 +107,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 	// excel记录行操作方法，以sheet索引，行索引和行元素列表为参数，对sheet的一行元素进行操作，元素为String类型
 	public abstract void optRows(int sheetIndex, int curRow,
-			ListRow rowlist) throws SQLException;
+			ListRow rowlist) ;
 
 	/**
 	 * 遍历 excel 文件
@@ -329,12 +329,10 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 			// 行结束时， 调用 optRows() 方法
 			lastColumnNumber = -1;
-			try {
+			
 
 				optRows(sheetIndex, curRow, rowlist);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			
 			rowlist.clear();
 			if (lastRowNumber >= maxReadLine) {
 				startRead = false;
