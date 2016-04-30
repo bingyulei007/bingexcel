@@ -69,7 +69,6 @@ public class ExcelWriterFactory {
 	public static WriteHandler createSXSSF(String path) {
 		isNewPath(path);
 		SXSSFWorkbook wb = new SXSSFWorkbook(200);
-		File file = FileCreateUtils.createFile(path);
 		return new DefaultFileWriteHandler(wb, path);
 	}
 
