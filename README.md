@@ -1,3 +1,8 @@
+## `重要声明`
+自即日起，github上的BingExcel 源码部分不在更新，代码托管放到开源中国的码云上面，请谅解！  
+BingExcel码云地址： [http://git.oschina.net/bingyulei007/bingExcel](http://git.oschina.net/bingyulei007/bingExcel)
+
+
 # bingExcel  
 
 处理excel与java model之间转换,想做成一个excel的orm类型的框架  
