@@ -157,14 +157,15 @@ public class BingExcelEventImpl implements BingExcelEvent {
 	@Override
 	public BingWriterHandler writeFile(File file) throws FileNotFoundException {
 		WriteHandler handler = ExcelWriterFactory.createSXSSF(file);
-		return new  BingWriterHandlerImpl(handler, ormMapper, this);
+		return new BingWriterHandlerImpl(handler, ormMapper, this);
 	}
 
 	@Override
 	public BingWriterHandler writeFile(String path) {
 		WriteHandler handler = ExcelWriterFactory.createSXSSF(path);
-		return new  BingWriterHandlerImpl(handler, ormMapper, this);
+		return new BingWriterHandlerImpl(handler, ormMapper, this);
 	}
+
 	private void registeAdapter(Class type) {
 
 		synchronized (type) {
@@ -221,63 +222,70 @@ public class BingExcelEventImpl implements BingExcelEvent {
 			Constructor<?> constructor, List<Field> tempConverterFields) {
 
 		TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
-				constructor, tempConverterFields,
-				defaultLocalConverterHandler);
+				constructor, tempConverterFields, defaultLocalConverterHandler);
 		return adConverter;
 	}
-	public static class BingWriterHandlerImpl implements BingWriterHandler {
 
-		private Set<Class<?>> objectSetClass=Collections.synchronizedSet(new HashSet<Class<?>>());
+	public static class BingWriterHandlerImpl implements BingWriterHandler {
+		// private Class currentHeaderClass;
+		private Set<Class<?>> objectSetClass = Collections
+				.synchronizedSet(new HashSet<Class<?>>());
 		private final ExcelConverterMapperHandler ormMapper;
 		private final BingExcelEventImpl bingExcelEventImpl;
 		private WriteHandler handler;
-		TypeAdapterConverter<?> typeAdapter=null;
-		private BingWriterHandlerImpl(WriteHandler handler,ExcelConverterMapperHandler ormMapper,BingExcelEventImpl bingExcelEventImpl) {
-			this.ormMapper=ormMapper;
-			this.bingExcelEventImpl=bingExcelEventImpl;
-				this.handler = handler;
-			
+		TypeAdapterConverter<?> typeAdapter = null;
+
+		private BingWriterHandlerImpl(WriteHandler handler,
+				ExcelConverterMapperHandler ormMapper,
+				BingExcelEventImpl bingExcelEventImpl) {
+			this.ormMapper = ormMapper;
+			this.bingExcelEventImpl = bingExcelEventImpl;
+			this.handler = handler;
+
 		}
 
 		@Override
 		public void writeLine(Object obj) {
-			if(!writeHeader(obj)){
-				ListLine listLine = typeAdapter.marshal(obj, ormMapper);
-				handler.writeLine(listLine);
+			if (null == obj) {
+				return;
 			}
-			
+			boolean b = writeHeader(obj);
+			// FIXME 要不要改为其他设计呢？
+			ListLine listLine = typeAdapter.marshal(obj, ormMapper);
+			handler.writeLine(listLine);
+
 		}
 
 		private boolean writeHeader(Object obj) {
-			Class<?> clazz=Object.class;
-			synchronized (clazz) {
-				if(objectSetClass.contains(clazz)){
-					return false;
-				}
+			Class<?> clazz = obj.getClass();
+			if (objectSetClass.contains(clazz)) {
+				return true;
 			}
 			preHandle(clazz);
 			synchronized (clazz) {
-				if(objectSetClass.contains(clazz)){
-					return false;
+				if (objectSetClass.contains(clazz)) {
+					return true;
 				}
 				handler.createSheet(ormMapper.getModelName(clazz));
 				typeAdapter = bingExcelEventImpl.typeTokenCache.get(clazz);
 				List<CellKV<String>> header = typeAdapter.getHeader(ormMapper);
 				handler.writeHeader(header);
 				objectSetClass.add(clazz);
-				return true;
+				// currentHeaderClass = clazz;
+				return false;
 			}
 		}
-		private void preHandle(Class clazz){
+
+		private void preHandle(Class clazz) {
 			ormMapper.processAnnotations(clazz);
 			bingExcelEventImpl.registeAdapter(clazz);
 		}
+
 		@Override
 		public void close() {
 			handler.flush();
-			
+
 		}
-		
 
 	}
 
@@ -336,8 +344,6 @@ public class BingExcelEventImpl implements BingExcelEvent {
 				}
 			}
 		}
-
-		
 
 		@Override
 		public void endSheet(int sheetIndex, String name) {
