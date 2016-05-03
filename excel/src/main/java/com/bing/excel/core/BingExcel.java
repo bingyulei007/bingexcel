@@ -107,6 +107,11 @@ public interface BingExcel {
 	 */
 	 void writeExcel(String path,Iterable... iterable);
 	 void writeOldExcel(String path,Iterable... iterable);
-	 void writeExcel(OutputStream stream,Iterable... iterable);
+	 /**
+	  * 写出xls格式的excel到输出流
+	 * @param stream
+	 * @param iterable
+	 */
+	void writeExcel(OutputStream stream,Iterable... iterable);
 	 void writeOldExcel(OutputStream stream,Iterable... iterable);
 }
