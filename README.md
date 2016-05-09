@@ -1,4 +1,4 @@
-##  `声明：github上的bingexcel项目不再维护更新，项目转移到 [开源中国https://git.oschina.net/bingyulei007/bingExcel](https://git.oschina.net/bingyulei007/bingExcel) 上，对于造成不便请理解。`
+##  `声明：github上的bingexcel项目不再维护更新，项目转移到` [开源中国](https://git.oschina.net/bingyulei007/bingExcel) `上，对于造成不便请理解。`
 # bingExcel  
 
 处理excel与java model之间转换,想做成一个excel的orm类型的框架
