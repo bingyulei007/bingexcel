@@ -6,6 +6,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 
+/**
+ * @author shizhongtao
+ *
+ */
 public interface BingExcelEvent {
 
 	
