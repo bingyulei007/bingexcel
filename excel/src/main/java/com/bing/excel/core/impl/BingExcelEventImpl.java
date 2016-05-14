@@ -204,7 +204,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
 					constructor = type.getDeclaredConstructor();
 				} catch (NoSuchMethodException | SecurityException e) {
 					throw new IllegalEntityException(type,
-							"Gets the default constructor failed");
+							"Gets the default constructor failed,the Objet must contains a  [no-args&public constructor] ",e);
 				}
 				TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
 						constructor, tempConverterFields);
