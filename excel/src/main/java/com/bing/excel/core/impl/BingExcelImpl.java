@@ -154,47 +154,47 @@ public class BingExcelImpl implements BingExcel {
 	}
 
 	@Override
-	public void writeExcel(File file, Iterable... iterable)
+	public void writeExcel(File file, Iterable... iterables)
 			throws FileNotFoundException {
 		WriteHandler handler = ExcelWriterFactory.createXSSF(file);
-		writeToExcel(handler, iterable);
+		writeToExcel(handler, iterables);
 
 	}
 
 	@Override
-	public void writeOldExcel(File file, Iterable... iterable)
+	public void writeOldExcel(File file, Iterable... iterables)
 			throws FileNotFoundException {
 		WriteHandler handler = ExcelWriterFactory.createHSSF(file);
-		writeToExcel(handler, iterable);
+		writeToExcel(handler, iterables);
 	}
 
 	@Override
-	public void writeExcel(String path, Iterable... iterable) {
+	public void writeExcel(String path, Iterable... iterables) {
 		WriteHandler handler=ExcelWriterFactory.createXSSF(path);
-		writeToExcel(handler, iterable);
+		writeToExcel(handler, iterables);
 	}
 
 	@Override
-	public void writeExcel(OutputStream stream, Iterable... iterable)  {
+	public void writeExcel(OutputStream stream, Iterable... iterables)  {
 		WriteHandler handler=ExcelWriterFactory.createXSSF(stream);
-		writeToExcel(handler, iterable);
+		writeToExcel(handler, iterables);
 	}
 
 	@Override
-	public void writeOldExcel(String path, Iterable... iterable) {
+	public void writeOldExcel(String path, Iterable... iterables) {
 		WriteHandler handler = ExcelWriterFactory.createHSSF(path);
-		writeToExcel(handler, iterable);
+		writeToExcel(handler, iterables);
 
 	}
 
 	@Override
-	public void writeOldExcel(OutputStream stream, Iterable... iterable) {
+	public void writeOldExcel(OutputStream stream, Iterable... iterables) {
 		WriteHandler handler = ExcelWriterFactory.createHSSF(stream);
-		writeToExcel(handler, iterable);
+		writeToExcel(handler, iterables);
 	}
 
-	private void writeToExcel(WriteHandler handler,Iterable... iterable) {
-		for (Iterable list : iterable) {
+	private void writeToExcel(WriteHandler handler,Iterable... iterables) {
+		for (Iterable list : iterables) {
 			boolean isAdd=false;
 			TypeAdapterConverter<?> typeAdapter=null;
 			for (Object object : list) {
@@ -210,6 +210,8 @@ public class BingExcelImpl implements BingExcel {
 								.get(clazz);
 						List<CellKV<String>> header = typeAdapter.getHeader( ormMapper);
 						handler.writeHeader(header);
+						ListLine listLine = typeAdapter.marshal(object, ormMapper);
+						handler.writeLine(listLine);
 					}
 					
 				}else{

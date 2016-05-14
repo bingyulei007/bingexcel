@@ -60,6 +60,7 @@ public class ReadTest {
 	public static class Person {
 		@CellConfig(index = 1)
 		private int age;
+		//@CellConfig(index = 0,readRequired=true)
 		@CellConfig(index = 0)
 		private String name;
 		@CellConfig(index = 3)

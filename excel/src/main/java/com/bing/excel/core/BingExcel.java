@@ -95,18 +95,28 @@ public interface BingExcel {
 	
 	/**
 	 * 输出model集合到excel 文件。
-	 * @param iterable 要输出到文件的集合对象，
+	 * @param iterables 要输出到文件的集合对象，
 	 * @param file 文件对象
 	 */
-	 void writeExcel(File file,Iterable... iterable)throws FileNotFoundException;
-	 void writeOldExcel(File file,Iterable... iterable)throws FileNotFoundException;
+	 void writeExcel(File file,Iterable... iterables)throws FileNotFoundException;
+	 void writeOldExcel(File file,Iterable... iterables)throws FileNotFoundException;
 	/**
 	 * 输出model集合到excel 文件。
-	 * @param iterable
+	 * @param iterables
 	 * @param path 文件路径
 	 */
-	 void writeExcel(String path,Iterable... iterable);
-	 void writeOldExcel(String path,Iterable... iterable);
-	 void writeExcel(OutputStream stream,Iterable... iterable);
-	 void writeOldExcel(OutputStream stream,Iterable... iterable);
+	 void writeExcel(String path,Iterable... iterables);
+/**
+ * 写出xls格式的excel文件
+* @param path
+* @param iterables
+*/
+	 void writeOldExcel(String path,Iterable... iterables);
+	 /**
+	  * 写出xls格式的excel到输出流
+	 * @param stream
+	 * @param iterables
+	 */
+	void writeExcel(OutputStream stream,Iterable... iterables);
+	 void writeOldExcel(OutputStream stream,Iterable... iterables);
 }

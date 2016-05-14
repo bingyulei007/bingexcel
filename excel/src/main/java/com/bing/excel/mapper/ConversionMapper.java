@@ -16,12 +16,21 @@ public class ConversionMapper {
 	public ConversionMapper() {
 	}
 
+	/**
+	 * @param definedIn
+	 * @param fieldName
+	 * @param index
+	 * @param alias
+	 * @param fieldType
+	 * @param converter
+	 */
+	//TODO 构造方法参数比较多，可能是设计不合理引起的，后面改进
 	public void registerLocalConverter(Class definedIn, String fieldName,
-			int index, String alias,Class<?> fieldType,
+			int index, String alias,Class<?> fieldType,boolean readRequired,
 			FieldValueConverter converter) {
 
 		registerLocalConverter(definedIn, fieldName, new FieldConverterMapper(
-				index, converter, alias, fieldType));
+				index, converter, alias, fieldType,readRequired));
 	}
 
 	private void registerLocalConverter(Class definedIn, String fieldName,
@@ -34,7 +43,7 @@ public class ConversionMapper {
 			}
 			modelAlias.put(definedIn, value);
 		}
-
+		mapper.setContainer(definedIn);
 		fieldMapper.put(new FieldRelation(definedIn, fieldName), mapper);
 	}
 
@@ -59,6 +68,17 @@ public class ConversionMapper {
 		private Class<?> clazz;
 		private FieldValueConverter converter;
 		private String alias;
+		private boolean readRequired=false;
+		
+		private Class container;
+		
+		public Class getContainer() {
+			return container;
+		}
+
+		public void setContainer(Class container) {
+			this.container = container;
+		}
 
 		public int getIndex() {
 			return index;
@@ -77,6 +97,10 @@ public class ConversionMapper {
 		}
 
 
+		public boolean isReadRequired() {
+			return readRequired;
+		}
+
 		public FieldValueConverter getFieldConverter() {
 			return converter;
 		}
@@ -92,6 +116,16 @@ public class ConversionMapper {
 			this.isPrimitive = clazz.isPrimitive();
 			this.clazz = clazz;
 			this.alias = alias;
+			this.converter = converter;
+		}
+		public FieldConverterMapper(int index, FieldValueConverter converter,
+				String alias,  Class<?> clazz,boolean readRequired) {
+			super();
+			this.index = index;
+			this.isPrimitive = clazz.isPrimitive();
+			this.clazz = clazz;
+			this.alias = alias;
+			this.readRequired=readRequired;
 			this.converter = converter;
 		}
 

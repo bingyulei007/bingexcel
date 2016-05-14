@@ -8,15 +8,23 @@ package com.bing.excel.exception;
  * 文件名称：ErrorValueException.java  
  * 类说明：  
  */
-public class ErrorValueException extends RuntimeException {
+public class illegalValueException extends RuntimeException {
 
 	/**
 	 * serialVersionUID
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public ErrorValueException() {
-		super("单元格类型错误");
+	public illegalValueException() {
+		super("单元格数值非法");
+	}
+
+	public illegalValueException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public illegalValueException(String message) {
+		super(message);
 	}
 
 }

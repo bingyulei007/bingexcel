@@ -15,6 +15,7 @@ import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
 import com.bing.excel.exception.IllegalEntityException;
+import com.bing.excel.exception.illegalValueException;
 import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.vo.CellKV;
@@ -24,6 +25,10 @@ import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
 import com.google.common.primitives.Primitives;
 
+/**
+ * @author shizhongtao
+ *
+ */
 public class TypeAdapterConverter<T> implements ModelAdapter,
 		HeaderReflectConverter {
 	private final Constructor<T> constructor;
@@ -239,6 +244,13 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 				} else {
 					throw new NullPointerException("the converterMapper for ["
 							+ name + "] is null");
+				}
+			}else{
+				if (converterMapper.isReadRequired()) {
+					throw new illegalValueException(
+							"  field in ["+ converterMapper.getContainer()
+							+ "] indexed "+converterMapper.getIndex()+" is required");
+					
 				}
 			}
 			return obj;
