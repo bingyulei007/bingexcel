@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class ReadTest3 {
 
 		@CellConfig(index = 0)
 		private String id;
-
+		//默认的boolean类型只支持"TRUE", "FALSE"字符的转换，但是它自带了传参数的构造方法，具体可以参考源码，
 		@CellConfig(index = 8)
 		@BingConvertor(value = BooleanFieldConverter.class, strings = { "1","0" }, booleans = { false })
 		private boolean allDay;
@@ -66,14 +67,11 @@ public class ReadTest3 {
 		@CellConfig(index=7)
 		private Department department;//枚举类型
 		
-		
 		@CellConfig(index = 13)
 		@BingConvertor(DateTestConverter.class)
 		// 自定义转换器
 		private Date atypiaDate;
-		@CellConfig(index = 15)
-		@BingConvertor(DateTestConverter.class)
-		// 自定义转换器
+		@CellConfig(index = 14)
 		private Date entryTime;
 
 		// 其他变量可以这样定义。
@@ -91,15 +89,10 @@ public class ReadTest3 {
 
 	public static class DateTestConverter extends AbstractFieldConvertor {
 
-	
-
-		
-
 		@Override
 		public boolean canConvert(Class<?> clz) {
 			return clz.equals(Date.class);
 		}
-
 		@Override
 		public Object fromString(String cell, ConverterHandler converterHandler,Type type) {
 
@@ -107,9 +100,11 @@ public class ReadTest3 {
 				return null;
 			}
 			try {
-				return StringParseUtil.convertYMDT2Date(cell);
+				//return StringParseUtil.convertYMDT2Date(cell);项目中的util类
+				SimpleDateFormat format=new SimpleDateFormat("yyyy.MM.dd");
+				Date date = format.parse(cell);
+				return date;
 			} catch (ParseException e) {
-
 				throw new RuntimeException(e);
 			}
 		}
