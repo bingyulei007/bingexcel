@@ -234,7 +234,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
 		private final BingExcelEventImpl bingExcelEventImpl;
 		private WriteHandler handler;
 		TypeAdapterConverter<?> typeAdapter = null;
-
+		private int maxLine=Integer.MAX_VALUE;
 		private BingWriterHandlerImpl(WriteHandler handler,
 				ExcelConverterMapperHandler ormMapper,
 				BingExcelEventImpl bingExcelEventImpl) {
@@ -254,6 +254,13 @@ public class BingExcelEventImpl implements BingExcelEvent {
 			ListLine listLine = typeAdapter.marshal(obj, ormMapper);
 			handler.writeLine(listLine);
 
+		}
+
+		@Override
+		public void setMaxLine(int max) {
+			if(max>1){
+				this.maxLine=max;
+			}
 		}
 
 		private boolean writeHeader(Object obj) {
