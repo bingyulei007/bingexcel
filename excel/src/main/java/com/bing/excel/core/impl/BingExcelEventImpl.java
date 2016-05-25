@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.omg.CORBA.portable.UnknownException;
@@ -38,6 +39,7 @@ import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.ListRow;
 import com.bing.excel.writer.ExcelWriterFactory;
+import com.bing.excel.writer.SXSSFWriterHandler;
 import com.bing.excel.writer.WriteHandler;
 import com.google.common.base.MoreObjects;
 
@@ -157,13 +159,13 @@ public class BingExcelEventImpl implements BingExcelEvent {
 	@Override
 	public BingWriterHandler writeFile(File file) throws FileNotFoundException {
 		WriteHandler handler = ExcelWriterFactory.createSXSSF(file);
-		return new BingWriterHandlerImpl(handler, ormMapper, this);
+		return new BingWriterHandlerImpl((SXSSFWriterHandler) handler, ormMapper, this);
 	}
 
 	@Override
 	public BingWriterHandler writeFile(String path) {
 		WriteHandler handler = ExcelWriterFactory.createSXSSF(path);
-		return new BingWriterHandlerImpl(handler, ormMapper, this);
+		return new BingWriterHandlerImpl((SXSSFWriterHandler) handler, ormMapper, this);
 	}
 
 	private void registeAdapter(Class type) {
@@ -230,12 +232,14 @@ public class BingExcelEventImpl implements BingExcelEvent {
 		// private Class currentHeaderClass;
 		private Set<Class<?>> objectSetClass = Collections
 				.synchronizedSet(new HashSet<Class<?>>());
+		private Map<String, Integer> linesMap=new ConcurrentHashMap<String, Integer>();
+		private String currentSheetName;
 		private final ExcelConverterMapperHandler ormMapper;
 		private final BingExcelEventImpl bingExcelEventImpl;
-		private WriteHandler handler;
+		private SXSSFWriterHandler handler;
 		TypeAdapterConverter<?> typeAdapter = null;
 		private int maxLine=Integer.MAX_VALUE;
-		private BingWriterHandlerImpl(WriteHandler handler,
+		private BingWriterHandlerImpl(SXSSFWriterHandler handler,
 				ExcelConverterMapperHandler ormMapper,
 				BingExcelEventImpl bingExcelEventImpl) {
 			this.ormMapper = ormMapper;
@@ -249,7 +253,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
 			if (null == obj) {
 				return;
 			}
-			boolean b = writeHeader(obj);
+			writeHeader(obj);
 			// FIXME 要不要改为其他设计呢？
 			ListLine listLine = typeAdapter.marshal(obj, ormMapper);
 			handler.writeLine(listLine);
@@ -263,17 +267,24 @@ public class BingExcelEventImpl implements BingExcelEvent {
 			}
 		}
 
+		//TODO 逻辑走不通
 		private boolean writeHeader(Object obj) {
 			Class<?> clazz = obj.getClass();
+			String modelName = ormMapper.getModelName(clazz);
 			if (objectSetClass.contains(clazz)) {
-				return true;
+				if(linesMap.get(clazz.getName())<maxLine){
+					if(currentSheetName !=null&&!modelName.equals(currentSheetName)){
+					handler.setCurrentSheetByName(currentSheetName);
+					}
+					return true;
+				}
 			}
 			preHandle(clazz);
 			synchronized (clazz) {
 				if (objectSetClass.contains(clazz)) {
 					return true;
 				}
-				handler.createSheet(ormMapper.getModelName(clazz));
+				handler.createSheet();
 				typeAdapter = bingExcelEventImpl.typeTokenCache.get(clazz);
 				List<CellKV<String>> header = typeAdapter.getHeader(ormMapper);
 				handler.writeHeader(header);
