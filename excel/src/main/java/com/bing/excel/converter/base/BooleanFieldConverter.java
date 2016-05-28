@@ -19,6 +19,11 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 	private final String trueCaseStr;
 	private final String falseCaseStr;
 
+	/**
+	 * @param trueCaseStr 为真时候的输入
+	 * @param falseCaseStr 为家时候的输入
+	 * @param caseSensitive 是不是忽略大小写
+	 */
 	public BooleanFieldConverter(String trueCaseStr, String falseCaseStr,
 			boolean caseSensitive) {
 		this.caseSensitive = caseSensitive;
@@ -26,6 +31,9 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 		this.falseCaseStr = falseCaseStr;
 	}
 
+	/**
+	 * 默认的boolean类型转换器，支持"TRUE", "FALSE"字符的转换
+	 */
 	public BooleanFieldConverter() {
 		this("TRUE", "FALSE", false);
 	}

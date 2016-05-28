@@ -38,9 +38,9 @@ public interface BingExcel {
 	 * <p>
 	 * Description:读取excel 的第一个sheet页到list<／p>
 	 * 
-	 * @param file
-	 * @param clazz
-	 * @param startRowNum
+	 * @param file excel对应的文件
+	 * @param clazz 要转换类型的class对象
+	 * @param startRowNum 从第几行开始读取
 	 * @return 
 	 * @throws Exception 
 	 */
@@ -48,7 +48,6 @@ public interface BingExcel {
 	/**
 	 * 根据condition条件读取相应的sheet到list对象
 	 * @param file
-	 * @param clazz
 	 * @param condition
 	 * @return
 	 * @throws Exception 

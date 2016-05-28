@@ -51,6 +51,12 @@ public class BingExcelBuilder implements Builder<BingExcel> {
 		return new BingExcelBuilder();
 
 	}
+	/**
+	 * @return BingExcel 实例
+	 */
+	public static BingExcel builderInstance(){
+		return (new BingExcelBuilder()).builder();
+	}
 	@Override
 	public Builder<BingExcel> registerFieldConverter(Class<?> clazz,
 			FieldValueConverter converter) {

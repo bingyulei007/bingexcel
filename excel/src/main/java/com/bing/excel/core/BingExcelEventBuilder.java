@@ -49,7 +49,12 @@ public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
 		return new BingExcelEventBuilder();
 
 	}
-
+	/**
+	 * @return BingExcelEvent实例
+	 */
+	public static BingExcelEvent builderInstance(){
+		return (new BingExcelEventBuilder()).builder();
+	}
 	@Override
 	public Builder<BingExcelEvent> registerFieldConverter(Class<?> clazz,
 			FieldValueConverter converter) {
