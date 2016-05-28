@@ -53,7 +53,7 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 
 	
 	
-	private int currentRowIndex = -1;
+	 int currentRowIndex = -1;
 
 	CellStyle createHeadStyle() {
 		if (headerCellStyle != null) {
@@ -167,7 +167,7 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 	private void createOrderNumSheet(String name, int num) {
 		Sheet sheet = wb.getSheet(name + "-" + num);
 		if (sheet != null) {
-			createOrderNumSheet(name,num++);
+			createOrderNumSheet(name,num+1);
 		} else {
 			currentSheet = wb.createSheet(name + "-" + num);
 		}

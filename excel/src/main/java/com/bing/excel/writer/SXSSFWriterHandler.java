@@ -3,7 +3,6 @@ package com.bing.excel.writer;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -25,7 +24,7 @@ public class SXSSFWriterHandler extends AbstractWriteHandler {
 		this.wb=(SXSSFWorkbook) wb;
 	}
 
-	@Override
+	@ Override
 	public void flush() {
 		try {
 			if (os != null) {
@@ -38,12 +37,13 @@ public class SXSSFWriterHandler extends AbstractWriteHandler {
 		}
 	}
 
-	public void setCurrentSheetByName(String name){
+	public void setCurrentSheetByName(String name, int lineNum){
 		SXSSFSheet sheet = wb.getSheet(name);
 		if(sheet==null){
 			throw new NullPointerException(String.format("no sheet named [%s]", name));
 		}else{
 			super.currentSheet=sheet;
+			super.currentRowIndex=lineNum;
 		}
 	}
 }
