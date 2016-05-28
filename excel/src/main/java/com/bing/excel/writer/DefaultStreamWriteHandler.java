@@ -22,7 +22,7 @@ public class DefaultStreamWriteHandler extends AbstractWriteHandler {
 	 *            U should close the stream by youself.
 	 * @throws FileNotFoundException 
 	 */
-	public DefaultStreamWriteHandler(Workbook wb, OutputStream outStream)  {
+	 DefaultStreamWriteHandler(Workbook wb, OutputStream outStream)  {
 		super(wb, outStream);
 		this.os = super.os;
 

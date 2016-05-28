@@ -76,7 +76,7 @@ public class ReadTest2 {
 		
 		
 		
-		// 其他变量可以这样定义。
+		// 其他不对应的属性可以这样定义
 		private transient String test;
 
 		public String toString() {

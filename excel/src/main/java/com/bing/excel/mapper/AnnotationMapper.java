@@ -4,9 +4,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,8 +16,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import javax.management.DescriptorKey;
-
 
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
@@ -30,12 +26,10 @@ import com.bing.excel.exception.InitializationException;
 import com.bing.excel.exception.MissingCellConfigException;
 import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 import com.bing.utils.ReflectDependencyFactory;
-import com.google.common.base.Objects;
+
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Maps;
-import com.google.common.primitives.Primitives;
 
 /**
  * 创建时间：2015-12-11下午8:33:01 项目名称：excel
@@ -48,7 +42,7 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 
 	// 属性转换器的缓存
 	private Cache<Class<?>, Map<List<Object>, FieldValueConverter>> converterCache = null;
-	private  ConversionMapper fieldMapper = new ConversionMapper();
+	private  ConversionMapper objConversionMapper = new ConversionMapper();
 	private final Set<Class<?>> annotatedTypes = Collections
 			.synchronizedSet(new HashSet<Class<?>>());
 
@@ -105,21 +99,21 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 	public FieldValueConverter getLocalConverter(Class definedIn,
 			String fieldName) {
 
-		return fieldMapper.getLocalConverter(definedIn, fieldName);
+		return objConversionMapper.getLocalConverter(definedIn, fieldName);
 	}
 
 	@Override
 	public FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,
 			String fieldName) {
 
-		return fieldMapper.getLocalConverterMapper(definedIn, fieldName);
+		return objConversionMapper.getLocalConverterMapper(definedIn, fieldName);
 	}
 
 	
 
 	@Override
 	public String getModelName(Class<?> key) {
-		return fieldMapper.getModelName(key);
+		return objConversionMapper.getModelName(key);
 	}
 
 	private void processTypes(final Set<Class<?>> types) {
@@ -210,7 +204,7 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 				}
 			} 
 		} 
-		fieldMapper.registerLocalConverter(clazz,
+		objConversionMapper.registerLocalConverter(clazz,
 				field.getName(), index,alias, field.getType(),readRequired, converter);
 	}
 

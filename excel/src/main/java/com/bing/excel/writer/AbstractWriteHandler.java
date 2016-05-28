@@ -27,10 +27,9 @@ import com.bing.excel.vo.ListLine;
 import com.bing.utils.FileCreateUtils;
 
 public abstract class AbstractWriteHandler implements WriteHandler {
-	private Sheet currentSheet;
+	Sheet currentSheet;
 	private final Workbook wb;
 	transient OutputStream os;
-	private Set<String> names = new HashSet<>();
 	private CellStyle headerCellStyle;
 	private CellStyle dateCellStyle;
 
@@ -52,7 +51,9 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 
 	}
 
-	private int currentRowIndex = -1;
+	
+	
+	 int currentRowIndex = -1;
 
 	CellStyle createHeadStyle() {
 		if (headerCellStyle != null) {
@@ -148,16 +149,27 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 	}
 
 	@Override
-	public void createSheet(String name) {
+	public String createSheet(String name) {
 		if (StringUtils.isBlank(name)) {
 			currentSheet = wb.createSheet();
+			
 		} else {
 			Sheet sheet = wb.getSheet(name);
 			if (sheet == null) {
 				currentSheet = wb.createSheet(name);
 			} else {
-				createSheet(name + "-" + RandomStringUtils.randomNumeric(2));
+				createOrderNumSheet(name, 1);
 			}
+		}
+		return currentSheet.getSheetName();
+	}
+
+	private void createOrderNumSheet(String name, int num) {
+		Sheet sheet = wb.getSheet(name + "-" + num);
+		if (sheet != null) {
+			createOrderNumSheet(name,num+1);
+		} else {
+			currentSheet = wb.createSheet(name + "-" + num);
 		}
 	}
 
@@ -168,7 +180,7 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			wb.write(os);
 			wb.close();
 		} catch (IOException e) {
-			throw new IllegalStateException(e); 
+			throw new IllegalStateException(e);
 			// e.printStackTrace();
 		}
 	}

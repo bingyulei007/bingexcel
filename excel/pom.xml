@@ -106,7 +106,7 @@
 	<distributionManagement>
 		<repository>
 			<id>bingyulei-mvn-repo</id>
-			<url>file:///D:/maven/excelreps/repository</url>
+			<url>file:///D:/maven/excelreps/mvn-repo/repository</url>
 		</repository>
 	</distributionManagement>
 </project>
