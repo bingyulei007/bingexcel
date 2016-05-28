@@ -24,13 +24,13 @@ public class DefaultFileWriteHandler extends AbstractWriteHandler {
 	
 	
 
-	public DefaultFileWriteHandler(Workbook wb, File file)
+	 DefaultFileWriteHandler(Workbook wb, File file)
 			throws FileNotFoundException {
 		super(wb,new FileOutputStream(file));
 		this.os=super.os;
 	}
 
-	public DefaultFileWriteHandler(Workbook wb, String path) {
+	 DefaultFileWriteHandler(Workbook wb, String path) {
 		super(wb, path);
 		this.os=super.os;
 	}

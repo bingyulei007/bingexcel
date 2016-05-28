@@ -7,6 +7,12 @@ public interface BingWriterHandler {
 	 * @param obj
 	 */
 	void writeLine(Object obj);
+	
+	/**
+	 * 单页最大行数
+	 * @param max
+	 */
+	void setMaxLine(int max);
 	/**
 	 * 输出文件。
 	 */
