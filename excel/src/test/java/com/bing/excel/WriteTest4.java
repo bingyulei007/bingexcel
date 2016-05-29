@@ -1,7 +1,6 @@
 package com.bing.excel;
 
 import com.google.common.base.MoreObjects;
-
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.core.BingExcelEvent;
@@ -9,7 +8,6 @@ import com.bing.excel.core.BingExcelEventBuilder;
 import com.bing.excel.core.BingWriterHandler;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.text.StrBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,9 +31,13 @@ public class WriteTest4 {
         BingWriterHandler writerHandler = bing.writeFile("E:/test/student.xlsx");
         writerHandler.writeLine(new Student("a", RandomStringUtils.randomAlphanumeric(4), "cc"));
         writerHandler.writeLine(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
-        writerHandler.writeLine(new Student("a", RandomStringUtils.randomAlphanumeric(4), "cc"));
-        writerHandler.writeLine(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
-        writerHandler.writeLine(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
+        writerHandler.setMaxLine(100);
+        for (int i = 0; i < 200; i++) {
+        	if(i>100&& i<110){
+        		writerHandler.writeLine(new Student("a", RandomStringUtils.randomAlphanumeric(4), "cc"));
+        	}
+            writerHandler.writeLine(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
+        }
         writerHandler.close();
     }
 
