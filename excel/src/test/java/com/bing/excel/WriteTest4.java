@@ -31,7 +31,7 @@ public class WriteTest4 {
         BingWriterHandler writerHandler = bing.writeFile("E:/test/student.xlsx");
         writerHandler.writeLine(new Student("a", RandomStringUtils.randomAlphanumeric(4), "cc"));
         writerHandler.writeLine(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
-        writerHandler.setMaxLine(100);
+        writerHandler.setMaxLineForSheet(100);
         for (int i = 0; i < 200; i++) {
         	if(i>100&& i<110){
         		writerHandler.writeLine(new Student("a", RandomStringUtils.randomAlphanumeric(4), "cc"));

@@ -285,7 +285,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
         }
 
         @Override
-        public void setMaxLine(int max) {
+        public void setMaxLineForSheet(int max) {
             if (max > 1) {
                 this.maxLine = max;
             }
