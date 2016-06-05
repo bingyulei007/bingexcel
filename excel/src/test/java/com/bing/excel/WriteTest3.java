@@ -33,7 +33,7 @@ public class WriteTest3 {
          * 你如果想初始化一个长多为百万级的list，劝你趁早放弃
          */
         //测试百万级的写出,
-        BingWriterHandler writerHandler = bing.writeFile("E:/test/adb.xlsx");
+        BingWriterHandler writerHandler = bing.writeFile("E:/test/bigdata.xlsx");
        // writerHandler.setMaxLine(100000);
         for (int i = 0; i < 1000000; i++) {
             writerHandler.writeLine(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));

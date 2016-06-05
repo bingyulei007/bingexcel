@@ -24,6 +24,7 @@ public class WriteTest1 {
 		list.add(new Person(12, "nihoa", 23434.9));
 		list.add(new Person(23, "nihoa", 234.9));
 		list.add(new Person(122, "nihoa", 23434.9));
+		list.add(new Person(12, "nihoa", 23434.9));
 
 		
 		bing.writeExcel("E:/test/adb.xlsx", list,list);

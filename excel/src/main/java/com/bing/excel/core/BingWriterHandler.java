@@ -12,7 +12,7 @@ public interface BingWriterHandler {
 	 * 单页最大行数
 	 * @param max
 	 */
-	void setMaxLine(int max);
+	void setMaxLineForSheet(int max);
 	/**
 	 * 输出文件。
 	 */

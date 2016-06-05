@@ -38,7 +38,7 @@ public class ReadTest {
 	public void readExcelTest2() throws URISyntaxException {
 		InputStream in = Person.class.getResourceAsStream("/person.xls");
 		
-		BingExcel bing = BingExcelBuilder.toBuilder().builder();
+		BingExcel bing = BingExcelBuilder.builderInstance();
 		try {
 			SheetVo<Person> vo = bing.readStream(in, Person.class, 1);
 			System.out.println(vo.getSheetIndex());
