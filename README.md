@@ -5,6 +5,8 @@
 具体使用说明可以参照   [开源中国wiki](https://git.oschina.net/bingyulei007/bingExcel/wikis/home),wiki写的比较简单，大家可以fork下源码，里面有很多单元测试的例子。
 ## 环境说明
 基于java1.7，依赖poi3.1X.jar包,commons-lang3 jar,com.google.guava 等
+## jar 包管理地址
+https://github.com/bingyulei007/mvn-repo/tree/master/repository/com/bing/excel
 ## 联系我
 如果有问题可以留言，也可以发送邮件到 * _shizhongtao@gmail.com_ *    
 也可以加入qq群进行问题交流：  
