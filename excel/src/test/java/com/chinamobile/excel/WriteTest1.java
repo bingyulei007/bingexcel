@@ -27,7 +27,7 @@ public class WriteTest1 {
 		list.add(new Person(12, "nihoa", 23434.9));
 
 		
-		bing.writeExcel("E:/aoptest/adb.xlsx", list,list);
+		bing.writeExcel("D:/aoptest/adb.xlsx", list,list);
 	}
 
 	@OutAlias("xiaoshou")
@@ -50,7 +50,8 @@ public class WriteTest1 {
 		private String name;
 		@CellConfig(index = 3)
 		private Double salary;
-		private transient boolean testProperty = false;
+		@CellConfig(index = 2)
+		private  boolean testProperty = false;
 
 		public String getName() {
 			return name;

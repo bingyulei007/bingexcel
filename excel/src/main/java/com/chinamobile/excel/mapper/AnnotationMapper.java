@@ -168,8 +168,8 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 	 * Description:
 	 * </p>
 	 * 
-	 * @param key
-	 * @param cls
+	 * @param clazz
+	 * @param field
 	 */
 	private void addMapper(Class<?>  clazz,Field field) {
 		CellConfig cellConfig = field.getAnnotation(CellConfig.class);
@@ -178,7 +178,9 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 		String alias;
 		boolean readRequired;
 		if (cellConfig == null) {
-			throw new MissingCellConfigException("["+clazz+"#"+field.getName()+"]Missing CellConfig annotation");
+			//当属性上没有此注解时候，忽略
+			return;
+			//throw new MissingCellConfigException("["+clazz+"#"+field.getName()+"]Missing CellConfig annotation");
 		} else {
 			index = cellConfig.index();
 			//omitOutput=cellConfig.omitOutput();

@@ -22,7 +22,7 @@ public class ReadTest {
 		URL url = Person.class.getResource("/person.xlsx");
 		File f = new File(url.toURI());
 
-		BingExcel bing = BingExcelBuilder.toBuilder().builder();
+		BingExcel bing = BingExcelBuilder.builderInstance();
 		try {
 			SheetVo<Person> vo = bing.readFile(f, Person.class, 1);
 			System.out.println(vo.getSheetIndex());
@@ -64,6 +64,15 @@ public class ReadTest {
 		private String name;
 		@CellConfig(index = 3)
 		private Double salary;
+		private int gongling;
+
+		public int getGongling() {
+			return gongling;
+		}
+
+		public void setGongling(int gongling) {
+			this.gongling = gongling;
+		}
 
 		public String getName() {
 			return name;
@@ -83,7 +92,7 @@ public class ReadTest {
 
 		public String toString() {
 			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
-					.add("name", name).add("age", age).add("salary", salary)
+					.add("name", name).add("age", age).add("salary", salary).add("gl",gongling)
 					.toString();
 		}
 	}

@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
+import com.chinamobile.excel.annotation.CellConfig;
 import com.chinamobile.excel.core.BingExcel;
 import com.chinamobile.excel.core.ReaderCondition;
 import com.chinamobile.excel.core.handler.ConverterHandler;
@@ -58,7 +59,7 @@ public class BingExcelImpl implements BingExcel {
 	private final Set<Class<?>> targetTypes = Collections
 			.synchronizedSet(new HashSet<Class<?>>());
 	private ExcelConverterMapperHandler ormMapper = new AnnotationMapper();
-	private List<SheetVo> resultList;
+	//private List<SheetVo> resultList;
 
 	public BingExcelImpl(ConverterHandler localConverterHandler) {
 		this.localConverterHandler = localConverterHandler;
@@ -95,9 +96,9 @@ public class BingExcelImpl implements BingExcel {
 	@Override
 	public List<SheetVo> readFileToList(File file, ReaderCondition[] conditions)
 			throws Exception {
-		resultList = null;
+		List<SheetVo> resultList = Lists.newArrayList();
 		BingExcelReaderListener listner = new BingExcelReaderListener(
-				conditions);
+				conditions,resultList);
 		ReadHandler handler = ExcelReaderFactory.create(file, listner, true);
 		int[] indexArr = new int[conditions.length];
 		int minNum = -1;
@@ -111,7 +112,7 @@ public class BingExcelImpl implements BingExcel {
 			}
 		}
 		handler.readSheet(indexArr, minNum);
-		return this.resultList;
+		return resultList.size()==0?Collections.emptyList():resultList;
 	}
 
 	@Override
@@ -135,9 +136,9 @@ public class BingExcelImpl implements BingExcel {
 	public List<SheetVo> readStreamToList(InputStream stream,
 			ReaderCondition[] conditions) throws IOException, SQLException,
 			OpenXML4JException, SAXException {
-		resultList = null;
+		List<SheetVo> resultList = Lists.newArrayList();
 		BingExcelReaderListener listner = new BingExcelReaderListener(
-				conditions);
+				conditions,resultList);
 		ReadHandler handler = ExcelReaderFactory.create(stream, listner, true);
 		int[] indexArr = new int[conditions.length];
 		int minNum = 0;
@@ -149,7 +150,7 @@ public class BingExcelImpl implements BingExcel {
 			}
 		}
 		handler.readSheet(indexArr, minNum);
-		return this.resultList;
+		return resultList;
 	}
 
 	@Override
@@ -248,8 +249,13 @@ public class BingExcelImpl implements BingExcel {
 							|| (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
 						continue;
 					}
+
 					// 应该不会出现
 					if (field.isSynthetic()) {
+						continue;
+					}
+					CellConfig cellConfig = field.getAnnotation(CellConfig.class);
+					if (cellConfig == null) {
 						continue;
 					}
 					field.setAccessible(true);
@@ -298,7 +304,7 @@ public class BingExcelImpl implements BingExcel {
 		private List<SheetVo> list;
 		private SheetVo currentSheetVo;
 
-		public BingExcelReaderListener(ReaderCondition[] conditions) {
+		public BingExcelReaderListener(ReaderCondition[] conditions,List<SheetVo>  resultList) {
 			super();
 			this.conditions = conditions;
 			Class[] arr = new Class[conditions.length];
@@ -306,6 +312,7 @@ public class BingExcelImpl implements BingExcel {
 				arr[i] = conditions[i].getTargetClazz();
 			}
 			ormMapper.processAnnotations(arr);
+			this.list=resultList;
 		}
 
 		@Override
@@ -351,9 +358,7 @@ public class BingExcelImpl implements BingExcel {
 		@Override
 		public void endSheet(int sheetIndex, String name) {
 			if (currentSheetVo != null) {
-				if (list == null) {
-					list = Lists.newArrayList();
-				}
+
 				list.add(currentSheetVo);
 				currentSheetVo = null;
 			}
@@ -361,11 +366,7 @@ public class BingExcelImpl implements BingExcel {
 
 		@Override
 		public void endWorkBook() {
-			if (list == null) {
-				resultList = Collections.EMPTY_LIST;
-			} else {
-				resultList = this.list;
-			}
+
 		}
 
 	}
