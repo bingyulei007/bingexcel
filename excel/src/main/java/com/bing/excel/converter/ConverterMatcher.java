@@ -4,7 +4,7 @@ package com.bing.excel.converter;
 /**
  * <p>Title: ConverterMatcher</p>
  * <p>Description: ConverterMatcher is the base interface of any converter</p>
- * <p>Company: bing</p> 
+ * <p>Company: chinamobile</p>
  * 
  * @author zhongtao.shi
  * @date 2015-12-14

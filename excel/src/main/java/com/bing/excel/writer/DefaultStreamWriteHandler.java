@@ -3,9 +3,9 @@ package com.bing.excel.writer;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
+
 import com.bing.excel.writer.exception.ExcelOutException;
 
 /**
@@ -33,7 +33,7 @@ public class DefaultStreamWriteHandler extends AbstractWriteHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.bing.excel.writer.WriterHandler#flush()
+	 * @see com.chinamobile.excel.writer.WriterHandler#flush()
 	 */
 	@Override
 	public void flush() {

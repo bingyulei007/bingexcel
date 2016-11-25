@@ -9,6 +9,7 @@ import java.util.Map;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.exception.ConversionException;
 import com.bing.excel.mapper.BaseGlobalConverterMapper;
+
 import com.google.common.primitives.Primitives;
 
 public class LocalConverterHandler implements ConverterHandler {
@@ -47,7 +48,7 @@ public class LocalConverterHandler implements ConverterHandler {
 			}else{
 				keyType=keyFieldType;
 			}
-			fieldValueConverter=BaseGlobalConverterMapper.globalFieldConverterMapper.get(keyType);
+			fieldValueConverter= BaseGlobalConverterMapper.globalFieldConverterMapper.get(keyType);
 			if (fieldValueConverter!=null) {
 				defaultLocalConverter.put(keyFieldType, fieldValueConverter);
 			}

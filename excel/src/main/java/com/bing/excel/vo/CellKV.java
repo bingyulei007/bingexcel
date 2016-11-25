@@ -26,9 +26,8 @@ public class CellKV <T>{
 	 * Constructs an CellKV object which associates the given attribute name
 	 * with the given value.
 	 * 
-	 * @param name
-	 *            A String containing the name of the attribute to be created.
-	 *            Cannot be null.
+	 * @param index
+	 *            A Int of the index cell,0 started.
 	 * @param value
 	 *            The Object which is assigned to the attribute. This object
 	 *            must be of the same type as the attribute.

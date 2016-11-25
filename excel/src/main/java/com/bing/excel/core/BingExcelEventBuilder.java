@@ -1,9 +1,9 @@
 package com.bing.excel.core;
 
 
+import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.common.Builder;
 import com.bing.excel.converter.FieldValueConverter;
-import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.impl.BingExcelEventImpl;
 
@@ -13,10 +13,11 @@ import com.bing.excel.core.impl.BingExcelEventImpl;
  * <p>
  * Description: <code>BingExcel</code>的构造类，可以添加自定义转换器等。<／p>
  * <p>
- * Company: bing<／p>
+ * Company: chinamobile<／p>
  * 
  * @author zhongtao.shi
  * @date 2015-12-8
+ * @Deprecated 不建议使用，如果要每次都输出，建议使用ExcelReadFactory
  */
 /**
  * <p>
@@ -24,11 +25,12 @@ import com.bing.excel.core.impl.BingExcelEventImpl;
  * <p>
  * Description: <／p>
  * <p>
- * Company: bing<／p>
+ * Company: chinamobile<／p>
  * 
  * @author zhongtao.shi
  * @date 2015-12-8
  */
+@Deprecated
 public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
 	private final ConverterHandler defaultLocalConverterHandler = new LocalConverterHandler();
 

@@ -1,15 +1,17 @@
 package com.bing.excel.core;
 
+import com.bing.excel.core.rw.BingWriterHandler;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 
 /**
  * @author shizhongtao
  *
  */
+@Deprecated
 public interface BingExcelEvent {
 
 	

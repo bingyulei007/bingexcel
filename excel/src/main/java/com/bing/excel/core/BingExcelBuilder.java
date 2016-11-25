@@ -1,9 +1,9 @@
 package com.bing.excel.core;
 
 
-import com.bing.common.Builder;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.common.Builder;
 import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl;
 
@@ -13,7 +13,7 @@ import com.bing.excel.core.impl.BingExcelImpl;
  * <p>
  * Description: <code>BingExcel</code>的构造类，可以添加自定义转换器等。<／p>
  * <p>
- * Company: bing<／p>
+ * Company: chinamobile<／p>
  * 
  * @author zhongtao.shi
  * @date 2015-12-8
@@ -24,7 +24,7 @@ import com.bing.excel.core.impl.BingExcelImpl;
  * <p>
  * Description: <／p>
  * <p>
- * Company: bing<／p>
+ * Company: chinamobile<／p>
  * 
  * @author zhongtao.shi
  * @date 2015-12-8

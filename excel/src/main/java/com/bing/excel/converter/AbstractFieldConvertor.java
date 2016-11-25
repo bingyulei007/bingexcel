@@ -4,7 +4,6 @@ import java.lang.reflect.Type;
 
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.vo.OutValue;
-import com.bing.excel.vo.OutValue.OutType;
 
 public class AbstractFieldConvertor implements FieldValueConverter {
 
@@ -15,11 +14,11 @@ public class AbstractFieldConvertor implements FieldValueConverter {
 	}
 
 	@Override
-	public OutValue toObject(Object source,ConverterHandler converterHandler) {
+	public OutValue toObject(Object source, ConverterHandler converterHandler) {
 		if(source==null){
 			return null;
 		}
-		return new OutValue(OutType.STRING, source.toString());
+		return new OutValue(OutValue.OutType.STRING, source.toString());
 	}
 
 	@Override

@@ -11,8 +11,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.bing.utils.FileCreateUtils;
-
 public class ExcelWriterFactory {
 	private static final Pattern OLD_EXCEL_PATH = Pattern
 			.compile("^\\S*\\.xls$");

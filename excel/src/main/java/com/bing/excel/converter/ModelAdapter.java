@@ -18,4 +18,3 @@ public interface ModelAdapter  {
 	ListLine marshal(Object source,ExcelConverterMapperHandler handler);
 	Object unmarshal(ListRow source, ExcelConverterMapperHandler handler);
 }
- 

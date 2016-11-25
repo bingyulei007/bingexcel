@@ -1,11 +1,11 @@
-package com.bing.excel;
+package com.chinamobile.excel;
 
 import com.google.common.base.MoreObjects;
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingExcelEventBuilder;
-import com.bing.excel.core.BingWriterHandler;
+import com.bing.excel.core.rw.BingWriterHandler;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
@@ -28,7 +28,7 @@ public class WriteTest4 {
          * 对于数据量非常大时候，注意一点就是数据绝对不能放入到内存，
          * 你如果想初始化一个长多为百万级的list，劝你趁早放弃
          */
-        BingWriterHandler writerHandler = bing.writeFile("E:/test/student.xlsx");
+        BingWriterHandler writerHandler = bing.writeFile("D:/aoptest/student.xlsx");
         writerHandler.writeLine(new Student("a", RandomStringUtils.randomAlphanumeric(4), "cc"));
         writerHandler.writeLine(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
         writerHandler.setMaxLineForSheet(100);

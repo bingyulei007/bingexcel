@@ -7,16 +7,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.poi.ss.usermodel.DateUtil;
-
-import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
+import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.vo.OutValue;
-import com.bing.utils.StringParseUtil;
 
 /**
  * @author shizhongtao

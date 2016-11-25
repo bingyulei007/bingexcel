@@ -17,14 +17,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 
-import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
-import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.converter.ConverterMatcher;
+import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.exception.IllegalCellConfigException;
 import com.bing.excel.exception.InitializationException;
-import com.bing.excel.exception.MissingCellConfigException;
-import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
+import com.bing.excel.annotation.BingConvertor;
 import com.bing.utils.ReflectDependencyFactory;
 
 import com.google.common.base.Strings;
@@ -57,7 +55,7 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.bing.excel.mapper.OrmMapper#processAnnotations(java.lang.Class[])
+	 * com.chinamobile.excel.mapper.OrmMapper#processAnnotations(java.lang.Class[])
 	 */
 	@Override
 	public void processAnnotations(final Class[] initialTypes) {
@@ -75,7 +73,7 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.bing.excel.mapper.OrmMapper#processAnnotations(java.lang.Class)
+	 * @see com.chinamobile.excel.mapper.OrmMapper#processAnnotations(java.lang.Class)
 	 */
 	@Override
 	public void processAnnotations(final Class initialType) {
@@ -91,7 +89,7 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.bing.excel.mapper.OrmMapper#getLocalConverter(java.lang.Class,
+	 * @see com.chinamobile.excel.mapper.OrmMapper#getLocalConverter(java.lang.Class,
 	 * java.lang.String)
 	 */
 
@@ -103,8 +101,8 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 	}
 
 	@Override
-	public FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,
-			String fieldName) {
+	public ConversionMapper.FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,
+                                                                            String fieldName) {
 
 		return objConversionMapper.getLocalConverterMapper(definedIn, fieldName);
 	}
@@ -168,8 +166,8 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 	 * Description:
 	 * </p>
 	 * 
-	 * @param key
-	 * @param cls
+	 * @param clazz
+	 * @param field
 	 */
 	private void addMapper(Class<?>  clazz,Field field) {
 		CellConfig cellConfig = field.getAnnotation(CellConfig.class);
@@ -178,7 +176,9 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 		String alias;
 		boolean readRequired;
 		if (cellConfig == null) {
-			throw new MissingCellConfigException("["+clazz+"#"+field.getName()+"]Missing CellConfig annotation");
+			//当属性上没有此注解时候，忽略
+			return;
+			//throw new MissingCellConfigException("["+clazz+"#"+field.getName()+"]Missing CellConfig annotation");
 		} else {
 			index = cellConfig.index();
 			//omitOutput=cellConfig.omitOutput();

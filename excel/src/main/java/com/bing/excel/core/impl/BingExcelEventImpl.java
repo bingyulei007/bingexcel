@@ -19,25 +19,25 @@ import java.util.Set;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.rw.BingWriterHandler;
+import com.bing.excel.mapper.ExcelConverterMapperHandler;
+import com.bing.excel.vo.CellKV;
+import com.bing.excel.writer.ExcelWriterFactory;
+import com.bing.excel.writer.SXSSFWriterHandler;
+import com.bing.excel.writer.WriteHandler;
 import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingReadListener;
-import com.bing.excel.core.BingWriterHandler;
 import com.bing.excel.core.ReaderCondition;
-import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.reflect.TypeAdapterConverter;
 import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.mapper.AnnotationMapper;
-import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.ReadHandler;
-import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.ListRow;
-import com.bing.excel.writer.ExcelWriterFactory;
-import com.bing.excel.writer.SXSSFWriterHandler;
-import com.bing.excel.writer.WriteHandler;
 
 import com.google.common.base.MoreObjects;
 
@@ -48,6 +48,7 @@ import com.google.common.base.MoreObjects;
  * @version 1.0
  * @since JDK 1.7 文件名称：BingExcelImpl.java 类说明：
  */
+@Deprecated
 public class BingExcelEventImpl implements BingExcelEvent {
 
     /**
@@ -91,8 +92,8 @@ public class BingExcelEventImpl implements BingExcelEvent {
     /*
      * (non-Javadoc)
      *
-     * @see com.bing.excel.core.ExcelBing#readSheetsToList(java.io.File,
-     * com.bing.excel.core.ReaderCondition[])
+     * @see com.chinamobile.excel.core.ExcelBing#readSheetsToList(java.io.File,
+     * com.chinamobile.excel.core.ReaderCondition[])
      */
     @SuppressWarnings({"rawtypes"})
     @Override
@@ -339,7 +340,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
         }
 
     }
-
+@Deprecated
     private class BingExcelReaderListener extends AbstractExcelReadListener {
 
         private final ReaderCondition[] conditions;
