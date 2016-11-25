@@ -1,12 +1,15 @@
 package com.chinamobile.excel;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.chinamobile.excel.annotation.BingConvertor;
 import com.chinamobile.excel.annotation.CellConfig;
 import com.chinamobile.excel.annotation.OutAlias;
+import com.chinamobile.excel.converter.base.BooleanFieldConverter;
 import com.chinamobile.excel.core.BingExcel;
 import com.chinamobile.excel.core.BingExcelBuilder;
 import com.google.common.base.MoreObjects;
@@ -24,10 +27,16 @@ public class WriteTest1 {
 		list.add(new Person(12, "nihoa", 23434.9));
 		list.add(new Person(23, "nihoa", 234.9));
 		list.add(new Person(122, "nihoa", 23434.9));
-		list.add(new Person(12, "nihoa", 23434.9));
+		list.add(new Person(12, null, 23434.9));
 
 		
-		bing.writeExcel("D:/aoptest/adb.xlsx", list,list);
+		bing.writeExcel("D:/aoptest/adb.xlsx", list);
+		try {
+			bing.writeCSV("D:/aoptest/adb.csv",list);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//bing.writeExcel("D:/aoptest/adb.xlsx", list,list,list);
 	}
 
 	@OutAlias("xiaoshou")
@@ -50,7 +59,8 @@ public class WriteTest1 {
 		private String name;
 		@CellConfig(index = 3)
 		private Double salary;
-		@CellConfig(index = 2)
+		@CellConfig(index = 2,readRequired = true,aliasName = "玩玩")
+		@BingConvertor(value = BooleanFieldConverter.class, strings = { "1","0" }, booleans = { true })
 		private  boolean testProperty = false;
 
 		public String getName() {

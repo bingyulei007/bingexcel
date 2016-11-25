@@ -64,6 +64,16 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 		}
 		return list;
 	}
+	public ListLine  getHeadertoListLine(ExcelConverterMapperHandler handler) {
+		ListLine line = new ListLine();
+		for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
+			FieldConverterMapper fieldConverterMapper = handler
+					.getLocalFieldConverterMapper(clazz, kv.getKey());
+			line.addValue( fieldConverterMapper.getIndex(),
+						fieldConverterMapper.getAlias());
+		}
+		return line;
+	}
 
 	@Override
 	public ListLine marshal(Object source, ExcelConverterMapperHandler handler) {

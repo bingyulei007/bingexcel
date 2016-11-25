@@ -86,7 +86,11 @@
             <artifactId>poi</artifactId>
             <version>3.13</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.4</version>
+        </dependency>
 
         <dependency>
             <groupId>xerces</groupId>

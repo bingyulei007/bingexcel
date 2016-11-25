@@ -28,7 +28,7 @@ public class WriteTest4 {
          * 对于数据量非常大时候，注意一点就是数据绝对不能放入到内存，
          * 你如果想初始化一个长多为百万级的list，劝你趁早放弃
          */
-        BingWriterHandler writerHandler = bing.writeFile("E:/aoptest/student.xlsx");
+        BingWriterHandler writerHandler = bing.writeFile("D:/aoptest/student.xlsx");
         writerHandler.writeLine(new Student("a", RandomStringUtils.randomAlphanumeric(4), "cc"));
         writerHandler.writeLine(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
         writerHandler.setMaxLineForSheet(100);

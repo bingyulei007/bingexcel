@@ -65,13 +65,13 @@ public class WriteTest2 {
 		public void run() {
 
 			if (Math.random() > 0.4) {
-				bing.writeExcel("E:/aoptest/adb"
+				bing.writeExcel("D:/aoptest/adb"
 						+ Thread.currentThread().getName() + ".xlsx", list,
 						list);
 			} else {
 				// chinamobile.writeExcel("E:/aoptest/adb"+Thread.currentThread().getName()+".xlsx",
 				// list);
-				bing.writeOldExcel("E:/aoptest/adb"
+				bing.writeOldExcel("D:/aoptest/adb"
 						+ Thread.currentThread().getName() + ".xls", list);
 			}
 			System.out.println("end:" + Thread.currentThread().getName());

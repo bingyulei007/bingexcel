@@ -29,6 +29,7 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 	transient OutputStream os;
 	private CellStyle headerCellStyle;
 	private CellStyle dateCellStyle;
+	private CellStyle headDateCellStyle;
 
 	public AbstractWriteHandler(Workbook wb, OutputStream outStream) {
 		this.wb = wb;
@@ -73,6 +74,30 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		return style;
 	}
 
+	CellStyle createHeadDateStyle() {
+		if (headDateCellStyle != null) {
+			return headDateCellStyle;
+		}
+		CellStyle cellStyle = wb.createCellStyle();
+		DataFormat format = wb.createDataFormat();
+		cellStyle.setDataFormat(format.getFormat("m/d/yy h:mm"));
+
+		// 设置这些样式
+		cellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
+		cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+
+		cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+		// 生成一个字体
+		Font font = wb.createFont();
+		font.setColor(IndexedColors.BLACK.index);
+		font.setFontHeightInPoints((short) 12);
+		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+		// 把字体应用到当前的样式
+		cellStyle.setFont(font);
+
+		headDateCellStyle = cellStyle;
+		return cellStyle;
+	}
 	CellStyle createDateStyle() {
 		if (dateCellStyle != null) {
 			return dateCellStyle;
@@ -141,6 +166,60 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			}
 			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
 					(short) ((25 * size) * 20));
+		}
+
+	}
+	@Override
+	public void writeHeader(ListLine listLine) {
+
+		currentRowIndex = 0;
+		CellStyle style = createHeadStyle();
+		Row currentRow = currentSheet.createRow(currentRowIndex);
+		currentRow.setHeight((short) 0x180);
+		for (CellKV<String> cellKV : listLine.getListStr()) {
+			Cell cell = currentRow.createCell(cellKV.getIndex());
+			cell.setCellValue(cellKV.getValue());
+			cell.setCellStyle(style);
+			int size = cellKV.getValue().length();
+			if (size > 10) {
+				size = 10;
+			}
+			if (size < 4) {
+				size = 4;
+			}
+			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
+					(short) ((25 * size) * 20));
+		}
+		for (CellKV<Double> cellKV : listLine.getListDouble()) {
+			Cell cell = currentRow.createCell(cellKV.getIndex());
+			cell.setCellValue(cellKV.getValue());
+			cell.setCellStyle(style);
+			int size = cellKV.getValue().toString().length();
+			if (size > 10) {
+				size = 10;
+			}
+			if (size < 4) {
+				size = 4;
+			}
+			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
+					(short) ((25 * size) * 20));
+		}
+		for (CellKV<Boolean> cellKV : listLine.getListBoolean()) {
+			Cell cell = currentRow.createCell(cellKV.getIndex());
+			cell.setCellValue(cellKV.getValue());
+			cell.setCellStyle(style);
+
+
+			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
+					(short) ((25 * 4) * 20));
+		}
+		for (CellKV<Date> cellKV : listLine.getListDate()) {
+			Cell cell = currentRow.createCell(cellKV.getIndex());
+			cell.setCellValue(cellKV.getValue());
+			cell.setCellStyle(createHeadDateStyle());
+			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
+					(short) 5000);
+			cell.setCellValue(cellKV.getValue());
 		}
 
 	}
