@@ -1,9 +1,6 @@
 package com.chinamobile.other;
 
-import com.google.common.collect.Lists;
-
-import com.chinamobile.excel.vo.ListRow;
-import com.chinamobile.utils.FileCreateUtils;
+import com.bing.utils.FileCreateUtils;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;

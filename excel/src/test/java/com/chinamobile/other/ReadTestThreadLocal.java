@@ -9,11 +9,11 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import com.chinamobile.excel.annotation.CellConfig;
-import com.chinamobile.excel.reader.ExcelReadListener;
-import com.chinamobile.excel.reader.ExcelReaderFactory;
-import com.chinamobile.excel.reader.ReadHandler;
-import com.chinamobile.excel.vo.ListRow;
+import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.reader.ExcelReadListener;
+import com.bing.excel.reader.ExcelReaderFactory;
+import com.bing.excel.reader.ReadHandler;
+import com.bing.excel.vo.ListRow;
 import com.google.common.base.MoreObjects;
 
 public class ReadTestThreadLocal {

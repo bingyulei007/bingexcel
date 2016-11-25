@@ -6,12 +6,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.chinamobile.excel.annotation.BingConvertor;
-import com.chinamobile.excel.annotation.CellConfig;
-import com.chinamobile.excel.annotation.OutAlias;
-import com.chinamobile.excel.converter.base.BooleanFieldConverter;
-import com.chinamobile.excel.core.BingExcel;
-import com.chinamobile.excel.core.BingExcelBuilder;
+import com.bing.excel.annotation.BingConvertor;
+import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.annotation.OutAlias;
+import com.bing.excel.converter.base.BooleanFieldConverter;
+import com.bing.excel.core.BingExcel;
+import com.bing.excel.core.BingExcelBuilder;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 

@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import com.chinamobile.excel.annotation.OutAlias;
+import com.bing.excel.annotation.OutAlias;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

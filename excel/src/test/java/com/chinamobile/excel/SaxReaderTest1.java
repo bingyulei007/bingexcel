@@ -4,10 +4,10 @@ import java.io.File;
 
 import org.junit.Test;
 
-import com.chinamobile.excel.reader.ExcelReadListener;
-import com.chinamobile.excel.reader.ExcelReaderFactory;
-import com.chinamobile.excel.reader.ReadHandler;
-import com.chinamobile.excel.vo.ListRow;
+import com.bing.excel.reader.ExcelReadListener;
+import com.bing.excel.reader.ExcelReaderFactory;
+import com.bing.excel.reader.ReadHandler;
+import com.bing.excel.vo.ListRow;
 
 /**
  * @author shizhongtao

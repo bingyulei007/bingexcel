@@ -11,14 +11,14 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.chinamobile.excel.annotation.BingConvertor;
-import com.chinamobile.excel.annotation.CellConfig;
-import com.chinamobile.excel.converter.AbstractFieldConvertor;
-import com.chinamobile.excel.core.BingExcel;
-import com.chinamobile.excel.core.BingExcelBuilder;
-import com.chinamobile.excel.core.handler.ConverterHandler;
-import com.chinamobile.excel.core.impl.BingExcelImpl.SheetVo;
-import com.chinamobile.utils.StringParseUtil;
+import com.bing.excel.annotation.BingConvertor;
+import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.core.BingExcel;
+import com.bing.excel.core.BingExcelBuilder;
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
+import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
 public class ReadTest2 {

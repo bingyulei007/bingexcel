@@ -1,11 +1,11 @@
 package com.chinamobile.excel;
 
 import com.google.common.base.MoreObjects;
-import com.chinamobile.excel.annotation.CellConfig;
-import com.chinamobile.excel.annotation.OutAlias;
-import com.chinamobile.excel.core.BingExcelEvent;
-import com.chinamobile.excel.core.BingExcelEventBuilder;
-import com.chinamobile.excel.core.rw.BingWriterHandler;
+import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.annotation.OutAlias;
+import com.bing.excel.core.BingExcelEvent;
+import com.bing.excel.core.BingExcelEventBuilder;
+import com.bing.excel.core.rw.BingWriterHandler;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;

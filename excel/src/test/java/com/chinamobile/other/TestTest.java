@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.chinamobile.excel.vo.CellKV;
-import com.chinamobile.excel.vo.ListLine;
-import com.chinamobile.excel.writer.ExcelWriterFactory;
-import com.chinamobile.excel.writer.WriteHandler;
+import com.bing.excel.vo.CellKV;
+import com.bing.excel.vo.ListLine;
+import com.bing.excel.writer.ExcelWriterFactory;
+import com.bing.excel.writer.WriteHandler;
 
 public class TestTest {
 	@Test

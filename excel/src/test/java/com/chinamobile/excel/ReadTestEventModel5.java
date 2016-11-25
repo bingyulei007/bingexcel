@@ -10,15 +10,15 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.chinamobile.excel.annotation.BingConvertor;
-import com.chinamobile.excel.annotation.CellConfig;
-import com.chinamobile.excel.converter.AbstractFieldConvertor;
-import com.chinamobile.excel.core.BingExcelEvent;
-import com.chinamobile.excel.core.BingExcelEventBuilder;
-import com.chinamobile.excel.core.BingReadListener;
-import com.chinamobile.excel.core.handler.ConverterHandler;
-import com.chinamobile.excel.core.impl.BingExcelEventImpl.ModelInfo;
-import com.chinamobile.utils.StringParseUtil;
+import com.bing.excel.annotation.BingConvertor;
+import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.core.BingExcelEvent;
+import com.bing.excel.core.BingExcelEventBuilder;
+import com.bing.excel.core.BingReadListener;
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.impl.BingExcelEventImpl.ModelInfo;
+import com.bing.utils.StringParseUtil;
 import com.google.common.base.MoreObjects;
 
 /**
