@@ -1,49 +1,50 @@
 package com.bing.excel.core.impl;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.common.collect.Lists;
+
+import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.core.BingExcel;
+import com.bing.excel.core.ReaderCondition;
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.handler.LocalConverterHandler;
+import com.bing.excel.core.reflect.TypeAdapterConverter;
+import com.bing.excel.exception.IllegalEntityException;
+import com.bing.excel.mapper.AnnotationMapper;
+import com.bing.excel.mapper.ExcelConverterMapperHandler;
+import com.bing.excel.reader.AbstractExcelReadListener;
+import com.bing.excel.reader.ExcelReaderFactory;
+import com.bing.excel.reader.ReadHandler;
+import com.bing.excel.vo.CellKV;
+import com.bing.excel.vo.ListLine;
+import com.bing.excel.vo.ListRow;
+import com.bing.excel.writer.ExcelWriterFactory;
+import com.bing.excel.writer.WriteHandler;
+import com.bing.utils.FileCreateUtils;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
-import com.bing.excel.annotation.CellConfig;
-import com.bing.excel.core.handler.ConverterHandler;
-import com.bing.excel.mapper.ExcelConverterMapperHandler;
-import com.bing.excel.vo.CellKV;
-import com.bing.excel.writer.ExcelWriterFactory;
-import com.bing.excel.writer.WriteHandler;
-import com.bing.excel.core.BingExcel;
-import com.bing.excel.core.ReaderCondition;
-import com.bing.excel.core.handler.LocalConverterHandler;
-import com.bing.excel.core.reflect.TypeAdapterConverter;
-import com.bing.excel.exception.IllegalEntityException;
-import com.bing.excel.mapper.AnnotationMapper;
-import com.bing.excel.reader.AbstractExcelReadListener;
-import com.bing.excel.reader.ExcelReaderFactory;
-import com.bing.excel.reader.ReadHandler;
-import com.bing.excel.vo.ListLine;
-import com.bing.excel.vo.ListRow;
-import com.bing.utils.FileCreateUtils;
-
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 创建时间：2015-12-8上午11:56:30 项目名称：excel
@@ -190,39 +191,76 @@ public class BingExcelImpl implements BingExcel {
   //临时使用下
   public void writeCSV(String path, Iterable iterable) throws IOException {
     File file = FileCreateUtils.createFile(path);
-      try (Writer out = new FileWriter(file)) {
-        CSVFormat format;
-        CSVPrinter csvPrinter=null;
-        boolean isAdd = false;
-        TypeAdapterConverter<?> typeAdapter = null;
-        for (Object object : iterable) {
-          if (!isAdd) {
-            if (object != null) {
-              isAdd = true;
-              Class clazz = object.getClass();
-              ormMapper.processAnnotations(clazz);
-              registeAdapter(clazz);
-              typeAdapter = typeTokenCache.get(clazz);
-              ListLine header = typeAdapter.getHeadertoListLine(ormMapper);
-              ListLine listLine = typeAdapter.marshal(object, ormMapper);
-              int maxIndex = header.getMaxIndex();
-              String[] headerArr = new String[maxIndex+1];
-              for (CellKV<String> kv : header.getListStr()) {
-                headerArr[kv.getIndex()]=kv.getValue();
-              }
-             format = CSVFormat.DEFAULT.withHeader(headerArr);
-              csvPrinter=new CSVPrinter(out,format);
-
-              csvPrinter.printRecord(listLine.toFullArray());
-            }
-
-          } else {
+    try (Writer out = new FileWriter(file)) {
+      CSVFormat format;
+      CSVPrinter csvPrinter = null;
+      boolean isAdd = false;
+      TypeAdapterConverter<?> typeAdapter = null;
+      for (Object object : iterable) {
+        if (!isAdd) {
+          if (object != null) {
+            isAdd = true;
+            Class clazz = object.getClass();
+            ormMapper.processAnnotations(clazz);
+            registeAdapter(clazz);
+            typeAdapter = typeTokenCache.get(clazz);
+            ListLine header = typeAdapter.getHeadertoListLine(ormMapper);
             ListLine listLine = typeAdapter.marshal(object, ormMapper);
+            int maxIndex = header.getMaxIndex();
+            String[] headerArr = new String[maxIndex + 1];
+            for (CellKV<String> kv : header.getListStr()) {
+              headerArr[kv.getIndex()] = kv.getValue();
+            }
+            format = CSVFormat.DEFAULT.withHeader(headerArr);
+            csvPrinter = new CSVPrinter(out, format);
+
             csvPrinter.printRecord(listLine.toFullArray());
           }
+
+        } else {
+          ListLine listLine = typeAdapter.marshal(object, ormMapper);
+          csvPrinter.printRecord(listLine.toFullArray());
         }
-        csvPrinter.close();
       }
+      csvPrinter.close();
+    }
+
+  }
+
+  @Override
+  //临时使用下,后面再改
+  public void writeCSV(OutputStream os, Iterable iterable) throws IOException {
+
+    Writer out = new OutputStreamWriter(os);
+    CSVFormat format;
+    CSVPrinter csvPrinter = null;
+    boolean isAdd = false;
+    TypeAdapterConverter<?> typeAdapter = null;
+    for (Object object : iterable) {
+      if (!isAdd) {
+        if (object != null) {
+          isAdd = true;
+          Class clazz = object.getClass();
+          ormMapper.processAnnotations(clazz);
+          registeAdapter(clazz);
+          typeAdapter = typeTokenCache.get(clazz);
+          ListLine header = typeAdapter.getHeadertoListLine(ormMapper);
+          ListLine listLine = typeAdapter.marshal(object, ormMapper);
+          int maxIndex = header.getMaxIndex();
+          String[] headerArr = new String[maxIndex + 1];
+          for (CellKV<String> kv : header.getListStr()) {
+            headerArr[kv.getIndex()] = kv.getValue();
+          }
+          format = CSVFormat.DEFAULT.withHeader(headerArr);
+          csvPrinter = new CSVPrinter(out, format);
+          csvPrinter.printRecord(listLine.toFullArray());
+        }
+
+      } else {
+        ListLine listLine = typeAdapter.marshal(object, ormMapper);
+        csvPrinter.printRecord(listLine.toFullArray());
+      }
+    }
 
   }
 

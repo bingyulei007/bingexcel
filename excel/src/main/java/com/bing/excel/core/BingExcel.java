@@ -119,4 +119,5 @@ public interface BingExcel {
 	void writeExcel(OutputStream stream,Iterable... iterables);
 	 void writeOldExcel(OutputStream stream,Iterable... iterables);
 	void writeCSV(String path,Iterable iterable) throws IOException;
+	void writeCSV(OutputStream os,Iterable iterable) throws IOException;
 }
