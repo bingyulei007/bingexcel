@@ -261,7 +261,7 @@ public class BingExcelImpl implements BingExcel {
         csvPrinter.printRecord(listLine.toFullArray());
       }
     }
-
+    csvPrinter.close();
   }
 
   private void writeToExcel(WriteHandler handler, Iterable... iterables) {

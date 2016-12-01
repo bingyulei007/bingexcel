@@ -1,5 +1,6 @@
 package com.chinamobile.excel;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -31,8 +32,9 @@ public class WriteTest1 {
 
 		
 		bing.writeExcel("D:/aoptest/adb.xlsx", list);
-		try {
-			bing.writeCSV("D:/aoptest/adb.csv",list);
+		try (FileOutputStream os = new FileOutputStream("D:/aoptest/adb1.csv")){
+		bing.writeCSV("D:/aoptest/adb.csv",list);
+			bing.writeCSV(os,list);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

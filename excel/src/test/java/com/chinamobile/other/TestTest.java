@@ -22,4 +22,15 @@ listStr.add(new CellKV<String>(0, "diyi"));
 		handler.flush();
 		
 	}
+	@Test
+	public void testA() {
+		String i=null;
+		try {
+				i.equals("a");
+		} catch (Exception e) {
+			throw new RuntimeException("test for me");
+		}finally {
+			System.out.println(123);
+		}
+	}
 }
