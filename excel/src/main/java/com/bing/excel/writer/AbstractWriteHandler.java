@@ -164,8 +164,8 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			if (size < 4) {
 				size = 4;
 			}
-			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
-					(short) ((25 * size) * 20));
+			currentSheet.setColumnWidth((cellKV.getIndex()),
+					((25 * size) * 20));
 		}
 
 	}

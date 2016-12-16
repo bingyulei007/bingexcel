@@ -28,16 +28,14 @@ public class WriteTest1 {
 		list.add(new Person(12, "nihoa", 23434.9));
 		list.add(new Person(23, "nihoa", 234.9));
 		list.add(new Person(122, "nihoa", 23434.9));
-		list.add(new Person(12, null, 23434.9));
 
-		
 		bing.writeExcel("D:/aoptest/adb.xlsx", list);
-		try (FileOutputStream os = new FileOutputStream("D:/aoptest/adb1.csv")){
-		bing.writeCSV("D:/aoptest/adb.csv",list);
+	/*	try (FileOutputStream os = new FileOutputStream("D:/aoptest/adb1.csv")){
+		//bing.writeCSV("D:/aoptest/adb.csv",list);
 			bing.writeCSV(os,list);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 		//bing.writeExcel("D:/aoptest/adb.xlsx", list,list,list);
 	}
 

@@ -26,8 +26,10 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -191,7 +193,7 @@ public class BingExcelImpl implements BingExcel {
   //临时使用下
   public void writeCSV(String path, Iterable iterable) throws IOException {
     File file = FileCreateUtils.createFile(path);
-    try (Writer out = new FileWriter(file)) {
+    try (Writer out = new BufferedWriter( new OutputStreamWriter(new FileOutputStream(file),"UTF-8"))) {
       CSVFormat format;
       CSVPrinter csvPrinter = null;
       boolean isAdd = false;
@@ -231,7 +233,7 @@ public class BingExcelImpl implements BingExcel {
   //临时使用下,后面再改
   public void writeCSV(OutputStream os, Iterable iterable) throws IOException {
 
-    Writer out = new OutputStreamWriter(os);
+    Writer out = new OutputStreamWriter(os,"UTF-8");
     CSVFormat format;
     CSVPrinter csvPrinter = null;
     boolean isAdd = false;
