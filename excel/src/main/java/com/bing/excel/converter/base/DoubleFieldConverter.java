@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.vo.OutValue;
-import com.google.common.base.Strings;
 
 public final class DoubleFieldConverter extends AbstractFieldConvertor {
 

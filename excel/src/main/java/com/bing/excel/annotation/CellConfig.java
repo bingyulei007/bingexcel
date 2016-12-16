@@ -26,6 +26,11 @@ public @interface CellConfig {
 	public int index() ;
 	
 	/**
+	 * excel 读取数据时候，是不是为必须参数。默认是false
+	 * @return
+	 */
+	public boolean readRequired() default false;
+	/**
 	 * excel导出时候，字段是否忽略导出，default <code>false</code>。
 	 * @return
 	 */

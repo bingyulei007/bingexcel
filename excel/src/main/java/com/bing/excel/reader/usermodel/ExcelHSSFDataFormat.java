@@ -132,7 +132,7 @@ public final class ExcelHSSFDataFormat implements DataFormat {
 		}
 
      if(index == -1) {
-         // YK: formatIndex can be -1, for example, for cell in column Y in test-data/spreadsheet/45322.xls
+         // YK: formatIndex can be -1, for example, for cell in column Y in aoptest-data/spreadsheet/45322.xls
          // return null for those
          return null;
      }

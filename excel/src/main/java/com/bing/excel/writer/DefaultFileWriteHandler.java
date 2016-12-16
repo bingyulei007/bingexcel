@@ -5,12 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
 
-import com.bing.excel.vo.CellKV;
-import com.bing.excel.vo.ListLine;
 import com.bing.excel.writer.exception.ExcelOutException;
 
 /**
@@ -24,13 +21,13 @@ public class DefaultFileWriteHandler extends AbstractWriteHandler {
 	
 	
 
-	public DefaultFileWriteHandler(Workbook wb, File file)
+	 DefaultFileWriteHandler(Workbook wb, File file)
 			throws FileNotFoundException {
 		super(wb,new FileOutputStream(file));
 		this.os=super.os;
 	}
 
-	public DefaultFileWriteHandler(Workbook wb, String path) {
+	 DefaultFileWriteHandler(Workbook wb, String path) {
 		super(wb, path);
 		this.os=super.os;
 	}

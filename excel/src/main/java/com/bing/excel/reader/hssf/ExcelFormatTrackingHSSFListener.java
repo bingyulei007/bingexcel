@@ -35,8 +35,8 @@ import org.apache.poi.util.LocaleUtil;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
 
-import com.bing.excel.reader.usermodel.ExcelHSSFDataFormat;
 import com.bing.excel.reader.usermodel.ExcelHSSFDataFormatter;
+import com.bing.excel.reader.usermodel.ExcelHSSFDataFormat;
 
 
 /**

@@ -44,7 +44,7 @@ public class ExcelDateUtil {
      * Given a Date, converts it into a double representing its internal Excel representation,
      *   which is the number of days since 1/1/1900. Fractional days represent hours, minutes, and seconds.
      *
-     * @return Excel representation of Date (-1 if error - test for error by checking for less than 0.1)
+     * @return Excel representation of Date (-1 if error - aoptest for error by checking for less than 0.1)
      * @param  date the Date
      */
     public static double getExcelDate(Date date) {
@@ -54,7 +54,7 @@ public class ExcelDateUtil {
      * Given a Date, converts it into a double representing its internal Excel representation,
      *   which is the number of days since 1/1/1900. Fractional days represent hours, minutes, and seconds.
      *
-     * @return Excel representation of Date (-1 if error - test for error by checking for less than 0.1)
+     * @return Excel representation of Date (-1 if error - aoptest for error by checking for less than 0.1)
      * @param date the Date
      * @param use1904windowing Should 1900 or 1904 date windowing be used?
      */
@@ -69,7 +69,7 @@ public class ExcelDateUtil {
      *  number of days since 1/1/1900. Fractional days represent hours,
      *  minutes, and seconds.
      *
-     * @return Excel representation of Date (-1 if error - test for error by checking for less than 0.1)
+     * @return Excel representation of Date (-1 if error - aoptest for error by checking for less than 0.1)
      * @param date the Calendar holding the date to convert
      * @param use1904windowing Should 1900 or 1904 date windowing be used?
      */

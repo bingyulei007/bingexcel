@@ -13,7 +13,7 @@ public final class StringFieldConverter extends AbstractFieldConvertor {
 	}
 
 	@Override
-	public Object fromString(String cell,ConverterHandler converterHandler,Type targetType) {
+	public Object fromString(String cell, ConverterHandler converterHandler, Type targetType) {
 		return cell;
 	}
 

@@ -9,23 +9,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.converter.HeaderReflectConverter;
 import com.bing.excel.converter.ModelAdapter;
-import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
 import com.bing.excel.exception.IllegalEntityException;
-import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
+import com.bing.excel.exception.illegalValueException;
 import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.vo.CellKV;
+import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.ListRow;
 import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
 import com.google.common.primitives.Primitives;
 
-public class TypeAdapterConverter<T> implements ModelAdapter,
-		HeaderReflectConverter {
+/**
+ * @author shizhongtao
+ *
+ */
+public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConverter {
 	private final Constructor<T> constructor;
 	/**
 	 * 名称和
@@ -58,6 +62,16 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 						fieldConverterMapper.getAlias()));
 		}
 		return list;
+	}
+	public ListLine  getHeadertoListLine(ExcelConverterMapperHandler handler) {
+		ListLine line = new ListLine();
+		for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
+			FieldConverterMapper fieldConverterMapper = handler
+					.getLocalFieldConverterMapper(clazz, kv.getKey());
+			line.addValue( fieldConverterMapper.getIndex(),
+						fieldConverterMapper.getAlias());
+		}
+		return line;
 	}
 
 	@Override
@@ -239,6 +253,13 @@ public class TypeAdapterConverter<T> implements ModelAdapter,
 				} else {
 					throw new NullPointerException("the converterMapper for ["
 							+ name + "] is null");
+				}
+			}else{
+				if (converterMapper.isReadRequired()) {
+					throw new illegalValueException(
+							"  field in ["+ converterMapper.getContainer()
+							+ "] indexed "+converterMapper.getIndex()+" is required");
+					
 				}
 			}
 			return obj;

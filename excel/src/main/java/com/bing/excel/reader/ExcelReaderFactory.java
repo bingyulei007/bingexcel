@@ -29,7 +29,6 @@ public class ExcelReaderFactory {
 	 * @param file
 	 * @param excelReader
 	 * @param ignoreNumFormat  是否忽略数据格式  (default=false，按照格式读取)
-	 * @param maxReturnLines 可为null，当null时候，不限制
 	 * @return
 	 * @throws Exception
 	 */

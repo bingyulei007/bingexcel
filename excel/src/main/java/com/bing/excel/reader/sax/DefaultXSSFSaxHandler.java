@@ -18,9 +18,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.bing.excel.exception.BingSaxReadStopException;
 import com.bing.excel.reader.ExcelReadListener;
+import com.bing.excel.vo.CellKV;
 import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
-import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListRow;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
@@ -150,7 +150,7 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.bing.excel.reader.SaxHandler#process(int)
+	 * @see com.chinamobile.excel.reader.SaxHandler#process(int)
 	 */
 	@Override
 	public void readSheet(int index,int maxReadLine) throws IOException, OpenXML4JException,

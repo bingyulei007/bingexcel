@@ -34,8 +34,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.bing.excel.exception.BingSaxReadStopException;
-import com.bing.excel.reader.usermodel.ExcelBuiltinFormats;
 import com.bing.excel.reader.usermodel.ExcelDataFormatter;
+import com.bing.excel.reader.usermodel.ExcelBuiltinFormats;
 
 /**
  * This class handles the processing of a sheet#.xml sheet part of a XSSF .xlsx

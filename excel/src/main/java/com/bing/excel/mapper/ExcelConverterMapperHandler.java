@@ -5,12 +5,12 @@ import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 
 public interface ExcelConverterMapperHandler {
 
-	abstract void processAnnotations(final Class[] initialTypes);
+	 void processAnnotations(final Class[] initialTypes);
 
-	abstract void processAnnotations(final Class initialType);
+	 void processAnnotations(final Class initialType);
 
 	@Deprecated
-	abstract FieldValueConverter getLocalConverter(Class definedIn,
+	 FieldValueConverter getLocalConverter(Class definedIn,
 			String fieldName);
 
 	FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,

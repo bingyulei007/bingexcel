@@ -6,11 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -27,12 +24,12 @@ import com.bing.excel.vo.ListLine;
 import com.bing.utils.FileCreateUtils;
 
 public abstract class AbstractWriteHandler implements WriteHandler {
-	private Sheet currentSheet;
+	Sheet currentSheet;
 	private final Workbook wb;
 	transient OutputStream os;
-	private Set<String> names = new HashSet<>();
 	private CellStyle headerCellStyle;
 	private CellStyle dateCellStyle;
+	private CellStyle headDateCellStyle;
 
 	public AbstractWriteHandler(Workbook wb, OutputStream outStream) {
 		this.wb = wb;
@@ -52,7 +49,9 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 
 	}
 
-	private int currentRowIndex = -1;
+	
+	
+	 int currentRowIndex = -1;
 
 	CellStyle createHeadStyle() {
 		if (headerCellStyle != null) {
@@ -75,6 +74,30 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		return style;
 	}
 
+	CellStyle createHeadDateStyle() {
+		if (headDateCellStyle != null) {
+			return headDateCellStyle;
+		}
+		CellStyle cellStyle = wb.createCellStyle();
+		DataFormat format = wb.createDataFormat();
+		cellStyle.setDataFormat(format.getFormat("m/d/yy h:mm"));
+
+		// 设置这些样式
+		cellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
+		cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+
+		cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+		// 生成一个字体
+		Font font = wb.createFont();
+		font.setColor(IndexedColors.BLACK.index);
+		font.setFontHeightInPoints((short) 12);
+		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+		// 把字体应用到当前的样式
+		cellStyle.setFont(font);
+
+		headDateCellStyle = cellStyle;
+		return cellStyle;
+	}
 	CellStyle createDateStyle() {
 		if (dateCellStyle != null) {
 			return dateCellStyle;
@@ -141,23 +164,88 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			if (size < 4) {
 				size = 4;
 			}
+			currentSheet.setColumnWidth((cellKV.getIndex()),
+					((25 * size) * 20));
+		}
+
+	}
+	@Override
+	public void writeHeader(ListLine listLine) {
+
+		currentRowIndex = 0;
+		CellStyle style = createHeadStyle();
+		Row currentRow = currentSheet.createRow(currentRowIndex);
+		currentRow.setHeight((short) 0x180);
+		for (CellKV<String> cellKV : listLine.getListStr()) {
+			Cell cell = currentRow.createCell(cellKV.getIndex());
+			cell.setCellValue(cellKV.getValue());
+			cell.setCellStyle(style);
+			int size = cellKV.getValue().length();
+			if (size > 10) {
+				size = 10;
+			}
+			if (size < 4) {
+				size = 4;
+			}
 			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
 					(short) ((25 * size) * 20));
+		}
+		for (CellKV<Double> cellKV : listLine.getListDouble()) {
+			Cell cell = currentRow.createCell(cellKV.getIndex());
+			cell.setCellValue(cellKV.getValue());
+			cell.setCellStyle(style);
+			int size = cellKV.getValue().toString().length();
+			if (size > 10) {
+				size = 10;
+			}
+			if (size < 4) {
+				size = 4;
+			}
+			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
+					(short) ((25 * size) * 20));
+		}
+		for (CellKV<Boolean> cellKV : listLine.getListBoolean()) {
+			Cell cell = currentRow.createCell(cellKV.getIndex());
+			cell.setCellValue(cellKV.getValue());
+			cell.setCellStyle(style);
+
+
+			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
+					(short) ((25 * 4) * 20));
+		}
+		for (CellKV<Date> cellKV : listLine.getListDate()) {
+			Cell cell = currentRow.createCell(cellKV.getIndex());
+			cell.setCellValue(cellKV.getValue());
+			cell.setCellStyle(createHeadDateStyle());
+			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
+					(short) 5000);
+			cell.setCellValue(cellKV.getValue());
 		}
 
 	}
 
 	@Override
-	public void createSheet(String name) {
+	public String createSheet(String name) {
 		if (StringUtils.isBlank(name)) {
 			currentSheet = wb.createSheet();
+			
 		} else {
 			Sheet sheet = wb.getSheet(name);
 			if (sheet == null) {
 				currentSheet = wb.createSheet(name);
 			} else {
-				createSheet(name + "-" + RandomStringUtils.randomNumeric(2));
+				createOrderNumSheet(name, 1);
 			}
+		}
+		return currentSheet.getSheetName();
+	}
+
+	private void createOrderNumSheet(String name, int num) {
+		Sheet sheet = wb.getSheet(name + "-" + num);
+		if (sheet != null) {
+			createOrderNumSheet(name,num+1);
+		} else {
+			currentSheet = wb.createSheet(name + "-" + num);
 		}
 	}
 
@@ -168,7 +256,7 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			wb.write(os);
 			wb.close();
 		} catch (IOException e) {
-			throw new IllegalStateException(e); 
+			throw new IllegalStateException(e);
 			// e.printStackTrace();
 		}
 	}

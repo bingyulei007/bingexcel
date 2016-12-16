@@ -2,6 +2,7 @@ package com.bing.excel.core;
 
 
 /**
+ * 读取条件类
  * @author shizhongtao
  * 
  * @date 2016-2-17 Description:

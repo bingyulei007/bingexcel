@@ -29,17 +29,11 @@ public final class IntegerFieldConverter extends AbstractFieldConvertor {
 		if (Strings.isNullOrEmpty(cell)) {
 			return null;
 		}
-		long value;
-		char c1 = cell.charAt(1);
-		if (c1 == 'x' || c1 == 'X') {
-			value = Long.decode(cell);
-		} else {
-			value = Long.valueOf(cell.toString()).longValue();
-		}
-		if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
-			throw new NumberFormatException("For input string: \"" + cell + '"');
-		}
-		return new Integer((int) value);
+		long value= Long.decode(cell).longValue();
+    	if(value < Integer.MIN_VALUE || value > 0xFFFFFFFFl) {
+    		throw new NumberFormatException("For input string: \"" + cell + '"');
+    	}
+        return new Integer((int)value);
 	}
 
 	@Override

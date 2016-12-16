@@ -2,7 +2,6 @@ package com.bing.excel.reader.usermodel;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -460,7 +459,7 @@ public class ExcelDataFormatter implements Observer{
             code or immediately before the "ss" code; otherwise, Microsoft
             Excel displays the month instead of minutes."
           */
-        //start shizhongtao bing
+        //start shizhongtao chinamobile
        
         StringBuilder sb = new StringBuilder();
         char[] chars = formatStr.toCharArray();

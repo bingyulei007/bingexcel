@@ -85,7 +85,7 @@ public class ReflectDependencyFactory {
 					}
 				}
 
-				// first approach: test the ctor params against the dependencies
+				// first approach: aoptest the ctor params against the dependencies
 				// in the sequence
 				// of the parameter declaration
 				matchingDependencies.clear();

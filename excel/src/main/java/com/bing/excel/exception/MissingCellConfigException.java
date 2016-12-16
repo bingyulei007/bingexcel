@@ -1,15 +1,13 @@
 package com.bing.excel.exception;
 
-public class MissingCellConfigException extends RuntimeException {
+/**
+ * 当用户定义实体缺少CellConfig注解时候抛出
+ * @author shizhongtao
+ *
+ */
+public class MissingCellConfigException extends IllegalEntityException {
 
-	public MissingCellConfigException() {
-		super();
-	}
 
-	public MissingCellConfigException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
 
 	public MissingCellConfigException(String message, Throwable cause) {
 		super(message, cause);

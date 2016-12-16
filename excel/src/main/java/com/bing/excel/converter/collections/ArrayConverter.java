@@ -7,8 +7,8 @@ import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
-import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.vo.OutValue;
+
 import com.google.common.base.Strings;
 
 /**
@@ -43,7 +43,7 @@ public class ArrayConverter extends AbstractFieldConvertor {
 
 
 	@Override
-	public OutValue toObject(Object source,ConverterHandler converterHandler) {
+	public OutValue toObject(Object source, ConverterHandler converterHandler) {
 		if(source==null){
 			return null;
 		}

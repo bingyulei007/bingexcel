@@ -6,6 +6,7 @@ import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
 import com.bing.excel.vo.OutValue;
+
 import com.google.common.base.Strings;
 
 /**
@@ -19,6 +20,11 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 	private final String trueCaseStr;
 	private final String falseCaseStr;
 
+	/**
+	 * @param trueCaseStr 为真时候的输入
+	 * @param falseCaseStr 为家时候的输入
+	 * @param caseSensitive 是不是忽略大小写
+	 */
 	public BooleanFieldConverter(String trueCaseStr, String falseCaseStr,
 			boolean caseSensitive) {
 		this.caseSensitive = caseSensitive;
@@ -26,6 +32,9 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 		this.falseCaseStr = falseCaseStr;
 	}
 
+	/**
+	 * 默认的boolean类型转换器，支持"TRUE", "FALSE"字符的转换
+	 */
 	public BooleanFieldConverter() {
 		this("TRUE", "FALSE", false);
 	}
@@ -36,7 +45,7 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 	}
 
 	@Override
-	public OutValue toObject(Object source,ConverterHandler converterHandler) {
+	public OutValue toObject(Object source, ConverterHandler converterHandler) {
 		if(source==null){
 			return null;
 		}

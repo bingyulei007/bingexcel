@@ -11,8 +11,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.bing.utils.FileCreateUtils;
-
 public class ExcelWriterFactory {
 	private static final Pattern OLD_EXCEL_PATH = Pattern
 			.compile("^\\S*\\.xls$");
@@ -69,7 +67,7 @@ public class ExcelWriterFactory {
 	public static WriteHandler createSXSSF(String path) {
 		isNewPath(path);
 		SXSSFWorkbook wb = new SXSSFWorkbook(200);
-		return new DefaultFileWriteHandler(wb, path);
+		return new SXSSFWriterHandler(wb, path);
 	}
 
 	public static WriteHandler createSXSSF(File file)

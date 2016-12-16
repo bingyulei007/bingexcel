@@ -12,7 +12,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
-import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
+import com.bing.excel.core.impl.BingExcelImpl;
 
 
 /**
@@ -38,22 +38,21 @@ public interface BingExcel {
 	 * <p>
 	 * Description:读取excel 的第一个sheet页到list<／p>
 	 * 
-	 * @param file
-	 * @param clazz
-	 * @param startRowNum
+	 * @param file excel对应的文件
+	 * @param clazz 要转换类型的class对象
+	 * @param startRowNum 从第几行开始读取
 	 * @return 
 	 * @throws Exception 
 	 */
-	<T> SheetVo<T> readFile(File file, Class<T> clazz, int startRowNum) throws Exception ;
+	<T> BingExcelImpl.SheetVo<T> readFile(File file, Class<T> clazz, int startRowNum) throws Exception ;
 	/**
 	 * 根据condition条件读取相应的sheet到list对象
 	 * @param file
-	 * @param clazz
 	 * @param condition
 	 * @return
 	 * @throws Exception 
 	 */
-	<T> SheetVo<T> readFile(File file, ReaderCondition<T> condition) throws Exception ;
+	<T> BingExcelImpl.SheetVo<T> readFile(File file, ReaderCondition<T> condition) throws Exception ;
 
 	
 	 /**
@@ -63,10 +62,10 @@ public interface BingExcel {
 	 * @return sheetVo的list对象，如果没有符合conditions的结果，返回empetyList对象
 	 * @throws Exception 
 	 */
-	List<SheetVo> readFileToList(File file,ReaderCondition[] conditions) throws Exception ;
+	List<BingExcelImpl.SheetVo> readFileToList(File file, ReaderCondition[] conditions) throws Exception ;
 	 
 	 
-	<T> SheetVo<T> readStream(InputStream stream,ReaderCondition<T> condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;
+	<T> BingExcelImpl.SheetVo<T> readStream(InputStream stream, ReaderCondition<T> condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;
 
 	/**
 	 * read sheet witch index equal 0
@@ -78,7 +77,7 @@ public interface BingExcel {
 	 * @throws InvalidFormatException 
 	 * @throws SAXException 
 	 */
-	<T> SheetVo<T> readStream(InputStream stream, Class<T> clazz, int startRowNum) throws InvalidFormatException, IOException, SQLException ,OpenXML4JException, SAXException;
+	<T> BingExcelImpl.SheetVo<T> readStream(InputStream stream, Class<T> clazz, int startRowNum) throws InvalidFormatException, IOException, SQLException ,OpenXML4JException, SAXException;
 
 	 /**
 	  * read sheets 
@@ -91,22 +90,34 @@ public interface BingExcel {
 	 * @throws OpenXML4JException
 	 * @throws SAXException
 	 */
-	List<SheetVo> readStreamToList(InputStream stream,  ReaderCondition[] condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;
+	List<BingExcelImpl.SheetVo> readStreamToList(InputStream stream, ReaderCondition[] condition) throws InvalidFormatException, IOException, SQLException, OpenXML4JException, SAXException ;
 	
 	/**
 	 * 输出model集合到excel 文件。
-	 * @param iterable 要输出到文件的集合对象，
+	 * @param iterables 要输出到文件的集合对象，
 	 * @param file 文件对象
 	 */
-	 void writeExcel(File file,Iterable... iterable)throws FileNotFoundException;
-	 void writeOldExcel(File file,Iterable... iterable)throws FileNotFoundException;
+	 void writeExcel(File file,Iterable... iterables)throws FileNotFoundException;
+	 void writeOldExcel(File file,Iterable... iterables)throws FileNotFoundException;
 	/**
 	 * 输出model集合到excel 文件。
-	 * @param iterable
+	 * @param iterables
 	 * @param path 文件路径
 	 */
-	 void writeExcel(String path,Iterable... iterable);
-	 void writeOldExcel(String path,Iterable... iterable);
-	 void writeExcel(OutputStream stream,Iterable... iterable);
-	 void writeOldExcel(OutputStream stream,Iterable... iterable);
+	 void writeExcel(String path,Iterable... iterables);
+/**
+ * 写出xls格式的excel文件
+* @param path
+* @param iterables
+*/
+	 void writeOldExcel(String path,Iterable... iterables);
+	 /**
+	  * 写出xls格式的excel到输出流
+	 * @param stream
+	 * @param iterables
+	 */
+	void writeExcel(OutputStream stream,Iterable... iterables);
+	 void writeOldExcel(OutputStream stream,Iterable... iterables);
+	void writeCSV(String path,Iterable iterable) throws IOException;
+	void writeCSV(OutputStream os,Iterable iterable) throws IOException;
 }
