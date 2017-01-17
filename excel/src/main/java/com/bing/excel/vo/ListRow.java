@@ -101,6 +101,7 @@ public class ListRow implements Iterable<CellKV<String>> {
 				arr[i]=temp.getValue();
 				i++;
 			}
+			return arr;
 		}
 		return new String[0];
 	}

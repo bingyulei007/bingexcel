@@ -128,7 +128,11 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			}
 
 			cell.setCellStyle(cellStyle);
-			cell.setCellValue(kv.getValue());
+
+			Date value = kv.getValue();
+			if (value != null) {
+				cell.setCellValue(value);
+			}
 		}
 		for (CellKV<Double> kv : line.getListDouble()) {
 			Cell cell = row.createCell(kv.getIndex());
