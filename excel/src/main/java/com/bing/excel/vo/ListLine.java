@@ -74,8 +74,8 @@ public class ListLine {
     if (listDouble == null) {
       listDouble = new ArrayList<>();
     }
-    listDouble.add(new CellKV<Double>(index, value));
     changeIndex(index);
+    listDouble.add(new CellKV<Double>(index, value));
     return this;
   }
 
