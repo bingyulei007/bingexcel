@@ -27,18 +27,18 @@ public @interface CellConfig {
 	
 	/**
 	 * excel 读取数据时候，是不是为必须参数。默认是false
-	 * @return
+	 * @return true or false
 	 */
 	public boolean readRequired() default false;
 	/**
 	 * excel导出时候，字段是否忽略导出，default <code>false</code>。
-	 * @return
+	 * @return ture or false
 	 */
 	//public boolean omitOutput() default false;
 	
 	/**
 	 * 输出时候的title名称
-	 * @return
+	 * @return  别名
 	 */
 	public String aliasName() default "";
 }

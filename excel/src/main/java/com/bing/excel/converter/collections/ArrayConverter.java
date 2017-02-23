@@ -14,7 +14,7 @@ import com.google.common.base.Strings;
 /**
  * @author shizhongtao
  *
- * @date 2016-3-24
+ * date 2016-3-24
  * Description:  
  */
 public class ArrayConverter extends AbstractFieldConvertor {

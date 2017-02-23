@@ -16,7 +16,7 @@ import com.bing.excel.core.impl.BingExcelImpl;
  * Company: chinamobile<／p>
  * 
  * @author zhongtao.shi
- * @date 2015-12-8
+ * date 2015-12-8
  */
 /**
  * <p>
@@ -27,7 +27,7 @@ import com.bing.excel.core.impl.BingExcelImpl;
  * Company: chinamobile<／p>
  * 
  * @author zhongtao.shi
- * @date 2015-12-8
+ * date 2015-12-8
  */
 public class BingExcelBuilder implements Builder<BingExcel> {
 	private final ConverterHandler localConverterHandler = new LocalConverterHandler();

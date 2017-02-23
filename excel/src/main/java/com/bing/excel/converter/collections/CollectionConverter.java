@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 /**
  * @author shizhongtao
  *
- * @date 2016-3-24
+ * date 2016-3-24
  * Description:  
  */
 public class CollectionConverter extends AbstractFieldConvertor {

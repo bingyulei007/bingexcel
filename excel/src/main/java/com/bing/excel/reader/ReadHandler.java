@@ -8,18 +8,24 @@ import org.xml.sax.SAXException;
 /**
  * @author shizhongtao
  *
- * @date 2016-3-1
+ * date 2016-3-1
  * Description:  
  */
 public interface ReadHandler {
 	/**
 	 * 处理所用数据对象
+	 * @throws IOException
+	 * @throws OpenXML4JException
+	 * @throws SAXException
 	 */
 	void readSheets() throws IOException, OpenXML4JException , SAXException;
 	void readSheets(int maxReadLine) throws IOException, OpenXML4JException , SAXException;
 	/**
 	 * 读取指定的数据
 	 * @param index sheetDate对应下标 0 start
+	 * @throws IOException
+	 * @throws OpenXML4JException
+	 * @throws SAXException
 	 */
 	void readSheet(int index)throws IOException, OpenXML4JException , SAXException;
 	void readSheet(int[] indexs)throws IOException, OpenXML4JException , SAXException;

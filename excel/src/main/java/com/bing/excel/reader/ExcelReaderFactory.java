@@ -21,7 +21,7 @@ import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
 /**
  * @author shizhongtao
  *
- * @date 2016-3-1
+ * date 2016-3-1
  * Description:  
  */
 public class ExcelReaderFactory {
@@ -82,14 +82,14 @@ public class ExcelReaderFactory {
 	 * @param inp
 	 * @param excelReader
 	 * @param ignoreNumFormat 是否忽略数据格式  (default=false，按照格式读取) 
-	 * @param maxReturnLines
-	 * @return
+	 * @return  jie
 	 * @throws InvalidFormatException
 	 * @throws IOException
 	 * @throws SQLException
 	 */
 	public static ReadHandler create(InputStream inp,
-			ExcelReadListener excelReader, boolean ignoreNumFormat) throws InvalidFormatException, IOException, SQLException {
+			ExcelReadListener excelReader, boolean ignoreNumFormat)
+			throws InvalidFormatException, IOException, SQLException {
 		 // If clearly doesn't do mark/reset, wrap up
         if (! inp.markSupported()) {
             inp = new PushbackInputStream(inp, 8);

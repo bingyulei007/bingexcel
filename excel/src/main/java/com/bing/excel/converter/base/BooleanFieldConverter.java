@@ -13,7 +13,8 @@ import com.google.common.base.Strings;
  * 
  * @author shizhongtao
  * 
- * @date 2016-3-21 Description: thanks for Joe Walnes and David Blevins
+ * date 2016-3-21
+ * Description: thanks for Joe Walnes and David Blevins
  */
 public final class BooleanFieldConverter extends AbstractFieldConvertor {
 	private final boolean caseSensitive;

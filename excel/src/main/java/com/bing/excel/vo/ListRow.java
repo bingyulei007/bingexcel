@@ -13,7 +13,7 @@ import java.util.List;
  * 
  * @author shizhongtao
  * 
- * @date 2016-2-17 Description:
+ * date 2016-2-17 Description:
  */
 public class ListRow implements Iterable<CellKV<String>> {
 	private List<CellKV<String>> list = null;

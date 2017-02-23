@@ -5,8 +5,7 @@ import com.bing.excel.converter.FieldValueConverter;
 /**
  * @author shizhongtao
  *
- * @date 2015-12-17
- * Description:  
+ * Description:
  */
 public interface Builder<T> {
 	

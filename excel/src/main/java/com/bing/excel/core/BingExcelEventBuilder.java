@@ -16,7 +16,7 @@ import com.bing.excel.core.impl.BingExcelEventImpl;
  * Company: chinamobile<／p>
  * 
  * @author zhongtao.shi
- * @date 2015-12-8
+ * date 2015-12-8
  * @Deprecated 不建议使用，如果要每次都输出，建议使用ExcelReadFactory
  */
 /**
@@ -28,7 +28,7 @@ import com.bing.excel.core.impl.BingExcelEventImpl;
  * Company: chinamobile<／p>
  * 
  * @author zhongtao.shi
- * @date 2015-12-8
+ * date 2015-12-8
  */
 @Deprecated
 public class BingExcelEventBuilder implements Builder<BingExcelEvent> {

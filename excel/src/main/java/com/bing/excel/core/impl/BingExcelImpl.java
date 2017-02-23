@@ -362,7 +362,7 @@ public class BingExcelImpl implements BingExcel {
    * reade Class
    *
    * @author shizhongtao
-   * @date 2016-4-12 Description:
+   * date 2016-4-12 Description:
    */
   private class BingExcelReaderListener extends AbstractExcelReadListener {
 
