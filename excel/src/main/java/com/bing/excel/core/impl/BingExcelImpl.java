@@ -194,6 +194,8 @@ public class BingExcelImpl implements BingExcel {
   public void writeCSV(String path, Iterable iterable) throws IOException {
     File file = FileCreateUtils.createFile(path);
     try (Writer out = new BufferedWriter( new OutputStreamWriter(new FileOutputStream(file),"UTF-8"))) {
+      out.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
+
       CSVFormat format;
       CSVPrinter csvPrinter = null;
       boolean isAdd = false;
@@ -234,6 +236,7 @@ public class BingExcelImpl implements BingExcel {
   public void writeCSV(OutputStream os, Iterable iterable) throws IOException {
 
     Writer out = new OutputStreamWriter(os,"UTF-8");
+    out.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
     CSVFormat format;
     CSVPrinter csvPrinter = null;
     boolean isAdd = false;
