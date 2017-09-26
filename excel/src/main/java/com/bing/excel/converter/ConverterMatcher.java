@@ -7,13 +7,13 @@ package com.bing.excel.converter;
  * <p>Company: chinamobile</p>
  * 
  * @author zhongtao.shi
- * @date 2015-12-14
   */
 public interface ConverterMatcher {
 
     /**
      * Determines whether the converter can marshall a particular type.
      * @param clz the Class representing the object type to be converted
+     * @return true or false
      */
     boolean canConvert(Class<?> clz);
 

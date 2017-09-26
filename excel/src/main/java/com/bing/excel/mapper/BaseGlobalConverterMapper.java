@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableMap;
  * 默认的全局转换类，先静态吧，容我想想
  * @author shizhongtao
  *
- * @date 2016-3-19
+ * date 2016-3-19
  * Description:  
  */
 public class BaseGlobalConverterMapper {

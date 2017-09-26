@@ -194,6 +194,8 @@ public class BingExcelImpl implements BingExcel {
   public void writeCSV(String path, Iterable iterable) throws IOException {
     File file = FileCreateUtils.createFile(path);
     try (Writer out = new BufferedWriter( new OutputStreamWriter(new FileOutputStream(file),"UTF-8"))) {
+      out.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
+
       CSVFormat format;
       CSVPrinter csvPrinter = null;
       boolean isAdd = false;
@@ -224,7 +226,9 @@ public class BingExcelImpl implements BingExcel {
           csvPrinter.printRecord(listLine.toFullArray());
         }
       }
-      csvPrinter.close();
+      if (csvPrinter!=null) {
+        csvPrinter.close();
+      }
     }
 
   }
@@ -234,6 +238,7 @@ public class BingExcelImpl implements BingExcel {
   public void writeCSV(OutputStream os, Iterable iterable) throws IOException {
 
     Writer out = new OutputStreamWriter(os,"UTF-8");
+    out.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
     CSVFormat format;
     CSVPrinter csvPrinter = null;
     boolean isAdd = false;
@@ -263,13 +268,18 @@ public class BingExcelImpl implements BingExcel {
         csvPrinter.printRecord(listLine.toFullArray());
       }
     }
-    csvPrinter.close();
+    if (csvPrinter!=null) {
+      csvPrinter.close();
+    }
   }
 
   private void writeToExcel(WriteHandler handler, Iterable... iterables) {
     for (Iterable list : iterables) {
       boolean isAdd = false;
       TypeAdapterConverter<?> typeAdapter = null;
+      if (!list.iterator().hasNext()) {
+        handler.createSheet("sheet1");
+      }
       for (Object object : list) {
         if (!isAdd) {
           if (object != null) {
@@ -362,7 +372,7 @@ public class BingExcelImpl implements BingExcel {
    * reade Class
    *
    * @author shizhongtao
-   * @date 2016-4-12 Description:
+   * date 2016-4-12 Description:
    */
   private class BingExcelReaderListener extends AbstractExcelReadListener {
 

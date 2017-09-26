@@ -5,7 +5,7 @@ package com.bing.excel.core;
  * 读取条件类
  * @author shizhongtao
  * 
- * @date 2016-2-17 Description:
+ * date 2016-2-17 Description:
  */
 public class ReaderCondition<T>  {
 	private int startRow = 1;

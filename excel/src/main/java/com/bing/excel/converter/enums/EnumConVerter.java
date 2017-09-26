@@ -8,7 +8,7 @@ import com.bing.excel.core.handler.ConverterHandler;
 /**
  * @author shizhongtao
  *
- * @date 2016-3-21
+ * date 2016-3-21
  * Description:  
  */
 public class EnumConVerter extends AbstractFieldConvertor {

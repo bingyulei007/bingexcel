@@ -20,7 +20,7 @@ import org.xml.sax.XMLReader;
 /**
  * @author shizhongtao
  *
- * @date 2016-1-26
+ * date 2016-1-26
  * Description:  解决读取mac上xlsx结尾的excel文件读取中文问题
  */
 public class ExcelReadOnlySharedStringsTable extends ReadOnlySharedStringsTable {
@@ -64,7 +64,6 @@ public class ExcelReadOnlySharedStringsTable extends ReadOnlySharedStringsTable 
 	 * @throws IOException
 	 *             if an error occurs while reading.
 	 * @throws SAXException
-	 * @throws ParserConfigurationException
 	 */
 	public void readFrom(InputStream is) throws IOException, SAXException {
 		if (is.available() > 0) {

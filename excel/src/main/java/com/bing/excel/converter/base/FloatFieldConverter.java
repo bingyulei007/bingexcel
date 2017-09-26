@@ -10,7 +10,7 @@ import com.google.common.base.Strings;
 /**
  * @author shizhongtao
  *
- * @date 2016-3-21
+ * date 2016-3-21
  * Description:  
  */
 public final class FloatFieldConverter extends AbstractFieldConvertor {

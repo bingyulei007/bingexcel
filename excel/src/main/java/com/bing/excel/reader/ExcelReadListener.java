@@ -6,7 +6,7 @@ import com.bing.excel.vo.ListRow;
 /**
  * @author shizhongtao
  *
- * @date 2016-3-1
+ * date 2016-3-1
  * Description:  
  */
 public interface ExcelReadListener {

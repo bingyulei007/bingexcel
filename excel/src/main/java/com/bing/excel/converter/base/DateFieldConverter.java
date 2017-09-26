@@ -16,7 +16,7 @@ import com.bing.excel.vo.OutValue;
 /**
  * @author shizhongtao
  * 
- * @date 2016-3-21 Description:
+ * date 2016-3-21 Description:
  */
 public final class DateFieldConverter extends AbstractFieldConvertor {
 

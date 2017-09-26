@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 /**
  * @author shizhongtao
  * 
- * @date 2016-2-17 Description:
+ * date 2016-2-17 Description:
  */
 public class DataTypeDetect {
 	private static final Pattern DATE_PTRN = Pattern

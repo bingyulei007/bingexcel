@@ -5,7 +5,7 @@ import org.xml.sax.SAXException;
 /**
  * @author shizhongtao
  *
- * @date 2016-2-2
+ * date 2016-2-2
  * Description:  this only a mark exception ，when you want to stop the sax
  * 
  */

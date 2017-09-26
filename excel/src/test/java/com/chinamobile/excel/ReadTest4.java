@@ -18,7 +18,7 @@ import com.google.common.base.MoreObjects;
 /**
  * @author shizhongtao
  *
- * @date 2016-3-23
+ * date 2016-3-23
  * Description:  
  */
 public class ReadTest4 {

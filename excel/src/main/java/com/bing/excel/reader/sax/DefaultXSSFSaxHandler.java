@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * @author shizhongtao
  * 
- * @date 2016-2-2 Description:
+ * date 2016-2-2 Description:
  *       读取07excel的sax方法，解析器默认使用org.apache.xerces.parsers.SAXParser
  *       。可以痛痛set方法手动设置
  */

@@ -17,7 +17,7 @@ import com.google.common.base.Strings;
 /**
  * @author shizhongtao
  *
- * @date 2016-3-21
+ * date 2016-3-21
  * Description: MayBe is's useful 
  */
 public class StringParseUtil {

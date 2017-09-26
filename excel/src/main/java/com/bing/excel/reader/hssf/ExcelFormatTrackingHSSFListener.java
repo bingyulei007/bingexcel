@@ -47,7 +47,7 @@ import com.bing.excel.reader.usermodel.ExcelHSSFDataFormat;
 /**
  * @author shizhongtao
  *
- * @date 2016-2-17
+ * date 2016-2-17
  * Description:  
  */
 public class ExcelFormatTrackingHSSFListener implements HSSFListener {
