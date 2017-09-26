@@ -226,7 +226,9 @@ public class BingExcelImpl implements BingExcel {
           csvPrinter.printRecord(listLine.toFullArray());
         }
       }
-      csvPrinter.close();
+      if (csvPrinter!=null) {
+        csvPrinter.close();
+      }
     }
 
   }
@@ -266,13 +268,18 @@ public class BingExcelImpl implements BingExcel {
         csvPrinter.printRecord(listLine.toFullArray());
       }
     }
-    csvPrinter.close();
+    if (csvPrinter!=null) {
+      csvPrinter.close();
+    }
   }
 
   private void writeToExcel(WriteHandler handler, Iterable... iterables) {
     for (Iterable list : iterables) {
       boolean isAdd = false;
       TypeAdapterConverter<?> typeAdapter = null;
+      if (!list.iterator().hasNext()) {
+        handler.createSheet("sheet1");
+      }
       for (Object object : list) {
         if (!isAdd) {
           if (object != null) {
