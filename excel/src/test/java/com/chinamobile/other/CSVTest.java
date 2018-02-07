@@ -24,7 +24,7 @@ public class CSVTest {
     Writer out = new FileWriter(FileCreateUtils.createFile("/Users/shi/workspace/a.csv"));
     out.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
 
-    final String[] FILE_HEADER = {"ID", "我日", "Gender", "Major"};
+    final String[] FILE_HEADER = {"ID", "我", "Gender", "Major"};
     CSVFormat format = CSVFormat.DEFAULT.withHeader(FILE_HEADER);
     CSVPrinter csvPrinter = new CSVPrinter(out, format);
     csvPrinter.printRecord(12, "乱码", null, "gis");
