@@ -1,7 +1,10 @@
 package com.chinamobile.other;
 
+import com.bing.excel.core.BingExcel;
+import com.bing.excel.core.BingExcelBuilder;
 import com.bing.utils.FileCreateUtils;
 
+import com.chinamobile.excel.WriteTest2;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.Test;
@@ -18,11 +21,13 @@ import java.util.List;
 public class CSVTest {
   @Test
   public void csvWrite() throws IOException {
-    Writer out = new FileWriter(FileCreateUtils.createFile("D:/aoptest2/a.csv"));
-    final String[] FILE_HEADER = {"ID", "Name", "Gender", "Major"};
+    Writer out = new FileWriter(FileCreateUtils.createFile("/Users/shi/workspace/a.csv"));
+    out.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
+
+    final String[] FILE_HEADER = {"ID", "我日", "Gender", "Major"};
     CSVFormat format = CSVFormat.DEFAULT.withHeader(FILE_HEADER);
     CSVPrinter csvPrinter = new CSVPrinter(out, format);
-    csvPrinter.printRecord(12, "hello", null, "gis");
+    csvPrinter.printRecord(12, "乱码", null, "gis");
     csvPrinter.close();
   }
 
@@ -35,5 +40,18 @@ public class CSVTest {
 //    list.add(1,"adf");
 //    list.add(3,"asdf");
     System.out.println(list.size());
+  }
+
+
+  @Test
+  public void tersWrite() throws IOException {
+    BingExcel excel= BingExcelBuilder.builderInstance();
+    List<WriteTest2.Person> ps = new ArrayList<>();
+    ps.add(new WriteTest2
+        .Person(23,"he",3.45));
+ps.add(new WriteTest2
+        .Person(213,"你好",3.45));
+
+    excel.writeCSV("/Users/shi/workspace/ab.csv",ps);
   }
 }

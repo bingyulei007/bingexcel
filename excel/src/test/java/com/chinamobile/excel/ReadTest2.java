@@ -30,17 +30,20 @@ public class ReadTest2 {
 		File f = new File(url.toURI());
 
 		BingExcel bing = BingExcelBuilder.toBuilder().builder();
+
+		SheetVo<Salary> vo = null;
 		try {
-			SheetVo<Salary> vo = bing.readFile(f, Salary.class, 1);
-			System.out.println(vo.getSheetIndex());
+			vo = bing.readFile(f, Salary.class, 1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println(vo.getSheetIndex());
 			System.out.println(vo.getSheetName());
 			List<Salary> objectList = vo.getObjectList();
 			for (Salary salary : objectList) {
 				System.out.println(salary);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
 
 	}
 

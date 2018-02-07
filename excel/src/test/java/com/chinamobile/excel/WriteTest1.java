@@ -23,13 +23,14 @@ public class WriteTest1 {
 		bing = BingExcelBuilder.toBuilder().builder();
 	}
 	@Test
-	public void testWrite() {
+	public void testWrite() throws IOException {
 		List<Person> list = Lists.newArrayList();
-		list.add(new Person(12, "nihoa", 23434.9));
-		list.add(new Person(23, "nihoa", 234.9));
-		list.add(new Person(122, "nihoa", 23434.9));
+	//	list.add(new Person(12, "nihoa", 23434.9));
+//		list.add(new Person(23, "nihoa", 234.9));
+//		list.add(new Person(122, "nihoa", 23434.9));
 
-		bing.writeExcel("D:/aoptest/adb.xlsx", list);
+		bing.writeExcel("/Users/shi/workspace/aa/adb.xlsx", list);
+		bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);
 	/*	try (FileOutputStream os = new FileOutputStream("D:/aoptest/adb1.csv")){
 		//bing.writeCSV("D:/aoptest/adb.csv",list);
 			bing.writeCSV(os,list);

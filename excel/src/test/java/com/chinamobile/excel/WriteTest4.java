@@ -1,5 +1,6 @@
 package com.chinamobile.excel;
 
+import com.chinamobile.excel.WriteTest2.Person;
 import com.google.common.base.MoreObjects;
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.annotation.OutAlias;
@@ -28,7 +29,7 @@ public class WriteTest4 {
          * 对于数据量非常大时候，注意一点就是数据绝对不能放入到内存，
          * 你如果想初始化一个长多为百万级的list，劝你趁早放弃
          */
-        BingWriterHandler writerHandler = bing.writeFile("D:/aoptest/student.xlsx");
+        BingWriterHandler writerHandler = bing.writeFile("/Users/shi/workspace/student.xlsx");
         writerHandler.writeLine(new Student("a", RandomStringUtils.randomAlphanumeric(4), "cc"));
         writerHandler.writeLine(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
         writerHandler.setMaxLineForSheet(100);
@@ -61,6 +62,17 @@ public class WriteTest4 {
         private String name;
         @CellConfig(index = 3)
         private Double salary;
+
+        public Person getFriends() {
+            return friends;
+        }
+
+        public void setFriends(Person friends) {
+            this.friends = friends;
+        }
+
+        private Person  friends;
+
         private transient boolean testProperty = false;
 
         public String getName() {
