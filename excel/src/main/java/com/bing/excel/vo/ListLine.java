@@ -18,6 +18,7 @@ public class ListLine {
   private List<CellKV<Double>> listDouble = null;
   private List<CellKV<Boolean>> listBoolean = null;
   private List<CellKV<Date>> listDate = null;
+  private List<CellKV<Long>> listLong = null;
   private int minIndex = -1;
   private int maxIndex = -1;
 
@@ -41,6 +42,11 @@ public class ListLine {
   public List<CellKV<Date>> getListDate() {
     return listDate == null ? Collections.EMPTY_LIST : ImmutableList.copyOf(listDate);
   }
+
+  @SuppressWarnings("unchecked")
+  public List<CellKV<Long>> getListLong() {
+    return listLong == null ? Collections.EMPTY_LIST : ImmutableList.copyOf(listLong);
+  }
   public Object[] toFullArray() {
     int maxIndex = this.getMaxIndex();
     Object[] objArr = new Object[maxIndex+1];
@@ -57,17 +63,24 @@ public class ListLine {
       for (CellKV<Double> kv : this.getListDouble()) {
         objArr[kv.getIndex()] = kv.getValue();
       }
+      for (CellKV<Long> kv : this.getListLong()) {
+        objArr[kv.getIndex()] = kv.getValue();
+      }
     }
     return objArr;
   }
   public ListLine addValue(int index, int value) {
-    return addValue(index, (double) value);
+    return addValue(index, (long) value);
 
   }
 
   public ListLine addValue(int index, long value) {
-    return addValue(index, (double) value);
-
+    if (listLong == null) {
+      listLong = new ArrayList<>();
+    }
+    listLong.add(new CellKV<Long>(index, value));
+    changeIndex(index);
+    return this;
   }
 
   public ListLine addValue(int index, double value) {
@@ -107,6 +120,7 @@ public class ListLine {
     changeIndex(index);
     return this;
   }
+
 
   private void changeIndex(int index) {
     if (index > maxIndex) {

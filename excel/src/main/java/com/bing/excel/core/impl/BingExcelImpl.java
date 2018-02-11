@@ -9,7 +9,7 @@ import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.reflect.TypeAdapterConverter;
 import com.bing.excel.exception.IllegalEntityException;
-import com.bing.excel.mapper.AnnotationMapper;
+import com.bing.excel.mapper.AnnotationMapperHandler;
 import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
@@ -30,7 +30,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -67,7 +66,7 @@ public class BingExcelImpl implements BingExcel {
    */
   private final ConverterHandler localConverterHandler;
   private final Set<Class<?>> targetTypes = Collections.synchronizedSet(new HashSet<Class<?>>());
-  private ExcelConverterMapperHandler ormMapper = new AnnotationMapper();
+  private ExcelConverterMapperHandler ormMapper = new AnnotationMapperHandler();
   //private List<SheetVo> resultList;
 
   public BingExcelImpl(ConverterHandler localConverterHandler) {

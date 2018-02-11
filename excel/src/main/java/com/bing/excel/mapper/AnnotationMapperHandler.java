@@ -35,8 +35,9 @@ import com.google.common.cache.CacheBuilder;
  * @author shizhongtao
  * @version 1.0
  * @since JDK 1.7 文件名称：AnnotationMapper.java 类说明：
+ * @modify shizhongtao 修改名称AnnotationMapperHandler
  */
-public class AnnotationMapper implements ExcelConverterMapperHandler {
+public class AnnotationMapperHandler implements ExcelConverterMapperHandler {
 
 	// 属性转换器的缓存
 	private Cache<Class<?>, Map<List<Object>, FieldValueConverter>> converterCache = null;
@@ -46,7 +47,7 @@ public class AnnotationMapper implements ExcelConverterMapperHandler {
 
 	// private transient Object[] arguments;
 
-	public AnnotationMapper() {
+	public AnnotationMapperHandler() {
 		converterCache = CacheBuilder.newBuilder().maximumSize(500)
 				.expireAfterAccess(2, TimeUnit.MINUTES).build();
 	}

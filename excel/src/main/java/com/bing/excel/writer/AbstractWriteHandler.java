@@ -138,6 +138,10 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			Cell cell = row.createCell(kv.getIndex());
 			cell.setCellValue(kv.getValue());
 		}
+		for (CellKV<Long> kv : line.getListLong()) {
+			Cell cell = row.createCell(kv.getIndex());
+			cell.setCellValue(kv.getValue());
+		}
 	}
 
 	@Override

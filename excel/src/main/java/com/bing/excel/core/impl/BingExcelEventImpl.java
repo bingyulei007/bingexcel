@@ -32,7 +32,7 @@ import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.reflect.TypeAdapterConverter;
 import com.bing.excel.exception.IllegalEntityException;
-import com.bing.excel.mapper.AnnotationMapper;
+import com.bing.excel.mapper.AnnotationMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.ReadHandler;
@@ -62,7 +62,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
     private final ConverterHandler defaultLocalConverterHandler;
     private final Set<Class<?>> targetTypes = Collections
             .synchronizedSet(new HashSet<Class<?>>());
-    private ExcelConverterMapperHandler ormMapper = new AnnotationMapper();
+    private ExcelConverterMapperHandler ormMapper = new AnnotationMapperHandler();
     private BingReadListener listener = null;
 
     public BingExcelEventImpl(ConverterHandler converterHandler) {

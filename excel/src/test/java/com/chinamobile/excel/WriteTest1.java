@@ -25,9 +25,9 @@ public class WriteTest1 {
 	@Test
 	public void testWrite() throws IOException {
 		List<Person> list = Lists.newArrayList();
-	//	list.add(new Person(12, "nihoa", 23434.9));
-//		list.add(new Person(23, "nihoa", 234.9));
-//		list.add(new Person(122, "nihoa", 23434.9));
+		list.add(new Person(12, "nihoa", 23434.9));
+		list.add(new Person(23, "nihoa", 234.9));
+		list.add(new Person(122, "noa", 23434.9));
 
 		bing.writeExcel("/Users/shi/workspace/aa/adb.xlsx", list);
 		bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);
