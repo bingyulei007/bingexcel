@@ -1,7 +1,5 @@
 package com.bing.excel.core.reflect;
 
-import com.bing.excel.annotation.CellConfig;
-import com.sun.tools.javac.util.Assert;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -44,7 +42,11 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
 
   public Field getFieldByName(String fieldName) {
     BoundField boundField = boundFields.get(fieldName);
-    Assert.checkNonNull(boundField,"connot find the propertiy ："+fieldName);
+    if (boundField == null) {
+      throw new NullPointerException("connot find the propertiy ：" + fieldName);
+
+    }
+
     return boundField.field;
   }
 

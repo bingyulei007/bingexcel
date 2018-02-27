@@ -1,7 +1,6 @@
 package com.bing.excel.mapper;
 
 import com.bing.excel.converter.FieldValueConverter;
-import com.sun.tools.javac.util.Assert;
 
 /**
  * @author shizhongtao
@@ -23,7 +22,10 @@ public class UserDefineMapperHandler implements ExcelConverterMapperHandler {
   public UserDefineMapperHandler(ConversionMapperBuilder conversionMapperBuilder) {
 
     this.objConversionMapper = conversionMapperBuilder.build();
-    Assert.checkNonNull(this.objConversionMapper);
+    if (this.objConversionMapper == null) {
+      throw new NullPointerException("objConversionMapper is null");
+
+    }
   }
 
 
