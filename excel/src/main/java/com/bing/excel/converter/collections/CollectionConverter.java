@@ -24,6 +24,8 @@ import com.google.common.collect.Sets;
  * date 2016-3-24
  * Description:  
  */
+// TODO 等待完善
+@Deprecated
 public class CollectionConverter extends AbstractFieldConvertor {
 	private final String splitCharacter;
 	public final static String SPACE_SPLIT=" ";

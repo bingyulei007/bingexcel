@@ -1,5 +1,7 @@
 package com.bing.excel.mapper;
 
+import com.bing.excel.annotation.OutAlias;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -31,275 +33,280 @@ import com.google.common.cache.CacheBuilder;
 
 /**
  * 创建时间：2015-12-11下午8:33:01 项目名称：excel
- * 
+ *
  * @author shizhongtao
  * @version 1.0
- * @since JDK 1.7 文件名称：AnnotationMapper.java 类说明：
  * @modify shizhongtao 修改名称AnnotationMapperHandler
+ * @since JDK 1.7 文件名称：AnnotationMapper.java 类说明：
  */
-public class AnnotationMapperHandler implements ExcelConverterMapperHandler {
+public class AnnotationMapperHandler implements ExcelConverterMapperHandler, AnnotationMapper {
 
-	// 属性转换器的缓存
-	private Cache<Class<?>, Map<List<Object>, FieldValueConverter>> converterCache = null;
-	private  ConversionMapper objConversionMapper = new ConversionMapper();
-	private final Set<Class<?>> annotatedTypes = Collections
-			.synchronizedSet(new HashSet<Class<?>>());
+  // 属性转换器的缓存
+  private Cache<Class<?>, Map<List<Object>, FieldValueConverter>> converterCache = null;
+  private ConversionMapper objConversionMapper = new ConversionMapper();
+  private final Set<Class<?>> annotatedTypes = Collections
+      .synchronizedSet(new HashSet<Class<?>>());
 
-	// private transient Object[] arguments;
+  // private transient Object[] arguments;
 
-	public AnnotationMapperHandler() {
-		converterCache = CacheBuilder.newBuilder().maximumSize(500)
-				.expireAfterAccess(2, TimeUnit.MINUTES).build();
-	}
+  public AnnotationMapperHandler() {
+    converterCache = CacheBuilder.newBuilder().maximumSize(500)
+        .expireAfterAccess(2, TimeUnit.MINUTES).build();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.chinamobile.excel.mapper.OrmMapper#processAnnotations(java.lang.Class[])
-	 */
-	@Override
-	public void processAnnotations(final Class[] initialTypes) {
-		if (initialTypes == null || initialTypes.length == 0) {
-			return;
-		}
+  /*
+   * (non-Javadoc)
+   *
+   * @see
+   * com.chinamobile.excel.mapper.OrmMapper#processEntity(java.lang.Class[])
+   */
+  @Override
+  public void processEntity(final Class[] initialTypes) {
+    if (initialTypes == null || initialTypes.length == 0) {
+      return;
+    }
 
-		final Set<Class<?>> types = new UnprocessedTypesSet();
-		for (final Class initialType : initialTypes) {
-			types.add(initialType);
-		}
-		processTypes(types);
-	}
+    final Set<Class<?>> types = new UnprocessedTypesSet();
+    for (final Class initialType : initialTypes) {
+      types.add(initialType);
+    }
+    processTypes(types);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.chinamobile.excel.mapper.OrmMapper#processAnnotations(java.lang.Class)
-	 */
-	@Override
-	public void processAnnotations(final Class initialType) {
-		if (initialType == null) {
-			return;
-		}
+  /*
+   * (non-Javadoc)
+   *
+   * @see com.chinamobile.excel.mapper.OrmMapper#processEntity(java.lang.Class)
+   */
+  @Override
+  public void processEntity(final Class initialType) {
+    if (initialType == null) {
+      return;
+    }
 
-		final Set<Class<?>> types = new UnprocessedTypesSet();
-		types.add(initialType);
-		processTypes(types);
-	}
+    final Set<Class<?>> types = new UnprocessedTypesSet();
+    types.add(initialType);
+    processTypes(types);
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.chinamobile.excel.mapper.OrmMapper#getLocalConverter(java.lang.Class,
-	 * java.lang.String)
-	 */
+  /*
+   * (non-Javadoc)
+   *
+   * @see com.chinamobile.excel.mapper.OrmMapper#getLocalConverter(java.lang.Class,
+   * java.lang.String)
+   */
 
-	@Override
-	public FieldValueConverter getLocalConverter(Class definedIn,
-			String fieldName) {
+  @Override
+  public FieldValueConverter getLocalConverter(Class definedIn,
+      String fieldName) {
 
-		return objConversionMapper.getLocalConverter(definedIn, fieldName);
-	}
+    return objConversionMapper.getLocalConverter(definedIn, fieldName);
+  }
 
-	@Override
-	public ConversionMapper.FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,
-                                                                            String fieldName) {
+  @Override
+  public ConversionMapper.FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,
+      String fieldName) {
 
-		return objConversionMapper.getLocalConverterMapper(definedIn, fieldName);
-	}
+    return objConversionMapper.getLocalConverterMapper(definedIn, fieldName);
+  }
 
-	
 
-	@Override
-	public String getModelName(Class<?> key) {
-		return objConversionMapper.getModelName(key);
-	}
+  @Override
+  public String getModelName(Class<?> key) {
+    return objConversionMapper.getAliasName(key);
+  }
 
-	private void processTypes(final Set<Class<?>> types) {
+  private void processTypes(final Set<Class<?>> types) {
 
-		while (!types.isEmpty()) {
-			Iterator<Class<?>> iterator = types.iterator();
-			final Class<?> type = iterator.next();
-			iterator.remove();
-			synchronized (type) {
-				if (annotatedTypes.contains(type)) {
-					continue;
-				}
-				try {
-					// 转换的类型不可能对应的是基本类型
-					if (type.isPrimitive()) {
-						continue;
-					}
-					// 目前先不考虑model的接口继承问题 TODO
-					if (type.isInterface()
-							|| (type.getModifiers() & Modifier.ABSTRACT) > 0) {
-						continue;
-					}
-					final Field[] fields = type.getDeclaredFields();
-					for (int i = 0; i < fields.length; i++) {
-						final Field field = fields[i];
+    while (!types.isEmpty()) {
+      Iterator<Class<?>> iterator = types.iterator();
+      final Class<?> type = iterator.next();
+      iterator.remove();
+      synchronized (type) {
+        if (annotatedTypes.contains(type)) {
+          continue;
+        }
+        try {
+          // 转换的类型不可能对应的是基本类型
+          if (type.isPrimitive()) {
+            continue;
+          }
+          // 目前先不考虑model的接口继承问题 TODO
+          if (type.isInterface()
+              || (type.getModifiers() & Modifier.ABSTRACT) > 0) {
+            continue;
+          }
+          final Field[] fields = type.getDeclaredFields();
+          for (int i = 0; i < fields.length; i++) {
+            final Field field = fields[i];
 
-						if (field.isEnumConstant()
-								|| (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
-							continue;
-						}
-						// 应该不会出现
-						if (field.isSynthetic()) {
-							continue;
-						}
+            if (field.isEnumConstant()
+                || (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
+              continue;
+            }
+            // 应该不会出现
+            if (field.isSynthetic()) {
+              continue;
+            }
 
-						addMapper(type,field);
-					}
+            addMapper(type, field);
+          }
+          //注册表（sheet）别名
+          Annotation annotation = type.getAnnotation(OutAlias.class);
+          if (annotation != null) {
+            String value = ((OutAlias) annotation).value();
 
-				} finally {
-					annotatedTypes.add(type);
-				}
+            objConversionMapper.addModelName(type, value);
+          }
 
-			}
-		}
-	}
+        } finally {
+          annotatedTypes.add(type);
+        }
 
-	/**
-	 * <p>
-	 * Title: addConvertor
-	 * </p>
-	 * <p>
-	 * Description:
-	 * </p>
-	 * 
-	 * @param clazz
-	 * @param field
-	 */
-	private void addMapper(Class<?>  clazz,Field field) {
-		CellConfig cellConfig = field.getAnnotation(CellConfig.class);
-		BingConvertor bingConvertor = field.getAnnotation(BingConvertor.class);
-		int index;
-		String alias;
-		boolean readRequired;
-		if (cellConfig == null) {
-			//当属性上没有此注解时候，忽略
-			return;
-			//throw new MissingCellConfigException("["+clazz+"#"+field.getName()+"]Missing CellConfig annotation");
-		} else {
-			index = cellConfig.index();
-			//omitOutput=cellConfig.omitOutput();
-			alias=cellConfig.aliasName();
-			readRequired=cellConfig.readRequired();
-			if(Strings.isNullOrEmpty(alias)){
-				alias=field.getName();
-			}
-			if (index < 0) {
-				throw new IllegalCellConfigException("field[" + field.getName()
-						+ "] has an error cellConfig,illegal index");
-			}
-		}
-		FieldValueConverter converter = null;
-		if (bingConvertor != null) {
-			Class<? extends FieldValueConverter> value = bingConvertor.value();
-			if (value != null) {
-				try {
-					converter = cacheConverter(bingConvertor, field.getType());
-				} catch (ExecutionException e) {
-					throw new InitializationException("No " + value
-							+ " available");
-				}
-			} 
-		} 
-		objConversionMapper.registerLocalConverter(clazz,
-				field.getName(), index,alias, field.getType(),readRequired, converter);
-	}
+      }
+    }
+  }
 
-	private FieldValueConverter cacheConverter(final BingConvertor annotation,
-			final Class targetType) throws ExecutionException {
-		FieldValueConverter result = null;
-		final Object[] args;
-		final List<Object> parameter = new ArrayList<Object>();
+  /**
+   * <p>
+   * Title: addConvertor
+   * </p>
+   * <p>
+   * Description:
+   * </p>
+   */
+  private void addMapper(Class<?> clazz, Field field) {
+    CellConfig cellConfig = field.getAnnotation(CellConfig.class);
+    BingConvertor bingConvertor = field.getAnnotation(BingConvertor.class);
+    int index;
+    String alias;
+    boolean readRequired;
+    if (cellConfig == null) {
+      //当属性上没有此注解时候，忽略
+      return;
 
-		final List<Object> arrays = new ArrayList<Object>();
-		arrays.add(annotation.booleans());
-		arrays.add(annotation.bytes());
-		arrays.add(annotation.chars());
-		arrays.add(annotation.doubles());
-		arrays.add(annotation.floats());
-		arrays.add(annotation.ints());
-		arrays.add(annotation.longs());
-		arrays.add(annotation.shorts());
-		arrays.add(annotation.strings());
-		arrays.add(annotation.types());
-		for (Object array : arrays) {
-			if (array != null) {
-				int length = Array.getLength(array);
-				for (int i = 0; i < length; i++) {
-					Object object = Array.get(array, i);
-					if (!parameter.contains(object)) {
-						parameter.add(object);
-					}
-				}
-			}
-		}
-		final Class<? extends ConverterMatcher> converterType = annotation
-				.value();
-		Map<List<Object>, FieldValueConverter> converterMapping = converterCache
-				.get(converterType,
-						new Callable<Map<List<Object>, FieldValueConverter>>() {
+    } else {
+      index = cellConfig.index();
+      //omitOutput=cellConfig.omitOutput();
+      alias = cellConfig.aliasName();
+      readRequired = cellConfig.readRequired();
+      if (Strings.isNullOrEmpty(alias)) {
+        alias = field.getName();
+      }
+      if (index < 0) {
+        throw new IllegalCellConfigException("field[" + field.getName()
+            + "] has an error cellConfig,illegal index");
+      }
+    }
+    FieldValueConverter converter = null;
+    if (bingConvertor != null) {
+      Class<? extends FieldValueConverter> value = bingConvertor.value();
+      if (value != null) {
+        try {
+          converter = cacheConverter(bingConvertor, field.getType());
+        } catch (ExecutionException e) {
+          throw new InitializationException("No " + value
+              + " available");
+        }
+      }
+    }
 
-							@Override
-							public Map<List<Object>, FieldValueConverter> call()
-									throws Exception {
+    //注册属性转换器
+    objConversionMapper.registerLocalConverter(clazz,
+        field.getName(), index, alias, field.getType(), readRequired, converter);
+  }
 
-								Map<List<Object>, FieldValueConverter> converterMappingTemp = new HashMap<List<Object>, FieldValueConverter>();
-								return converterMappingTemp;
-							}
+  private FieldValueConverter cacheConverter(final BingConvertor annotation,
+      final Class targetType) throws ExecutionException {
+    FieldValueConverter result = null;
+    final Object[] args;
+    final List<Object> parameter = new ArrayList<Object>();
 
-						});
-		result = converterMapping.get(parameter);
-		if (result == null) {
-			int size = parameter.size();
+    final List<Object> arrays = new ArrayList<Object>();
+    arrays.add(annotation.booleans());
+    arrays.add(annotation.bytes());
+    arrays.add(annotation.chars());
+    arrays.add(annotation.doubles());
+    arrays.add(annotation.floats());
+    arrays.add(annotation.ints());
+    arrays.add(annotation.longs());
+    arrays.add(annotation.shorts());
+    arrays.add(annotation.strings());
+    arrays.add(annotation.types());
+    for (Object array : arrays) {
+      if (array != null) {
+        int length = Array.getLength(array);
+        for (int i = 0; i < length; i++) {
+          Object object = Array.get(array, i);
+          if (!parameter.contains(object)) {
+            parameter.add(object);
+          }
+        }
+      }
+    }
+    final Class<? extends ConverterMatcher> converterType = annotation
+        .value();
+    Map<List<Object>, FieldValueConverter> converterMapping = converterCache
+        .get(converterType,
+            new Callable<Map<List<Object>, FieldValueConverter>>() {
 
-			if (size > 0) {
-				args = new Object[size];
-				System.arraycopy(parameter.toArray(new Object[size]), 0, args,
-						0, size);
-			} else {
-				args = null;
-			}
-			final FieldValueConverter converter;
-			try {
+              @Override
+              public Map<List<Object>, FieldValueConverter> call()
+                  throws Exception {
 
-				converter = (FieldValueConverter) ReflectDependencyFactory
-						.newInstance(converterType, args);
-			} catch (final Exception e) {
-				throw new InitializationException(
-						"Cannot instantiate converter "
-								+ converterType.getName()
-								+ (targetType != null ? " for type "
-										+ targetType.getName() : ""), e);
-			}
+                Map<List<Object>, FieldValueConverter> converterMappingTemp = new HashMap<List<Object>, FieldValueConverter>();
+                return converterMappingTemp;
+              }
 
-			converterMapping.put(parameter, converter);
-			result=converter;
-		}
-		return result;
-	}
+            });
+    result = converterMapping.get(parameter);
+    if (result == null) {
+      int size = parameter.size();
 
-	
+      if (size > 0) {
+        args = new Object[size];
+        System.arraycopy(parameter.toArray(new Object[size]), 0, args,
+            0, size);
+      } else {
+        args = null;
+      }
+      final FieldValueConverter converter;
+      try {
 
-	private final class UnprocessedTypesSet extends LinkedHashSet<Class<?>> {
-		@Override
-		public boolean add(Class<?> type) {
-			if (type == null) {
-				return false;
-			}
-			while (type.isArray()) {
-				type = type.getComponentType();
-			}
-			final String name = type.getName();
-			if (name.startsWith("java.") || name.startsWith("javax.")) {
-				return false;
-			}
-			final boolean ret = annotatedTypes.contains(type) ? false : super
-					.add(type);
-			return ret;
-		}
-	}
+        converter = (FieldValueConverter) ReflectDependencyFactory
+            .newInstance(converterType, args);
+      } catch (final Exception e) {
+        throw new InitializationException(
+            "Cannot instantiate converter "
+                + converterType.getName()
+                + (targetType != null ? " for type "
+                + targetType.getName() : ""), e);
+      }
+
+      converterMapping.put(parameter, converter);
+      result = converter;
+    }
+    return result;
+  }
+
+
+  private final class UnprocessedTypesSet extends LinkedHashSet<Class<?>> {
+
+    @Override
+    public boolean add(Class<?> type) {
+      if (type == null) {
+        return false;
+      }
+      while (type.isArray()) {
+        type = type.getComponentType();
+      }
+      final String name = type.getName();
+      if (name.startsWith("java.") || name.startsWith("javax.")) {
+        return false;
+      }
+      final boolean ret = annotatedTypes.contains(type) ? false : super
+          .add(type);
+      return ret;
+    }
+  }
 }

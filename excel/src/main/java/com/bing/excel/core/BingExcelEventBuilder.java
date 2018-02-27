@@ -2,7 +2,7 @@ package com.bing.excel.core;
 
 
 import com.bing.excel.core.handler.ConverterHandler;
-import com.bing.common.Builder;
+import com.bing.common.ExcleBuilder;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.impl.BingExcelEventImpl;
@@ -31,7 +31,7 @@ import com.bing.excel.core.impl.BingExcelEventImpl;
  * date 2015-12-8
  */
 @Deprecated
-public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
+public class BingExcelEventBuilder implements ExcleBuilder<BingExcelEvent> {
 	private final ConverterHandler defaultLocalConverterHandler = new LocalConverterHandler();
 
 	private BingExcelEvent bingExcelEvent;
@@ -46,7 +46,7 @@ public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
 
 	}
 
-	public static Builder<BingExcelEvent> toBuilder() {
+	public static ExcleBuilder<BingExcelEvent> toBuilder() {
 
 		return new BingExcelEventBuilder();
 
@@ -58,7 +58,7 @@ public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
 		return (new BingExcelEventBuilder()).builder();
 	}
 	@Override
-	public Builder<BingExcelEvent> registerFieldConverter(Class<?> clazz,
+	public ExcleBuilder<BingExcelEvent> registerFieldConverter(Class<?> clazz,
 			FieldValueConverter converter) {
 		
 		defaultLocalConverterHandler.registerConverter(clazz, converter);
@@ -66,6 +66,7 @@ public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
 		return this;
 	}
 
+	@Deprecated
 	@Override
 	public BingExcelEvent builder() {
 		if (bingExcelEvent == null) {
@@ -74,5 +75,35 @@ public class BingExcelEventBuilder implements Builder<BingExcelEvent> {
 
 		return this.bingExcelEvent;
 	}
+	@Override
+	public BingExcelEvent build() {
+		if (bingExcelEvent == null) {
+			bingExcelEvent = new BingExcelEventImpl(defaultLocalConverterHandler);
+		}
 
+		return this.bingExcelEvent;
+	}
+
+	@Override
+	public ExcleBuilder<BingExcel> addFieldConversionMapper(Class<?> clazz, String filedName,
+			int index) {
+		return null;
+	}
+
+	@Override
+	public ExcleBuilder<BingExcel> addFieldConversionMapper(Class<?> clazz, String filedName,
+			int index, String alias) {
+		return null;
+	}
+
+	@Override
+	public ExcleBuilder<BingExcel> addFieldConversionMapper(Class<?> clazz, String filedName,
+			int index, String alias, FieldValueConverter converter) {
+		return null;
+	}
+
+	@Override
+	public ExcleBuilder<BingExcel> addClassNameAlias(Class<?> clazz, String alias) {
+		return null;
+	}
 }

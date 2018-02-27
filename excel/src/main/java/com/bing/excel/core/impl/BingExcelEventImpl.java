@@ -47,6 +47,7 @@ import com.google.common.base.MoreObjects;
  * @author shizhongtao
  * @version 1.0
  * @since JDK 1.7 文件名称：BingExcelImpl.java 类说明：
+ * 初衷是建立一个大数据读写的操作类，最后综合考虑，暂时废弃
  */
 @Deprecated
 public class BingExcelEventImpl implements BingExcelEvent {
@@ -62,7 +63,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
     private final ConverterHandler defaultLocalConverterHandler;
     private final Set<Class<?>> targetTypes = Collections
             .synchronizedSet(new HashSet<Class<?>>());
-    private ExcelConverterMapperHandler ormMapper = new AnnotationMapperHandler();
+    private AnnotationMapperHandler ormMapper = new AnnotationMapperHandler();
     private BingReadListener listener = null;
 
     public BingExcelEventImpl(ConverterHandler converterHandler) {
@@ -184,22 +185,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
                     return;
                 }
                 final Field[] fields = type.getDeclaredFields();
-                List<Field> tempConverterFields = new ArrayList<>();
-                for (int i = 0; i < fields.length; i++) {
-                    final Field field = fields[i];
 
-                    if (field.isEnumConstant()
-                            || (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
-                        continue;
-                    }
-                    // 应该不会出现
-                    if (field.isSynthetic()) {
-                        continue;
-                    }
-                    field.setAccessible(true);
-                    tempConverterFields.add(field);
-
-                }
                 Constructor<?> constructor;
                 try {
                     constructor = type.getDeclaredConstructor();
@@ -208,7 +194,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
                             "Gets the default constructor failed,the Objet must contains a  [no-args&public constructor] ", e);
                 }
                 TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(
-                        constructor, tempConverterFields);
+                        constructor, fields);
                 typeTokenCache.put(type, typeAdapterConverter);
 
             } finally {
@@ -220,7 +206,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
     }
 
     private TypeAdapterConverter getTypeAdapterConverter(
-            Constructor<?> constructor, List<Field> tempConverterFields) {
+            Constructor<?> constructor, Field[] tempConverterFields) {
 
         TypeAdapterConverter adConverter = new TypeAdapterConverter<>(
                 constructor, tempConverterFields, defaultLocalConverterHandler);
@@ -258,14 +244,14 @@ public class BingExcelEventImpl implements BingExcelEvent {
         private Set<Class<?>> objectSetClass = new HashSet<Class<?>>();
         private Map<String, WriteState> linesMap = new HashMap<>();
         private String currentSheetName;
-        private final ExcelConverterMapperHandler ormMapper;
+        private final AnnotationMapperHandler ormMapper;
         private final BingExcelEventImpl bingExcelEventImpl;
         private SXSSFWriterHandler handler;
         TypeAdapterConverter<?> typeAdapter = null;
         private int maxLine = Integer.MAX_VALUE;
 
         private BingWriterHandlerImpl(SXSSFWriterHandler handler,
-                                      ExcelConverterMapperHandler ormMapper,
+            AnnotationMapperHandler ormMapper,
                                       BingExcelEventImpl bingExcelEventImpl) {
             this.ormMapper = ormMapper;
             this.bingExcelEventImpl = bingExcelEventImpl;
@@ -329,7 +315,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
         }
 
         private void preHandle(Class clazz) {
-            ormMapper.processAnnotations(clazz);
+            ormMapper.processEntity(clazz);
             bingExcelEventImpl.registeAdapter(clazz);
         }
 
@@ -355,7 +341,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
             for (int i = 0; i < conditions.length; i++) {
                 arr[i] = conditions[i].getTargetClazz();
             }
-            ormMapper.processAnnotations(arr);
+            ormMapper.processEntity(arr);
         }
 
         @Override

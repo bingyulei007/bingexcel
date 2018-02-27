@@ -7,5 +7,5 @@ import com.bing.excel.vo.CellKV;
 
 
 public interface HeaderReflectConverter {
-   List<CellKV<String>> getHeader(ExcelConverterMapperHandler handler);
+   List<CellKV<String>> getHeader(ExcelConverterMapperHandler... handler);
 }

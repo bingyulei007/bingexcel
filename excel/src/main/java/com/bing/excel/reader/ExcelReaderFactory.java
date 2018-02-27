@@ -27,23 +27,23 @@ import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
 public class ExcelReaderFactory {
 	/**
 	 * @param file
-	 * @param excelReader
+	 * @param excelReadListener
 	 * @param ignoreNumFormat  是否忽略数据格式  (default=false，按照格式读取)
 	 * @return
 	 * @throws Exception
 	 */
-	public static ReadHandler create(File file, ExcelReadListener excelReader,
+	public static ReadHandler create(File file, ExcelReadListener excelReadListener,
 			boolean ignoreNumFormat) throws Exception {
 		if (!file.exists()) {
 			throw new FileNotFoundException(file.toString());
 		}
 		try {
 			POIFSFileSystem fs = new POIFSFileSystem(file);
-			return create(fs, excelReader, ignoreNumFormat);
+			return create(fs, excelReadListener, ignoreNumFormat);
 		} catch (OfficeXmlFileException e) {
 			OPCPackage pkg = OPCPackage.open(file, PackageAccess.READ);
 			try {
-				return create(pkg, excelReader, ignoreNumFormat);
+				return create(pkg, excelReadListener, ignoreNumFormat);
 			} catch (IllegalArgumentException | IOException e1) {
 				pkg.revert();
 				throw e1;
@@ -128,18 +128,18 @@ public class ExcelReaderFactory {
 
 	/*
 	 * public static SaxHandler create(OPCPackage pkg,ExcelReadListener
-	 * excelReader,Integer maxReturnLines) throws SQLException,
+	 * excelReadListener,Integer maxReturnLines) throws SQLException,
 	 * InvalidFormatException, IOException{ return
-	 * create(pkg,excelReader,false,maxReturnLines); } public static SaxHandler
-	 * create(OPCPackage pkg,ExcelReadListener excelReader,boolean
+	 * create(pkg,excelReadListener,false,maxReturnLines); } public static SaxHandler
+	 * create(OPCPackage pkg,ExcelReadListener excelReadListener,boolean
 	 * ignoreNumFormat) throws SQLException, InvalidFormatException,
-	 * IOException{ return create(pkg,excelReader,ignoreNumFormat,null); }
+	 * IOException{ return create(pkg,excelReadListener,ignoreNumFormat,null); }
 	 */
 	public static ReadHandler create(OPCPackage pkg,
-			ExcelReadListener excelReader, boolean ignoreNumFormat) throws SQLException,
+			ExcelReadListener excelReadListener, boolean ignoreNumFormat) throws SQLException,
 			InvalidFormatException, IOException {
 		DefaultXSSFSaxHandler handler = new DefaultXSSFSaxHandler(pkg,
-				excelReader, ignoreNumFormat);
+				excelReadListener, ignoreNumFormat);
 		
 		return handler;
 	}

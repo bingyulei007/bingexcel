@@ -1,5 +1,6 @@
 package com.bing.excel.core;
 
+import com.bing.excel.converter.FieldValueConverter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -70,7 +71,6 @@ public interface BingExcel {
 	/**
 	 * read sheet witch index equal 0
 	 * @param stream
-	 * @param condition
 	 * @return
 	 * @throws SQLException 
 	 * @throws IOException 
@@ -120,4 +120,9 @@ public interface BingExcel {
 	 void writeOldExcel(OutputStream stream,Iterable... iterables);
 	void writeCSV(String path,Iterable iterable) throws IOException;
 	void writeCSV(OutputStream os,Iterable iterable) throws IOException;
+
+  void modelName(Class<?> clazz, String alias);
+
+	void fieldConverter(Class<?> clazz, String filedName, int index, String alias,
+			FieldValueConverter converter);
 }

@@ -17,6 +17,8 @@ import com.google.common.base.Strings;
  * date 2016-3-24
  * Description:  
  */
+// TODO 等待完善
+@Deprecated
 public class ArrayConverter extends AbstractFieldConvertor {
 
 	

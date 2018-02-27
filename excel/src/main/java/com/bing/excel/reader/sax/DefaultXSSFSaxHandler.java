@@ -35,41 +35,41 @@ import com.google.common.collect.ImmutableSet;
 public class DefaultXSSFSaxHandler implements ReadHandler {
 	private OPCPackage pkg;
 	private XMLReader parser;
-	private ExcelReadListener excelReader;
+	private ExcelReadListener excelReadListener;
 	private boolean ignoreNumFormat = false;
 	private DefaultSheetContentsHandler handler ;
-	public DefaultXSSFSaxHandler(String path, ExcelReadListener excelReader)
+	public DefaultXSSFSaxHandler(String path, ExcelReadListener excelReadListener)
 			throws InvalidFormatException, IOException {
-		this(path, excelReader, false);
+		this(path, excelReadListener, false);
 	}
 
-	public DefaultXSSFSaxHandler(File file, ExcelReadListener excelReader)
+	public DefaultXSSFSaxHandler(File file, ExcelReadListener excelReadListener)
 			throws InvalidFormatException, IOException {
-		this(file, excelReader, false);
+		this(file, excelReadListener, false);
 	}
 
-	public DefaultXSSFSaxHandler(InputStream in, ExcelReadListener excelReader)
+	public DefaultXSSFSaxHandler(InputStream in, ExcelReadListener excelReadListener)
 			throws InvalidFormatException, IOException {
-		this(in, excelReader, false);
+		this(in, excelReadListener, false);
 	}
 
-	public DefaultXSSFSaxHandler(String path, ExcelReadListener excelReader,
+	public DefaultXSSFSaxHandler(String path, ExcelReadListener excelReadListener,
 			boolean ignoreNumFormat) throws InvalidFormatException, IOException {
 		
-		this(new File(path),excelReader,ignoreNumFormat);
+		this(new File(path), excelReadListener,ignoreNumFormat);
 		
 	}
 
-	public DefaultXSSFSaxHandler(File file, ExcelReadListener excelReader,
+	public DefaultXSSFSaxHandler(File file, ExcelReadListener excelReadListener,
 			boolean ignoreNumFormat) throws InvalidFormatException {
 		
 		
 		try {
 			this.pkg = OPCPackage.open(file, PackageAccess.READ);
-			this.excelReader = excelReader;
+			this.excelReadListener = excelReadListener;
 			this.ignoreNumFormat = ignoreNumFormat;
 			this.handler = new DefaultSheetContentsHandler(
-					excelReader);
+					excelReadListener);
 		} catch (IllegalArgumentException  e) {
 			//异常是open方法抛出的。确保io关闭
 			pkg.revert();
@@ -77,19 +77,19 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 		}
 	}
 
-	public DefaultXSSFSaxHandler(InputStream in, ExcelReadListener excelReader,
+	public DefaultXSSFSaxHandler(InputStream in, ExcelReadListener excelReadListener,
 			boolean ignoreNumFormat) throws InvalidFormatException, IOException {
 		// 不应该调用？异常没有处理
-		this(OPCPackage.open(in),excelReader,ignoreNumFormat);
+		this(OPCPackage.open(in), excelReadListener,ignoreNumFormat);
 	}
-	public DefaultXSSFSaxHandler(OPCPackage pkg, ExcelReadListener excelReader,
+	public DefaultXSSFSaxHandler(OPCPackage pkg, ExcelReadListener excelReadListener,
 			boolean ignoreNumFormat) throws InvalidFormatException {
 		
 		this.pkg = pkg;
-		this.excelReader = excelReader;
+		this.excelReadListener = excelReadListener;
 		this.ignoreNumFormat = ignoreNumFormat;
 		this.handler = new DefaultSheetContentsHandler(
-				excelReader);
+				excelReadListener);
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 		while (sheets.hasNext()) {
 			try (InputStream sheet = sheets.next()) {
 				String name = sheets.getSheetName();
-				excelReader.startSheet(sheetIndex, name);
+				excelReadListener.startSheet(sheetIndex, name);
 				InputSource sheetSource = new InputSource(sheet);
 			
 				try {
@@ -138,13 +138,13 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 						throw e;
 					}
 				}
-				excelReader.endSheet(sheetIndex, name);
+				excelReadListener.endSheet(sheetIndex, name);
 				sheetIndex++;
 			}
 		}
 		//Close the package WITHOUT saving its content. Reinitialize this package and cancel all changes done to it.
 		pkg.revert();
-		excelReader.endWorkBook();
+		excelReadListener.endWorkBook();
 	}
 
 	/*
@@ -207,7 +207,7 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 				}
 				
 				
-				excelReader.startSheet(sheetIndex, name);
+				excelReadListener.startSheet(sheetIndex, name);
 				InputSource sheetSource = new InputSource(sheet);
 				
 				try {
@@ -219,11 +219,11 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 						throw e;
 					}
 				}
-				excelReader.endSheet(sheetIndex, name);
+				excelReadListener.endSheet(sheetIndex, name);
 				sheetIndex++;
 			}
 		}
-		excelReader.endWorkBook();
+		excelReadListener.endWorkBook();
 		pkg.revert();
 	}
 
@@ -260,7 +260,7 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 					sheetIndex++;
 					continue;
 				}
-				excelReader.startSheet(sheetIndex, name);
+				excelReadListener.startSheet(sheetIndex, name);
 				InputSource sheetSource = new InputSource(sheet);
 				try {
 					getParser().parse(sheetSource);
@@ -270,12 +270,12 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 						throw e;
 					}
 				}
-				excelReader.endSheet(sheetIndex, name);
+				excelReadListener.endSheet(sheetIndex, name);
 				sheetIndex++;
 				break;
 			}
 		}
-		excelReader.endWorkBook();
+		excelReadListener.endWorkBook();
 		this.pkg.revert();
 	}
 
