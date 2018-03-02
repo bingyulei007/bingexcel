@@ -6,6 +6,8 @@ import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 public interface ExcelConverterMapperHandler {
 
 
+  ConversionMapper getObjConversionMapper();
+
   @Deprecated
   FieldValueConverter getLocalConverter(Class definedIn,
       String fieldName);

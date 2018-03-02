@@ -69,24 +69,17 @@ public class BingExcelImpl implements BingExcel {
   private final Set<Class<?>> targetTypes = Collections.synchronizedSet(new HashSet<Class<?>>());
   private AnnotationMapperHandler annotationMapperHandler = new AnnotationMapperHandler();
   private UserDefineMapperHandler userDefineMapperHandler;
-  private ConversionMapperBuilder conversionMapperBuilder;
 
   public BingExcelImpl(ConverterHandler localConverterHandler) {
     this.localConverterHandler = localConverterHandler;
   }
 
-  public ConversionMapperBuilder  getConversionMapperBuilder() {
-    if (this.conversionMapperBuilder == null) {
-      this.conversionMapperBuilder = ConversionMapperBuilder.toBuilder();
-    }
-    return this.conversionMapperBuilder;
-  }
 
-  public void defineUserDefineMapperHandler() {
+  public UserDefineMapperHandler getUserDefineMapperHandler() {
     if (userDefineMapperHandler == null) {
-      userDefineMapperHandler=new UserDefineMapperHandler(getConversionMapperBuilder());
+      userDefineMapperHandler = new UserDefineMapperHandler(ConversionMapperBuilder.toBuilder());
     }
-
+    return this.userDefineMapperHandler;
   }
 
   public BingExcelImpl() {
@@ -227,7 +220,8 @@ public class BingExcelImpl implements BingExcel {
             annotationMapperHandler.processEntity(clazz);
             registeAdapter(clazz);
             typeAdapter = typeTokenCache.get(clazz);
-            ListLine header = typeAdapter.getHeadertoListLine(annotationMapperHandler);
+            ListLine header = typeAdapter
+                .getHeadertoListLine(userDefineMapperHandler, annotationMapperHandler);
             ListLine listLine = typeAdapter
                 .marshal(object, userDefineMapperHandler, annotationMapperHandler);
             int maxIndex = header.getMaxIndex();
@@ -272,7 +266,8 @@ public class BingExcelImpl implements BingExcel {
           annotationMapperHandler.processEntity(clazz);
           registeAdapter(clazz);
           typeAdapter = typeTokenCache.get(clazz);
-          ListLine header = typeAdapter.getHeadertoListLine(annotationMapperHandler);
+          ListLine header = typeAdapter
+              .getHeadertoListLine(userDefineMapperHandler, annotationMapperHandler);
           ListLine listLine = typeAdapter
               .marshal(object, userDefineMapperHandler, annotationMapperHandler);
           int maxIndex = header.getMaxIndex();
@@ -301,8 +296,7 @@ public class BingExcelImpl implements BingExcel {
   public void modelName(Class<?> clazz, String alias) {
     annotationMapperHandler.processEntity(clazz);
     registeAdapter(clazz);
-    getConversionMapperBuilder().modelName(clazz, alias);
-    defineUserDefineMapperHandler();
+    getUserDefineMapperHandler().getObjConversionMapper().addModelName(clazz, alias);
 
   }
 
@@ -312,8 +306,7 @@ public class BingExcelImpl implements BingExcel {
     annotationMapperHandler.processEntity(clazz);
     registeAdapter(clazz);
     Field field = this.typeTokenCache.get(clazz).getFieldByName(filedName);
-    getConversionMapperBuilder().fieldConverter(clazz,filedName,field.getType(),index,alias,converter);
-    defineUserDefineMapperHandler();
+    getUserDefineMapperHandler().getObjConversionMapper().registerLocalConverter(clazz,filedName,index,alias,field.getType(),false,converter);
 
   }
 
@@ -332,14 +325,14 @@ public class BingExcelImpl implements BingExcel {
             annotationMapperHandler.processEntity(clazz);
             registeAdapter(clazz);
             //create sheet
-            String modelName=null;
+            String modelName = null;
             if (this.userDefineMapperHandler != null) {
               modelName = this.userDefineMapperHandler.getModelName(clazz);
             }
-            if (modelName==null){
+            if (modelName == null) {
               modelName = annotationMapperHandler.getModelName(clazz);
             }
-            if (modelName==null){
+            if (modelName == null) {
               modelName = clazz.getSimpleName();
             }
             handler.createSheet(modelName);

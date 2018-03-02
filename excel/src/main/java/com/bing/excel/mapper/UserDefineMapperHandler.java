@@ -28,6 +28,10 @@ public class UserDefineMapperHandler implements ExcelConverterMapperHandler {
     }
   }
 
+  @Override
+  public ConversionMapper getObjConversionMapper() {
+    return objConversionMapper;
+  }
 
   /*
    * (non-Javadoc)

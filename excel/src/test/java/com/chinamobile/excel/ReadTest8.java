@@ -58,6 +58,7 @@ public class ReadTest8 {
 		@CellConfig(index = 1)
 		private String employNum;
 		@CellConfig(index = 9)
+
 		private Date workingTime;
 
 		private String name;

@@ -98,11 +98,14 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
     return list;
   }
 
-  public ListLine getHeadertoListLine(ExcelConverterMapperHandler handler) {
+  public ListLine getHeadertoListLine(ExcelConverterMapperHandler... handlers) {
     ListLine line = new ListLine();
     for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
-      FieldConverterMapper fieldConverterMapper = handler
-          .getLocalFieldConverterMapper(clazz, kv.getKey());
+      FieldConverterMapper fieldConverterMapper = getFieldConverterMapper(kv.getKey(),
+          handlers);
+      if (fieldConverterMapper == null) {
+        continue;
+      }
       line.addValue(fieldConverterMapper.getIndex(),
           fieldConverterMapper.getAlias());
     }

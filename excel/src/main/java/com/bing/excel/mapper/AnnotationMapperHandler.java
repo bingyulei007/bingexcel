@@ -89,6 +89,10 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
     processTypes(types);
   }
 
+  @Override
+  public ConversionMapper getObjConversionMapper() {
+    return this.objConversionMapper;
+  }
   /*
    * (non-Javadoc)
    *
