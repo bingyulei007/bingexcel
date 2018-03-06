@@ -33,7 +33,7 @@ public class WriteTest6 {
   public void testWrite() throws IOException {
     List<Person>  list= Lists.newArrayList();
 
-    Person person = new Person(23, "wori",3.45);
+    Person person = new Person(23, "wori",2.0);
     Person person2 = new Person(20, "lily",13.5);
     list.add(person);
     list.add(person2);

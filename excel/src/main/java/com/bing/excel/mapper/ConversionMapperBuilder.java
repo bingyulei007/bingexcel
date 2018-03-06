@@ -9,7 +9,7 @@ import javafx.util.Builder;
  * @author shi
  * @create 2018-02-22.
  */
-public class ConversionMapperBuilder implements Builder<ConversionMapper> {
+public class ConversionMapperBuilder  {
 
   private ConversionMapper conversionMapper = new ConversionMapper();
 
@@ -21,7 +21,6 @@ public class ConversionMapperBuilder implements Builder<ConversionMapper> {
     return new ConversionMapperBuilder();
   }
 
-  @Override
   public ConversionMapper build() {
     return this.conversionMapper;
   }
