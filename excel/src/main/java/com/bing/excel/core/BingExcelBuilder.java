@@ -72,7 +72,7 @@ public class BingExcelBuilder implements ExcleBuilder<BingExcel> {
   @Override
   public ExcleBuilder<BingExcel> addFieldConversionMapper(Class<?> clazz,
       String filedName, int index) {
-    return addFieldConversionMapper(clazz, filedName, index, null, null);
+    return addFieldConversionMapper(clazz, filedName, index, filedName, null);
 
   }
 
