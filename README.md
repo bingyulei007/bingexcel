@@ -10,7 +10,7 @@
 <dependency>
     <groupId>cn.com.binging</groupId>
     <artifactId>excel</artifactId>
-    <version>2.1</version>
+    <version>2.2.1</version>
 </dependency>
 ```
 ## 环境说明
