@@ -4,7 +4,7 @@
 
     <groupId>cn.com.binging</groupId>
     <artifactId>excel</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>2.2.1</version>
     <packaging>jar</packaging>
 
     <name>bing-excel</name>
@@ -237,14 +237,4 @@
             <url>file:///D:/maven/excelreps/mvn-repo/repository</url>
         </repository>
     </distributionManagement>-->
-    <distributionManagement>
-        <snapshotRepository>
-            <id>bc_tuxedo_snapshots</id>
-            <url>http://10.147.20.2:8081/repository/bc_tuxedo_snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>bc_tuxedo_releases</id>
-            <url>http://10.147.20.2:8081/repository/bc_tuxedo_releases/</url>
-        </repository>
-    </distributionManagement>
 </project>
