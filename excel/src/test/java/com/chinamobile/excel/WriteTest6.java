@@ -1,6 +1,5 @@
 package com.chinamobile.excel;
 
-import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.converter.AbstractFieldConvertor;
@@ -11,6 +10,9 @@ import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import org.junit.Before;
@@ -44,6 +46,94 @@ public class WriteTest6 {
 
 
   }
+
+  @Test
+  public void csvWrite_semiColon_noHead() throws IOException {
+    BingExcel bingExcel = BingExcelBuilder.toBuilder().build();
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    List<ApiUsedNumForCSV>  list= Lists.newArrayList();
+    ApiUsedNumForCSV api1 = new ApiUsedNumForCSV();
+    api1.setDate("2018-10");
+    api1.setOwnerId("5632643255427352877312350");
+    api1.setTopicName("test1");
+    api1.setUsedNum(100000L);
+    ApiUsedNumForCSV api2 = new ApiUsedNumForCSV();
+    api2.setDate("2018-10");
+    api2.setOwnerId("5632643255427352877312350");
+    api2.setTopicName("test2");
+    api2.setUsedNum(200000L);
+    ApiUsedNumForCSV api3 = new ApiUsedNumForCSV();
+    api3.setDate("2018-10");
+    api3.setOwnerId("5632643255427352877312350");
+    api3.setTopicName("test3");
+    api3.setUsedNum(300000L);
+    list.add(api1);
+    list.add(api2);
+    list.add(api3);
+
+    bingExcel.writeCSV(os, list, ';', false, false);
+    String result = new String(os.toByteArray());
+    System.out.println(result);
+
+    File file = new File("E:\\test.csv");
+    FileOutputStream fileOutputStream = new FileOutputStream(file);
+    fileOutputStream.write(os.toByteArray());
+    fileOutputStream.close();
+  }
+
+  /**
+   * Model类。生成CSV文件用。表示每月的api调用次数计量信息。
+   *
+   * @author chengxiangwang
+   * @create 2018/10/30
+   */
+  static class ApiUsedNumForCSV{
+    //Format: 2018-10
+    @CellConfig(index = 0)
+    private String month;
+    @CellConfig(index = 1)
+    private String topicName;
+    @CellConfig(index = 2)
+    private String ownerId;
+    @CellConfig(index = 3)
+    private Long apiUsedNum;
+
+    public ApiUsedNumForCSV() {
+
+    }
+    public String getTopicName() {
+      return topicName;
+    }
+
+    public void setTopicName(String topicName) {
+      this.topicName = topicName;
+    }
+
+    public String getOwnerId() {
+      return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+      this.ownerId = ownerId;
+    }
+
+    public String getDate() {
+      return month;
+    }
+
+    public void setDate(String month) {
+      this.month = month;
+    }
+
+    public Long getUsedNum() {
+      return apiUsedNum;
+    }
+
+    public void setUsedNum(Long apiUsedNum) {
+      this.apiUsedNum = apiUsedNum;
+    }
+  }
+
 
   @OutAlias("xiaoshou1")
   public static class Person {
