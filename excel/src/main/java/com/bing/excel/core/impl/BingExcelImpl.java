@@ -291,6 +291,52 @@ public class BingExcelImpl implements BingExcel {
     }
   }
 
+  @Override
+  public void writeCSV(OutputStream os, Iterable iterable, char delimiter, boolean isWithHeader, boolean isWithBOM) throws IOException {
+    Writer out = new OutputStreamWriter(os, "UTF-8");
+    if(isWithBOM){
+        out.write(new String(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
+    }
+    CSVFormat format;
+    CSVPrinter csvPrinter = null;
+    boolean isAdd = false;
+    TypeAdapterConverter<?> typeAdapter = null;
+    for (Object object : iterable) {
+      if (!isAdd) {
+        if (object != null) {
+          isAdd = true;
+          Class clazz = object.getClass();
+          annotationMapperHandler.processEntity(clazz);
+          registeAdapter(clazz);
+          typeAdapter = typeTokenCache.get(clazz);
+          ListLine header = typeAdapter
+                  .getHeadertoListLine(userDefineMapperHandler, annotationMapperHandler);
+          ListLine listLine = typeAdapter
+                  .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+          int maxIndex = header.getMaxIndex();
+          if(isWithHeader) {
+            String[] headerArr = new String[maxIndex + 1];
+            for (CellKV<String> kv : header.getListStr()) {
+              headerArr[kv.getIndex()] = kv.getValue();
+            }
+            format = CSVFormat.DEFAULT.withDelimiter(delimiter).withHeader(headerArr);
+          }else {
+            format = CSVFormat.DEFAULT.withDelimiter(delimiter);
+          }
+          csvPrinter = new CSVPrinter(out, format);
+          csvPrinter.printRecord(listLine.toFullArray());
+        }
+
+      } else {
+        ListLine listLine = typeAdapter
+                .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+        csvPrinter.printRecord(listLine.toFullArray());
+      }
+    }
+    if (csvPrinter != null) {
+      csvPrinter.close();
+    }
+  }
 
   @Override
   public void modelName(Class<?> clazz, String alias) {
