@@ -1,32 +1,5 @@
 package com.bing.excel.core.impl;
 
-import com.bing.excel.converter.FieldValueConverter;
-import com.bing.excel.mapper.ConversionMapperBuilder;
-import com.bing.excel.mapper.UserDefineMapperHandler;
-import com.google.common.collect.Lists;
-
-import com.bing.excel.core.BingExcel;
-import com.bing.excel.core.ReaderCondition;
-import com.bing.excel.core.handler.ConverterHandler;
-import com.bing.excel.core.handler.LocalConverterHandler;
-import com.bing.excel.core.reflect.TypeAdapterConverter;
-import com.bing.excel.exception.IllegalEntityException;
-import com.bing.excel.mapper.AnnotationMapperHandler;
-import com.bing.excel.reader.AbstractExcelReadListener;
-import com.bing.excel.reader.ExcelReaderFactory;
-import com.bing.excel.reader.ReadHandler;
-import com.bing.excel.vo.CellKV;
-import com.bing.excel.vo.ListLine;
-import com.bing.excel.vo.ListRow;
-import com.bing.excel.writer.ExcelWriterFactory;
-import com.bing.excel.writer.WriteHandler;
-import com.bing.utils.FileCreateUtils;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.xml.sax.SAXException;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,6 +20,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.xml.sax.SAXException;
+
+import com.bing.excel.converter.FieldValueConverter;
+import com.bing.excel.core.BingExcel;
+import com.bing.excel.core.ReaderCondition;
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.handler.LocalConverterHandler;
+import com.bing.excel.core.reflect.TypeAdapterConverter;
+import com.bing.excel.exception.IllegalEntityException;
+import com.bing.excel.mapper.AnnotationMapperHandler;
+import com.bing.excel.mapper.ConversionMapperBuilder;
+import com.bing.excel.mapper.UserDefineMapperHandler;
+import com.bing.excel.reader.AbstractExcelReadListener;
+import com.bing.excel.reader.ExcelReaderFactory;
+import com.bing.excel.reader.ReadHandler;
+import com.bing.excel.vo.CellKV;
+import com.bing.excel.vo.ListLine;
+import com.bing.excel.vo.ListRow;
+import com.bing.excel.writer.ExcelWriterFactory;
+import com.bing.excel.writer.WriteHandler;
+import com.bing.utils.FileCreateUtils;
+import com.google.common.collect.Lists;
 
 /**
  * 创建时间：2015-12-8上午11:56:30 项目名称：excel
@@ -95,7 +94,7 @@ public class BingExcelImpl implements BingExcel {
   @Override
   public <T> SheetVo<T> readFile(File file, ReaderCondition<T> condition) throws Exception {
 
-    ReaderCondition[] arr = new ReaderCondition[]{condition};
+    ReaderCondition[] arr = new ReaderCondition[] {condition};
     List<SheetVo> list = readFileToList(file, arr);
 
     return list.size() == 0 ? null : list.get(0);
@@ -138,7 +137,7 @@ public class BingExcelImpl implements BingExcel {
   @Override
   public <T> SheetVo<T> readStream(InputStream stream, ReaderCondition<T> condition)
       throws IOException, SQLException, OpenXML4JException, SAXException {
-    ReaderCondition[] arr = new ReaderCondition[]{condition};
+    ReaderCondition[] arr = new ReaderCondition[] {condition};
     List<SheetVo> list = readStreamToList(stream, arr);
     return list.size() == 0 ? null : list.get(0);
   }
@@ -201,12 +200,12 @@ public class BingExcelImpl implements BingExcel {
   }
 
   @Override
-  //临时使用下
+  // 临时使用下
   public void writeCSV(String path, Iterable iterable) throws IOException {
     File file = FileCreateUtils.createFile(path);
-    try (Writer out = new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))) {
-      out.write(new String(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
+    try (Writer out =
+        new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))) {
+      out.write(new String(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
 
       CSVFormat format;
       CSVPrinter csvPrinter = null;
@@ -220,10 +219,10 @@ public class BingExcelImpl implements BingExcel {
             annotationMapperHandler.processEntity(clazz);
             registeAdapter(clazz);
             typeAdapter = typeTokenCache.get(clazz);
-            ListLine header = typeAdapter
-                .getHeadertoListLine(userDefineMapperHandler, annotationMapperHandler);
-            ListLine listLine = typeAdapter
-                .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+            ListLine header =
+                typeAdapter.getHeadertoListLine(userDefineMapperHandler, annotationMapperHandler);
+            ListLine listLine =
+                typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
             int maxIndex = header.getMaxIndex();
             String[] headerArr = new String[maxIndex + 1];
             for (CellKV<String> kv : header.getListStr()) {
@@ -236,8 +235,8 @@ public class BingExcelImpl implements BingExcel {
           }
 
         } else {
-          ListLine listLine = typeAdapter
-              .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+          ListLine listLine =
+              typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
           csvPrinter.printRecord(listLine.toFullArray());
         }
       }
@@ -249,11 +248,11 @@ public class BingExcelImpl implements BingExcel {
   }
 
   @Override
-  //临时使用下,后面再改
+  // 临时使用下,后面再改
   public void writeCSV(OutputStream os, Iterable iterable) throws IOException {
 
     Writer out = new OutputStreamWriter(os, "UTF-8");
-    out.write(new String(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
+    out.write(new String(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
     CSVFormat format;
     CSVPrinter csvPrinter = null;
     boolean isAdd = false;
@@ -266,10 +265,10 @@ public class BingExcelImpl implements BingExcel {
           annotationMapperHandler.processEntity(clazz);
           registeAdapter(clazz);
           typeAdapter = typeTokenCache.get(clazz);
-          ListLine header = typeAdapter
-              .getHeadertoListLine(userDefineMapperHandler, annotationMapperHandler);
-          ListLine listLine = typeAdapter
-              .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+          ListLine header =
+              typeAdapter.getHeadertoListLine(userDefineMapperHandler, annotationMapperHandler);
+          ListLine listLine =
+              typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
           int maxIndex = header.getMaxIndex();
           String[] headerArr = new String[maxIndex + 1];
           for (CellKV<String> kv : header.getListStr()) {
@@ -281,8 +280,8 @@ public class BingExcelImpl implements BingExcel {
         }
 
       } else {
-        ListLine listLine = typeAdapter
-            .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+        ListLine listLine =
+            typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
         csvPrinter.printRecord(listLine.toFullArray());
       }
     }
@@ -292,10 +291,11 @@ public class BingExcelImpl implements BingExcel {
   }
 
   @Override
-  public void writeCSV(OutputStream os, Iterable iterable, char delimiter, boolean isWithHeader, boolean isWithBOM) throws IOException {
+  public void writeCSV(OutputStream os, Iterable iterable, char delimiter, boolean isWithHeader,
+      boolean isWithBOM) throws IOException {
     Writer out = new OutputStreamWriter(os, "UTF-8");
-    if(isWithBOM){
-        out.write(new String(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
+    if (isWithBOM) {
+      out.write(new String(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
     }
     CSVFormat format;
     CSVPrinter csvPrinter = null;
@@ -309,18 +309,18 @@ public class BingExcelImpl implements BingExcel {
           annotationMapperHandler.processEntity(clazz);
           registeAdapter(clazz);
           typeAdapter = typeTokenCache.get(clazz);
-          ListLine header = typeAdapter
-                  .getHeadertoListLine(userDefineMapperHandler, annotationMapperHandler);
-          ListLine listLine = typeAdapter
-                  .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+          ListLine header =
+              typeAdapter.getHeadertoListLine(userDefineMapperHandler, annotationMapperHandler);
+          ListLine listLine =
+              typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
           int maxIndex = header.getMaxIndex();
-          if(isWithHeader) {
+          if (isWithHeader) {
             String[] headerArr = new String[maxIndex + 1];
             for (CellKV<String> kv : header.getListStr()) {
               headerArr[kv.getIndex()] = kv.getValue();
             }
             format = CSVFormat.DEFAULT.withDelimiter(delimiter).withHeader(headerArr);
-          }else {
+          } else {
             format = CSVFormat.DEFAULT.withDelimiter(delimiter);
           }
           csvPrinter = new CSVPrinter(out, format);
@@ -328,8 +328,8 @@ public class BingExcelImpl implements BingExcel {
         }
 
       } else {
-        ListLine listLine = typeAdapter
-                .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+        ListLine listLine =
+            typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
         csvPrinter.printRecord(listLine.toFullArray());
       }
     }
@@ -352,7 +352,8 @@ public class BingExcelImpl implements BingExcel {
     annotationMapperHandler.processEntity(clazz);
     registeAdapter(clazz);
     Field field = this.typeTokenCache.get(clazz).getFieldByName(filedName);
-    getUserDefineMapperHandler().getObjConversionMapper().registerLocalConverter(clazz,filedName,index,alias,field.getType(),false,converter);
+    getUserDefineMapperHandler().getObjConversionMapper().registerLocalConverter(clazz, filedName,
+        index, alias, field.getType(), false, converter);
 
   }
 
@@ -370,7 +371,7 @@ public class BingExcelImpl implements BingExcel {
             Class clazz = object.getClass();
             annotationMapperHandler.processEntity(clazz);
             registeAdapter(clazz);
-            //create sheet
+            // create sheet
             String modelName = null;
             if (this.userDefineMapperHandler != null) {
               modelName = this.userDefineMapperHandler.getModelName(clazz);
@@ -383,17 +384,17 @@ public class BingExcelImpl implements BingExcel {
             }
             handler.createSheet(modelName);
             typeAdapter = typeTokenCache.get(clazz);
-            List<CellKV<String>> header = typeAdapter.getHeader(userDefineMapperHandler,
-                annotationMapperHandler);
+            List<CellKV<String>> header =
+                typeAdapter.getHeader(userDefineMapperHandler, annotationMapperHandler);
             handler.writeHeader(header);
-            ListLine listLine = typeAdapter
-                .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+            ListLine listLine =
+                typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
             handler.writeLine(listLine);
           }
 
         } else {
-          ListLine listLine = typeAdapter
-              .marshal(object, userDefineMapperHandler, annotationMapperHandler);
+          ListLine listLine =
+              typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
           handler.writeLine(listLine);
         }
       }
@@ -427,8 +428,7 @@ public class BingExcelImpl implements BingExcel {
               "Gets the default constructor failed,the Objet must contains a  [no-args&public constructor] ",
               e);
         }
-        TypeAdapterConverter typeAdapterConverter =
-            getTypeAdapterConverter(constructor, fields);
+        TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(constructor, fields);
         typeTokenCache.put(type, typeAdapterConverter);
 
       } finally {
@@ -449,8 +449,7 @@ public class BingExcelImpl implements BingExcel {
   /**
    * reade Class
    *
-   * @author shizhongtao
-   * date 2016-4-12 Description:
+   * @author shizhongtao date 2016-4-12 Description:
    */
   private class BingExcelReaderListener extends AbstractExcelReadListener {
 
@@ -485,8 +484,8 @@ public class BingExcelImpl implements BingExcel {
             throw new NullPointerException("没有对应的适配器，无法转换");
           }
         } else {
-          Object object = typeAdapter
-              .unmarshal(rowList, userDefineMapperHandler, annotationMapperHandler);
+          Object object =
+              typeAdapter.unmarshal(rowList, userDefineMapperHandler, annotationMapperHandler);
           currentSheetVo.addObject(object);
         }
 
@@ -558,4 +557,113 @@ public class BingExcelImpl implements BingExcel {
 
   }
 
+
+  /**
+   * @author liluzhong
+   * @date 2019/03/07 sheet excel model
+   *
+   */
+  public static class SheetExcel {
+    private String sheetName;
+    private List<?> list = new ArrayList<>();
+
+    public SheetExcel(String sheetName, List<?> list) {
+      super();
+      this.sheetName = sheetName;
+      this.list = list;
+    }
+
+    public SheetExcel() {
+      // TODO Auto-generated constructor stub
+    }
+
+    public String getSheetName() {
+      return sheetName;
+    }
+
+    public void setSheetName(String sheetName) {
+      this.sheetName = sheetName;
+    }
+
+    public List<?> getList() {
+      return list;
+    }
+
+    public void setList(List<?> list) {
+      this.list = list;
+    }
+  }
+
+
+
+  @Override
+  public void writeSheetsExcel(String path, SheetExcel... sheetExcels) {
+    WriteHandler handler = ExcelWriterFactory.createXSSF(path);
+    writeToSheetExcel(handler, sheetExcels);
+  }
+
+
+  /**
+   * write sheet excel 写数据到多sheet页的excel
+   * 
+   * @param handler
+   * @param list
+   */
+  private void writeToSheetExcel(WriteHandler handler, SheetExcel... sheetExcels) {
+    TypeAdapterConverter<?> typeAdapter = null;
+    for (int i = 0; i < sheetExcels.length; i++) {
+      String sheetName = null;
+      if (sheetExcels[i] != null) {
+        boolean isAdd = false;
+        // 获得定义的sheet的名称
+        sheetName = sheetExcels[i].getSheetName();
+        // 获取该sheet页的数据
+        List<?> sheetList = sheetExcels[i].getList();
+        if (sheetList == null || sheetList.size() == 0) {
+          handler.createSheet("sheet" + (i + 1));
+        }
+
+        for (Object object : sheetList) {
+          if (!isAdd) {
+            if (object != null) {
+              isAdd = true;
+              // 获得一个实例的类型类
+              Class clazz = object.getClass();
+              annotationMapperHandler.processEntity(clazz);
+              registeAdapter(clazz);
+              // 没有指定sheetName,则拿对应的实体类的name
+              if (sheetName == null) {
+                // create sheet
+                if (this.userDefineMapperHandler != null) {
+                  sheetName = this.userDefineMapperHandler.getModelName(clazz);
+                }
+                if (sheetName == null) {
+                  sheetName = annotationMapperHandler.getModelName(clazz);
+                }
+                if (sheetName == null) {
+                  sheetName = clazz.getSimpleName();
+                }
+              }
+              // 创建sheet页
+              handler.createSheet(sheetName);
+              typeAdapter = typeTokenCache.get(clazz);
+              List<CellKV<String>> header =
+                  typeAdapter.getHeader(userDefineMapperHandler, annotationMapperHandler);
+              handler.writeHeader(header);
+              // 写入list的多行数据
+              ListLine listLine =
+                  typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
+              handler.writeLine(listLine);
+            }
+          } else {
+            // isAdd=true 则是同一个list中的多行数据，不需要创建新的sheet,只需要写入各行的数据
+            ListLine listLine =
+                typeAdapter.marshal(object, userDefineMapperHandler, annotationMapperHandler);
+            handler.writeLine(listLine);
+          }
+        }
+      }
+    }
+    handler.flush();
+  }
 }
