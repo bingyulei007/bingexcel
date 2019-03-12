@@ -53,13 +53,13 @@ public class WriteTestSheetExcel {
     list1.add(new Student(RandomStringUtils.randomAlphanumeric(4),
         RandomStringUtils.randomAlphanumeric(4), RandomStringUtils.randomAlphanumeric(4)));
 
-    // seExcel2.setSheetName("business");
+     seExcel2.setSheetName("business");
     seExcel2.setList(list1);
 
 
-    bing.writeSheetsExcel("C:\\Users\\shi\\workspace/sheets.xlsx", seExcel1, seExcel2);
+   // bing.writeSheetsExcel("C:\\Users\\shi\\workspace/sheets.xlsx", seExcel1, seExcel2);
 
-    // bing.writeExcel("/Users/shi/workspace/aa/adb.xlsx", list);
+     bing.writeSheetsExcel("/Users/shi/workspace/aa/adb.xlsx", seExcel2,seExcel1);
     // bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);
   }
 
