@@ -1,4 +1,4 @@
-package com.chinamobile.excel;
+package com.bing.excel;
 
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.converter.AbstractFieldConvertor;
@@ -7,22 +7,14 @@ import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
-import com.bing.utils.StringParseUtil;
-import com.chinamobile.excel.WriteTest2.Person;
 import com.google.common.base.MoreObjects;
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.annotation.OutAlias;
-import com.bing.excel.core.BingExcelEvent;
-import com.bing.excel.core.BingExcelEventBuilder;
-import com.bing.excel.core.rw.BingWriterHandler;
 
 import com.google.common.collect.Lists;
-import java.lang.reflect.Type;
-import java.text.ParseException;
-import java.util.Date;
+
 import java.util.List;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,7 +41,7 @@ public class WriteTest5 {
     listFriend.add(obj2);
     person.setFriends(listFriend);
     list.add(person);
-    bing.writeExcel("/Users/shi/workspace/student.xlsx",list);
+    bing.writeExcel("/Users/shi/workspace/student.xlsx",list,listFriend);
 
 
   }

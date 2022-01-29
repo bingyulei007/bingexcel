@@ -1,10 +1,10 @@
-package com.chinamobile.other;
+package com.bing.other;
 
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
 import com.bing.utils.FileCreateUtils;
 
-import com.chinamobile.excel.WriteTest2;
+import com.bing.excel.WriteTest2;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.Test;

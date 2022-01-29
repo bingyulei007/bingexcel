@@ -1,4 +1,4 @@
-package com.chinamobile.excel;
+package com.bing.excel;
 
 import java.util.ArrayList;
 import java.util.Date;

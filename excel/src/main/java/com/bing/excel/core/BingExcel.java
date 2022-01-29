@@ -130,11 +130,9 @@ public interface BingExcel {
 
   /**
    * 写出多sheet页的xls格式的excel文件暂时只支持xls格式,后续支持csv格式
-   * 
-   * @param <E>
+   *
    * 
    * @param path
-   * @param list
    */
   void writeSheetsExcel(String path, SheetExcel... sheetExcels);
 }

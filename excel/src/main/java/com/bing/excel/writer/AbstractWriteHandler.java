@@ -9,14 +9,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.hssf.usermodel.DVConstraint;
+import org.apache.poi.hssf.usermodel.HSSFDataValidation;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFDataValidation;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.omg.CORBA.portable.UnknownException;
 
 import com.bing.excel.vo.CellKV;
@@ -255,6 +254,18 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		} else {
 			currentSheet = wb.createSheet(name + "-" + num);
 		}
+	}
+
+	@Override
+	public void setDataValidationList(short firstRow, short endRow, short firstCol, short endCol, String[] validationStr) {
+		Class<? extends Workbook> aClass = wb.getClass();
+		DataValidation dataValidation;
+		CellRangeAddressList regions=new CellRangeAddressList(firstRow,endRow,firstCol,endCol);
+		DataValidationHelper helper = currentSheet.getDataValidationHelper();
+		DataValidationConstraint explicitListConstraint = helper.createExplicitListConstraint(validationStr);
+		explicitListConstraint.setExplicitListValues(validationStr);
+		dataValidation = helper.createValidation(explicitListConstraint, regions);
+		currentSheet.addValidationData(dataValidation);
 	}
 
 	@Override

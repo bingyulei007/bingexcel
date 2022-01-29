@@ -1,4 +1,4 @@
-package com.chinamobile.excel;
+package com.bing.excel;
 
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.annotation.OutAlias;
@@ -26,7 +26,7 @@ public class WriteTest6 {
 
   @Before
   public void before() {
-    bing = BingExcelBuilder.toBuilder().addClassNameAlias(Person.class,"xuesheng1")
+    bing = BingExcelBuilder.toBuilder().addClassNameAlias(Person.class,"aa")
         .addFieldConversionMapper(Person.class,"name",0)
         .addFieldConversionMapper(Person.class,"age",1,"年龄").build();
   }
@@ -42,7 +42,7 @@ public class WriteTest6 {
     list.add(person);
 
     //bing.writeExcel("/Users/shi/workspace/gaoxinqu/student.xlsx",list);
-    bing.writeCSV("/Users/shi/workspace/gaoxinqu/student.csv",list);
+    bing.writeCSV("/Users/shi/workspace/aa/student.csv",list);
 
 
   }

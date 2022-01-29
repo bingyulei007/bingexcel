@@ -1,4 +1,4 @@
-package com.chinamobile.excel;
+package com.bing.excel;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,7 +30,9 @@ public class WriteTest1 {
 		list.add(new Person(122, "noa", 23434.9));
 
 		bing.writeExcel("/Users/shi/workspace/aa/adb.xlsx", list);
-		bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);
+
+	//	bing.writeExcel("/Users/shi/workspace/aa/adb.xls", list);
+		//bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);
 	/*	try (FileOutputStream os = new FileOutputStream("D:/aoptest/adb1.csv")){
 		//bing.writeCSV("D:/aoptest/adb.csv",list);
 			bing.writeCSV(os,list);
@@ -61,7 +63,8 @@ public class WriteTest1 {
 		@CellConfig(index = 3)
 		private Double salary;
 		@CellConfig(index = 2,readRequired = true,aliasName = "玩玩")
-		@BingConvertor(value = BooleanFieldConverter.class, strings = { "1","0" }, booleans = { true })
+		//@BingConvertor(value = BooleanFieldConverter.class, strings = { "1","0" }, booleans = {
+		// true })
 		private  boolean testProperty = false;
 
 		public String getName() {

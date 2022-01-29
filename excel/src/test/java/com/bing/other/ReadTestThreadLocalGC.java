@@ -1,4 +1,4 @@
-package com.chinamobile.other;
+package com.bing.other;
 
 import org.junit.Test;
 

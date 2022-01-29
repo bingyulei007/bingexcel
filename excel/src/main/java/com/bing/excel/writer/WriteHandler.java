@@ -7,22 +7,29 @@ import com.bing.excel.vo.ListLine;
 
 /**
  * 目前的三个实现不是线程安全的
- * @author shizhongtao
  *
+ * @author shizhongtao
  */
 public interface WriteHandler {
 
-	/**
-	 * 
-	 */
-	public abstract void writeLine(ListLine line);
-	public abstract void writeHeader(List<CellKV<String>> listStr);
-	void writeHeader(ListLine listLine);
-	public abstract String createSheet(String name);
+    /**
+     *
+     */
+    public abstract void writeLine(ListLine line);
 
+    public abstract void writeHeader(List<CellKV<String>> listStr);
+
+    void writeHeader(ListLine listLine);
+
+    public abstract String createSheet(String name);
 	/**
-	 * 
+	 * 设置数据的有效性
 	 */
-	public abstract void flush();
+    public abstract void setDataValidationList(short firstRow, short endRow, short firstCol, short endCol, String[] validationStr);
+
+    /**
+     *
+     */
+    public abstract void flush();
 
 }

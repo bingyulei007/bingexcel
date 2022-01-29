@@ -1,8 +1,10 @@
-package com.chinamobile.other;
+package com.bing.other;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
 
 import com.bing.excel.vo.CellKV;
@@ -24,13 +26,8 @@ listStr.add(new CellKV<String>(0, "diyi"));
 	}
 	@Test
 	public void testA() {
-		String i=null;
-		try {
-				i.equals("a");
-		} catch (Exception e) {
-			throw new RuntimeException("test for me");
-		}finally {
-			System.out.println(123);
-		}
+		HSSFWorkbook wb = new HSSFWorkbook();
+		System.out.println(wb.getClass().isAssignableFrom(HSSFWorkbook.class));
+		System.out.println(wb.getClass().isAssignableFrom(XSSFWorkbook.class));
 	}
 }

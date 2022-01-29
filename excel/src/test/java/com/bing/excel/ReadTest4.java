@@ -1,4 +1,4 @@
-package com.chinamobile.excel;
+package com.bing.excel;
 
 import java.io.File;
 import java.net.URISyntaxException;
