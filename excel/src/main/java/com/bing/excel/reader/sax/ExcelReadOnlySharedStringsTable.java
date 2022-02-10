@@ -31,11 +31,6 @@ public class ExcelReadOnlySharedStringsTable extends ReadOnlySharedStringsTable 
 
 	}
 
-	public ExcelReadOnlySharedStringsTable(PackagePart part,
-			PackageRelationship rel_ignored) throws IOException, SAXException {
-		super(part, rel_ignored);
-
-	}
 
 	/**
 	 * An integer representing the total count of strings in the workbook. This

@@ -8,15 +8,12 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 
+import com.bing.excel.exception.UnknownException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.DVConstraint;
-import org.apache.poi.hssf.usermodel.HSSFDataValidation;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.usermodel.XSSFDataValidation;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.omg.CORBA.portable.UnknownException;
+
 
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListLine;
@@ -58,17 +55,17 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		}
 		CellStyle style = wb.createCellStyle();
 		// 设置这些样式
-		style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
-		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
-
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		// 生成一个字体
-		Font font = wb.createFont();
-		font.setColor(IndexedColors.BLACK.index);
-		font.setFontHeightInPoints((short) 12);
-		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+//		style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
+//		style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+//
+//		style.setAlignment(CellStyle.ALIGN_CENTER);
+//		// 生成一个字体
+//		Font font = wb.createFont();
+//		font.setColor(IndexedColors.BLACK.index);
+//		font.setFontHeightInPoints((short) 12);
+//		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
 		// 把字体应用到当前的样式
-		style.setFont(font);
+//		style.setFont(font);
 		headerCellStyle = style;
 		return style;
 	}
@@ -83,16 +80,16 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 
 		// 设置这些样式
 		cellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
-		cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
-
-		cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
-		// 生成一个字体
-		Font font = wb.createFont();
-		font.setColor(IndexedColors.BLACK.index);
-		font.setFontHeightInPoints((short) 12);
-		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+//		cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+//
+//		cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+//		// 生成一个字体
+//		Font font = wb.createFont();
+//		font.setColor(IndexedColors.BLACK.index);
+//		font.setFontHeightInPoints((short) 12);
+//		font.setBoldweight(Font.BOLDWEIGHT_BOLD);
 		// 把字体应用到当前的样式
-		cellStyle.setFont(font);
+//		cellStyle.setFont(font);
 
 		headDateCellStyle = cellStyle;
 		return cellStyle;

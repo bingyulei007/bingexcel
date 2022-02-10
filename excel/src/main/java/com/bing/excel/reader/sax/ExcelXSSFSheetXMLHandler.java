@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.POILogFactory;
 import org.apache.poi.util.POILogger;
@@ -312,7 +313,7 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 				break;
 
 			case FORMULA:
-				if (formulasNotResults) {
+				if(formulasNotResults) {
 					thisStr = formula.toString();
 				} else {
 					String fv = value.toString();
@@ -321,9 +322,8 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 						try {
 							// Try to use the value as a formattable number
 							double d = Double.parseDouble(fv);
-							thisStr = formatter.formatRawCellContents(d,
-									this.formatIndex, this.formatString);
-						} catch (NumberFormatException e) {
+							thisStr = formatter.formatRawCellContents(d, this.formatIndex, this.formatString);
+						} catch(NumberFormatException e) {
 							// Formula is a String result not a Numeric one
 							thisStr = fv;
 						}
@@ -334,48 +334,45 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 				}
 				break;
 
-			case INLINE_STRING:
-				// TODO: Can these ever have formatting on them?
-				XSSFRichTextString rtsi = new XSSFRichTextString(
-						value.toString());
-				thisStr = rtsi.toString();
-				break;
+				case INLINE_STRING:
+					// TODO: Can these ever have formatting on them?
+					XSSFRichTextString rtsi = new XSSFRichTextString(value.toString());
+					thisStr = rtsi.toString();
+					break;
 
-			case SST_STRING:
-				String sstIndex = value.toString();
-				try {
-					int idx = Integer.parseInt(sstIndex);
-					XSSFRichTextString rtss = new XSSFRichTextString(
-							sharedStringsTable.getEntryAt(idx));
-					thisStr = rtss.toString();
-				} catch (NumberFormatException ex) {
-					logger.log(POILogger.ERROR, "Failed to parse SST index '"
-							+ sstIndex, ex);
-				}
-				break;
+				case SST_STRING:
+					String sstIndex = value.toString();
+					try {
+						int idx = Integer.parseInt(sstIndex);
+						XSSFRichTextString rtss = new XSSFRichTextString(sharedStringsTable.getEntryAt(idx));
+						thisStr = rtss.toString();
+					}
+					catch (NumberFormatException ex) {
+						logger.log(POILogger.ERROR, "Failed to parse SST index '" + sstIndex, ex);
+					}
+					break;
 
-			case NUMBER:
-				String n = value.toString();
-				if (this.formatString != null && n.length() > 0)
-					thisStr = formatter.formatRawCellContents(
-							Double.parseDouble(n), this.formatIndex,
-							this.formatString);
-				else
-					thisStr = n;
-				break;
+				case NUMBER:
+					String n = value.toString();
+					if (this.formatString != null && n.length() > 0)
+						thisStr = formatter.formatRawCellContents(Double.parseDouble(n), this.formatIndex, this.formatString);
+					else
+						thisStr = n;
+					break;
 
-			default:
-				thisStr = "(TODO: Unexpected type: " + nextDataType + ")";
-				break;
+				default:
+					thisStr = "(TODO: Unexpected type: " + nextDataType + ")";
+					break;
 			}
 
-			// Do we have a comment for this cell? 先注释掉
-			//checkForEmptyCellComments(EmptyCellCommentsCheckType.CELL);
-			XSSFComment comment = commentsTable != null ? commentsTable
-					.findCellComment(cellRef) : null;
+			// Do we have a comment for this cell?
+			checkForEmptyCellComments(EmptyCellCommentsCheckType.CELL);
+			XSSFComment comment = commentsTable != null ? commentsTable.findCellComment(new CellAddress(cellRef)) : null;
 
+			// Output
+			output.cell(cellRef, thisStr, comment);
 			// Output 上面已经输出
-			output.cell(rowNum, cellRef, thisStr, comment);
+			//output.cell(rowNum, cellRef, thisStr, comment);
 		} else if ("f".equals(name)) {
 			fIsOpen = false;
 		} else if ("is".equals(name)) {
@@ -498,14 +495,18 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 	 */
 	private void outputEmptyCellComment(CellReference cellRef)
 			throws BingSaxReadStopException {
-		String cellRefString = cellRef.formatAsString();
-		XSSFComment comment = commentsTable.findCellComment(cellRefString);
-		output.cell(rowNum, cellRefString, null, comment);
+//		String cellRefString = cellRef.formatAsString();
+//		XSSFComment comment = commentsTable.findCellComment(cellRefString);
+//		output.cell(rowNum, cellRefString, null, comment);
+		XSSFComment comment = commentsTable.findCellComment(new CellAddress(cellRef));
+		output.cell(cellRef.formatAsString(), null, comment);
+	}
+	private enum EmptyCellCommentsCheckType {
+		CELL,
+		END_OF_ROW,
+		END_OF_SHEET_DATA
 	}
 
-	private enum EmptyCellCommentsCheckType {
-		CELL, END_OF_ROW, END_OF_SHEET_DATA
-	}
 
 	private static final Comparator<CellReference> cellRefComparator = new Comparator<CellReference>() {
 		@Override
@@ -525,25 +526,19 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 	public void ignoreNumFormat(boolean b) {
 		this.formatter.setIgnoreNumFormat(b);
 	}
-	
+
 	/**
 	 * You need to implement this to handle the results of the sheet parsing.
 	 */
 	public interface BingSheetContentsHandler {
 		/** A row with the (zero based) row number has started */
-		public void startRow(int rowNum)throws BingSaxReadStopException;
-
+		public void startRow(int rowNum) throws BingSaxReadStopException;
 		/** A row with the (zero based) row number has ended */
 		public void endRow(int rowNum);
-
 		/**
-		 * A cell, with the given formatted value (may be null), and possibly a
-		 * comment (may be null), was encountered
-		 */
-		public void cell(int rowNum, String cellReference,
-				String formattedValue, XSSFComment comment)
-				;
-
+		 * A cell, with the given formatted value (may be null),
+		 *  and possibly a comment (may be null), was encountered */
+		public void cell(String cellReference, String formattedValue, XSSFComment comment);
 		/** A header or footer has been encountered */
 		public void headerFooter(String text, boolean isHeader, String tagName);
 	}

@@ -5,6 +5,7 @@ import com.bing.excel.vo.ListLine;
 import com.bing.excel.writer.ExcelWriterFactory;
 import com.bing.excel.writer.WriteHandler;
 
+import com.bing.utils.FileCreateUtils;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class WriteHandlerTest {
   @Test
   public void test() {
     WriteHandler handler = ExcelWriterFactory.createXSSF("D:/aa.xlsx");
-    List<CellKV<String>> listStr=new ArrayList<>();
+    List<CellKV<String>> listStr = new ArrayList<CellKV<String>>();
     listStr.add(new CellKV<String>(0, "diyi"));
     listStr.add(new CellKV<String>(1, "date"));
     handler.createSheet("aa");
@@ -32,7 +33,8 @@ public class WriteHandlerTest {
   }
   @Test
   public void test2() {
-    WriteHandler handler = ExcelWriterFactory.createXSSF("/Users/shi/workspace/aa/测试.xlsx");
+    FileCreateUtils.deleteFile("/Users/shi/workspace/aa/bb.xlsx");
+    WriteHandler handler = ExcelWriterFactory.createXSSF("/Users/shi/workspace/aa/bb.xlsx");
     handler.createSheet("列表视图");
     ListLine listLine = new ListLine();
     listLine.addValue(0,"姓名").addValue(1,"性别");

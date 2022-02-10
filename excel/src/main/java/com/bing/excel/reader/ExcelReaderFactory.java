@@ -1,16 +1,13 @@
 package com.bing.excel.reader;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
+import java.io.*;
 import java.sql.SQLException;
 
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
+import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.util.IOUtils;
@@ -68,7 +65,6 @@ public class ExcelReaderFactory {
 	/**
 	 * @param inp
 	 * @param excelReader
-	 * @param maxReturnLines <code>null</code> 不限制，
 	 * @return
 	 * @throws InvalidFormatException
 	 * @throws IOException
@@ -91,25 +87,35 @@ public class ExcelReaderFactory {
 			ExcelReadListener excelReader, boolean ignoreNumFormat)
 			throws InvalidFormatException, IOException, SQLException {
 		 // If clearly doesn't do mark/reset, wrap up
+
         if (! inp.markSupported()) {
             inp = new PushbackInputStream(inp, 8);
         }
-
+		BufferedInputStream bis = new BufferedInputStream(inp);
         // Ensure that there is at least some data there
-        byte[] header8 = IOUtils.peekFirst8Bytes(inp);
+        byte[] header8 = IOUtils.peekFirst8Bytes(bis);
 
-        // Try to create
-        if (POIFSFileSystem.hasPOIFSHeader(header8)) {
-            POIFSFileSystem fs = new POIFSFileSystem(inp);
-            return create(fs, excelReader, ignoreNumFormat);
-        }
-        if (POIXMLDocument.hasOOXMLHeader(inp)) {
-             OPCPackage pkg = OPCPackage.open(inp);
-             return create(pkg, excelReader, ignoreNumFormat);
-        }
-        throw new InvalidFormatException("Your InputStream was neither an OLE2 stream, nor an OOXML stream");
-    
 
+
+//        if (POIXMLDocument.hasOOXMLHeader(bis)) {
+//             OPCPackage pkg = OPCPackage.open(bis);
+//             return create(pkg, excelReader, ignoreNumFormat);
+//        }
+
+		InputStream is = FileMagic.prepareToCheckMagic(bis);
+
+		FileMagic fm = FileMagic.valueOf(is);
+
+		switch (fm) {
+			case OLE2:
+				POIFSFileSystem fs = new POIFSFileSystem(is);
+				return create(fs, excelReader,ignoreNumFormat);
+			case OOXML:
+				return create(OPCPackage.open(is), excelReader, ignoreNumFormat);
+						//new XSSFWorkbook(OPCPackage.open(is));
+			default:
+				throw new InvalidFormatException("Your InputStream was neither an OLE2 stream, nor an OOXML stream");
+		}
 	}
 
 	/**

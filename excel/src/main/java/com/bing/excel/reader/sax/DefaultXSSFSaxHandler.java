@@ -344,7 +344,7 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 		}
 
 		@Override
-		public void cell(int rowNum, String cellReference,
+		public void cell(String cellReference,
 				String formattedValue, XSSFComment comment)
 				 {
 			

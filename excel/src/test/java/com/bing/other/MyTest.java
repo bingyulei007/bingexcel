@@ -31,13 +31,13 @@ public class MyTest {
 	        Row row = sheet.createRow((short) 2);
 	        row.setHeightInPoints(30);
 
-	        createCell(wb, row, (short) 0, CellStyle.ALIGN_CENTER, CellStyle.VERTICAL_BOTTOM);
-	        createCell(wb, row, (short) 1, CellStyle.ALIGN_CENTER_SELECTION, CellStyle.VERTICAL_BOTTOM);
-	        createCell(wb, row, (short) 2, CellStyle.ALIGN_FILL, CellStyle.VERTICAL_CENTER);
-	        createCell(wb, row, (short) 3, CellStyle.ALIGN_GENERAL, CellStyle.VERTICAL_CENTER);
-	        createCell(wb, row, (short) 4, CellStyle.ALIGN_JUSTIFY, CellStyle.VERTICAL_JUSTIFY);
-	        createCell(wb, row, (short) 5, CellStyle.ALIGN_LEFT, CellStyle.VERTICAL_TOP);
-	        createCell(wb, row, (short) 6, CellStyle.ALIGN_RIGHT, CellStyle.VERTICAL_TOP);
+//	        createCell(wb, row, (short) 0, CellStyle.ALIGN_CENTER, CellStyle.VERTICAL_BOTTOM);
+//	        createCell(wb, row, (short) 1, CellStyle.ALIGN_CENTER_SELECTION, CellStyle.VERTICAL_BOTTOM);
+//	        createCell(wb, row, (short) 2, CellStyle.ALIGN_FILL, CellStyle.VERTICAL_CENTER);
+//	        createCell(wb, row, (short) 3, CellStyle.ALIGN_GENERAL, CellStyle.VERTICAL_CENTER);
+//	        createCell(wb, row, (short) 4, CellStyle.ALIGN_JUSTIFY, CellStyle.VERTICAL_JUSTIFY);
+//	        createCell(wb, row, (short) 5, CellStyle.ALIGN_LEFT, CellStyle.VERTICAL_TOP);
+//	        createCell(wb, row, (short) 6, CellStyle.ALIGN_RIGHT, CellStyle.VERTICAL_TOP);
 	        // Write the output to a file
 	        
 	        FileOutputStream fileOut = new FileOutputStream("xssf-align.xlsx");
@@ -57,8 +57,8 @@ public class MyTest {
         Cell cell = row.createCell(column);
         cell.setCellValue("Align It");
         CellStyle cellStyle = wb.createCellStyle();
-        cellStyle.setAlignment(halign);
-        cellStyle.setVerticalAlignment(valign);
+//        cellStyle.setAlignment(halign);
+//        cellStyle.setVerticalAlignment(valign);
         cell.setCellStyle(cellStyle);
     }
     
@@ -77,7 +77,7 @@ public class MyTest {
     	    CellStyle style = wb.createCellStyle();
     	    
     	    //     style.setFillBackgroundColor(IndexedColors.AUTOMATIC.getIndex());
-    	   style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+//    	   style.setFillPattern(CellStyle.SOLID_FOREGROUND);
     	   style.setFillForegroundColor(IndexedColors.LIGHT_ORANGE.index);
     	   
     	    Font font = wb.createFont();
