@@ -5,3 +5,21 @@
 /.settings
 /WebRoot/WEB-INF/classes
 /WebRoot/WEB-INF/lib
+
+# IDE
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+
+# Excel test files
+*.xls
+*.xlsx
+
+# Windows/Mac drives
+D:/
+E:/
+
+# Config
+_config.yml
