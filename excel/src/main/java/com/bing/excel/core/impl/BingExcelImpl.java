@@ -15,10 +15,8 @@ import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.csv.CSVFormat;
@@ -65,7 +63,6 @@ public class BingExcelImpl implements BingExcel {
    * globe filed converter
    */
   private final ConverterHandler localConverterHandler;
-  private final Set<Class<?>> targetTypes = Collections.synchronizedSet(new HashSet<Class<?>>());
   private AnnotationMapperHandler annotationMapperHandler = new AnnotationMapperHandler();
   private UserDefineMapperHandler userDefineMapperHandler;
 
@@ -403,47 +400,30 @@ public class BingExcelImpl implements BingExcel {
 
   }
 
-  private void registeAdapter(Class type) {
-
-    synchronized (type) {
-      if (targetTypes.contains(type)) {
-        return;
-      }
-      try {
-        // 转换的类型不可能对应的是基本类型
-        if (type.isPrimitive()) {
-          return;
-        }
-        // 目前先不考虑model的接口继承问题 TODO
-        if (type.isInterface() || (type.getModifiers() & Modifier.ABSTRACT) > 0) {
-          return;
-        }
-        final Field[] fields = type.getDeclaredFields();
-
-        Constructor<?> constructor;
-        try {
-          constructor = type.getDeclaredConstructor();
-        } catch (NoSuchMethodException | SecurityException e) {
-          throw new IllegalEntityException(type,
-              "Gets the default constructor failed,the Objet must contains a  [no-args&public constructor] ",
-              e);
-        }
-        TypeAdapterConverter typeAdapterConverter = getTypeAdapterConverter(constructor, fields);
-        typeTokenCache.put(type, typeAdapterConverter);
-
-      } finally {
-        targetTypes.add(type);
-      }
-
+  private void registeAdapter(Class<?> type) {
+    // 已注册则直接返回
+    if (typeTokenCache.containsKey(type)) {
+      return;
+    }
+    // 转换的类型不可能对应的是基本类型
+    if (type.isPrimitive()) {
+      return;
+    }
+    // 目前先不考虑model的接口继承问题 TODO
+    if (type.isInterface() || (type.getModifiers() & Modifier.ABSTRACT) > 0) {
+      return;
     }
 
-  }
-
-  private TypeAdapterConverter getTypeAdapterConverter(Constructor<?> constructor, Field[] fields) {
-
-    TypeAdapterConverter adConverter =
-        new TypeAdapterConverter<>(constructor, fields, localConverterHandler);
-    return adConverter;
+    Constructor<?> constructor;
+    try {
+      constructor = type.getDeclaredConstructor();
+    } catch (NoSuchMethodException | SecurityException e) {
+      throw new IllegalEntityException(type,
+          "Gets the default constructor failed,the Objet must contains a  [no-args&public constructor] ",
+          e);
+    }
+    final Field[] fields = type.getDeclaredFields();
+    typeTokenCache.put(type, new TypeAdapterConverter<>(constructor, fields, localConverterHandler));
   }
 
   /**
@@ -478,17 +458,11 @@ public class BingExcelImpl implements BingExcel {
       if (tagertClazz != null) {
         TypeAdapterConverter<?> typeAdapter = typeTokenCache.get(tagertClazz);
         if (typeAdapter == null) {
-          if (targetTypes.contains(tagertClazz)) {
-            throw new IllegalEntityException(tagertClazz, "类型定义错误");
-          } else {
-            throw new NullPointerException("没有对应的适配器，无法转换");
-          }
-        } else {
-          Object object =
-              typeAdapter.unmarshal(rowList, userDefineMapperHandler, annotationMapperHandler);
-          currentSheetVo.addObject(object);
+          throw new NullPointerException("没有对应的适配器，无法转换");
         }
-
+        Object object =
+            typeAdapter.unmarshal(rowList, userDefineMapperHandler, annotationMapperHandler);
+        currentSheetVo.addObject(object);
       }
     }
 
@@ -607,7 +581,6 @@ public class BingExcelImpl implements BingExcel {
    * write sheet excel 写数据到多sheet页的excel
    * 
    * @param handler
-   * @param list
    */
   private void writeToSheetExcel(WriteHandler handler, SheetExcel... sheetExcels) {
     TypeAdapterConverter<?> typeAdapter = null;

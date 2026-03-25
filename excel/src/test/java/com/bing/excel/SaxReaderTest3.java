@@ -1,6 +1,7 @@
 package com.bing.excel;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class SaxReaderTest3 {
 
             @Override
             public void optRow(int curRow, ListRow rowList) {
-                System.out.println("第" + curRow + "行: " + rowList.toArray());
+                System.out.println("第" + curRow + "行: " + rowList.toString());
             }
 
             @Override
@@ -234,7 +235,7 @@ public class SaxReaderTest3 {
         URL url = SaxReaderTest3.class.getResource("/salary.xlsx");
         String path = url.toURI().getPath();
 
-        ReadHandler handler = ExcelReaderFactory.create(path, new ExcelReadListener() {
+        ReadHandler handler = ExcelReaderFactory.create(new File(path), new ExcelReadListener() {
             @Override
             public void startSheet(int sheetIndex, String name) {
                 System.out.println("Sheet: " + name);
@@ -243,7 +244,7 @@ public class SaxReaderTest3 {
             @Override
             public void optRow(int curRow, ListRow rowList) {
                 if (curRow <= 3) {
-                    System.out.println("行" + curRow + ": " + rowList.toArray());
+                    System.out.println("行" + curRow + ": " + rowList.toString());
                 }
             }
 
@@ -277,7 +278,7 @@ public class SaxReaderTest3 {
 
                 @Override
                 public void optRow(int curRow, ListRow rowList) {
-                    System.out.println("行" + curRow + ": " + rowList.toFullArray());
+                    System.out.println("行" + curRow + ": " + rowList.toString());
                 }
 
                 @Override
@@ -392,17 +393,6 @@ public class SaxReaderTest3 {
             }
         });
 
-        // 演示各种读取方法
-        System.out.println("--- readSheets() ---");
         handler.readSheets();
-
-        System.out.println("--- readSheets(5) ---");
-        handler.readSheets(5);
-
-        System.out.println("--- readSheet(0) ---");
-        handler.readSheet(0);
-
-        System.out.println("--- readSheet(0, 3) ---");
-        handler.readSheet(0, 3);
     }
 }
