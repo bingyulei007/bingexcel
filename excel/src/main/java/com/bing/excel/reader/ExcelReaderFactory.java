@@ -3,7 +3,6 @@ package com.bing.excel.reader;
 import java.io.*;
 import java.sql.SQLException;
 
-import org.apache.poi.POIXMLDocument;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;

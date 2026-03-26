@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.ExcelStyleDateFormatter;
 import org.apache.poi.ss.usermodel.FormulaError;
@@ -890,34 +891,34 @@ public class ExcelDataFormatter implements Observer{
      */
     public String formatCellValue(Cell cell, FormulaEvaluator evaluator) {
         localeChangedObervable.checkForLocaleChange();
-        
+
         if (cell == null) {
             return "";
         }
 
-        int cellType = cell.getCellType();
-        if (cellType == Cell.CELL_TYPE_FORMULA) {
+        CellType cellType = cell.getCellType();
+        if (cellType == CellType.FORMULA) {
             if (evaluator == null) {
                 return cell.getCellFormula();
             }
             cellType = evaluator.evaluateFormulaCell(cell);
         }
         switch (cellType) {
-            case Cell.CELL_TYPE_NUMERIC :
+            case NUMERIC :
 
                 if (ExcelDateUtil.isCellDateFormatted(cell)) {
                     return getFormattedDateString(cell);
                 }
                 return getFormattedNumberString(cell);
 
-            case Cell.CELL_TYPE_STRING :
+            case STRING :
                 return cell.getRichStringCellValue().getString();
 
-            case Cell.CELL_TYPE_BOOLEAN :
+            case BOOLEAN :
                 return String.valueOf(cell.getBooleanCellValue());
-            case Cell.CELL_TYPE_BLANK :
+            case BLANK :
                 return "";
-            case Cell.CELL_TYPE_ERROR:
+            case ERROR:
             	return FormulaError.forInt(cell.getErrorCellValue()).getString();
         }
         throw new RuntimeException("Unexpected celltype (" + cellType + ")");

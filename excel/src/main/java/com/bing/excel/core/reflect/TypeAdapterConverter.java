@@ -25,7 +25,6 @@ import com.bing.excel.vo.ListRow;
 import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
 import com.google.common.primitives.Primitives;
-import java.util.Map.Entry;
 
 /**
  * @author shizhongtao

@@ -5,12 +5,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.util.SAXHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -64,10 +64,12 @@ public class ExcelReadOnlySharedStringsTable extends ReadOnlySharedStringsTable 
 		if (is.available() > 0) {
 			InputSource sheetSource = new InputSource(is);
 			try {
-				XMLReader sheetParser = SAXHelper.newXMLReader();
+				SAXParserFactory saxFactory = SAXParserFactory.newInstance();
+				SAXParser saxParser = saxFactory.newSAXParser();
+				XMLReader sheetParser = saxParser.getXMLReader();
 				sheetParser.setContentHandler(this);
 				sheetParser.parse(sheetSource);
-			} catch (ParserConfigurationException e) {
+			} catch (Exception e) {
 				throw new RuntimeException("SAX parser appears to be broken - "
 						+ e.getMessage());
 			}

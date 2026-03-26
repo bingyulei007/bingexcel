@@ -2,145 +2,238 @@
 
 ## 简介
 
-BingExcel 是一个 Java 库，用于将 Excel 文件（xls/xlsx）与 Java 实体类相互转换，支持注解配置、自定义转换器、CSV 导出等功能。
+BingExcel 是一个轻量级 Java 库，用于实现 Excel 文件（xls/xlsx）与 Java 实体类之间的双向转换。框架基于 Apache POI 构建，提供注解驱动的配置方式，支持自定义转换器、大文件流式读取、多 Sheet 操作等功能。
 
-**最新版本：4.0**
+**核心特性：**
+- 支持 `.xls` 和 `.xlsx` 格式
+- 注解驱动的列映射配置
+- 灵活的类型转换器机制
+- 多 Sheet 读写支持
+- CSV 导出支持
+- 运行时字段映射配置
 
-**Maven 依赖：**
+**技术依赖：**
+| 组件 | 版本要求 |
+|------|----------|
+| Java | 1.8+ |
+| Apache POI | 4.1.2+ |
+| commons-lang3 | 3.14.0+ |
+| commons-csv | 1.10.0+ |
 
-```xml
-<dependency>
-    <groupId>cn.com.binging</groupId>
-    <artifactId>excel</artifactId>
-    <version>4.0</version>
-</dependency>
-```
+---
+
+## 目录
+
+- [一、快速开始](#一快速开始)
+- [二、核心概念与架构](#二核心概念与架构)
+- [三、读取 Excel](#三读取-excel)
+- [四、导出 Excel](#四导出-excel)
+- [五、CSV 导出](#五csv-导出)
+- [六、自定义转换器](#六自定义转换器)
+- [七、低级 API（流式读写）](#七低级-api流式读写)
+- [八、运行时配置](#八运行时配置)
+- [九、扩展开发指南](#九扩展开发指南)
+- [十、常见问题](#十常见问题)
+- [十一、更新日志](#十一更新日志)
 
 ---
 
 ## 一、快速开始
 
-### 1.1 读取 Excel 到实体类
+### 1.1 环境要求
 
-定义一个实体类，使用 `@CellConfig` 注解标记字段对应的 Excel 列索引：
+- JDK 1.8 或更高版本
+- Maven 3.x
+
+### 1.2 定义实体类
+
+使用 `@CellConfig` 注解标记字段与 Excel 列的映射关系：
 
 ```java
+import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.annotation.OutAlias;
+
+@OutAlias("人员信息")
 public class Person {
     @CellConfig(index = 0)
     private String name;
+
     @CellConfig(index = 1)
     private int age;
-    @CellConfig(index = 3)
+
+    @CellConfig(index = 2)
     private Double salary;
 
     // getter/setter 省略
 }
 ```
 
-读取 Excel 文件：
+### 1.3 读取 Excel
 
 ```java
+import com.bing.excel.BingExcel;
+import com.bing.excel.BingExcelBuilder;
+import com.bing.excel.core.SheetVo;
+import java.io.File;
+
 BingExcel bing = BingExcelBuilder.builderInstance();
 File file = new File("person.xlsx");
-SheetVo<Person> vo = bing.readFile(file, Person.class, 1); // 1 = 从第2行开始读取
-System.out.println(vo.getSheetName());    // Sheet1
-System.out.println(vo.getObjectList());  // List<Person>
+
+// 读取第一个 Sheet，从第 2 行开始（索引为 1，跳过表头）
+SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
+
+System.out.println("Sheet名称: " + vo.getSheetName());
+System.out.println("数据列表: " + vo.getObjectList());
 ```
 
-从输入流读取（xls 格式）：
+### 1.4 导出 Excel
 
 ```java
-InputStream in = Person.class.getResourceAsStream("/person.xls");
-SheetVo<Person> vo = bing.readStream(in, Person.class, 1);
-```
+import com.bing.excel.BingExcel;
+import com.bing.excel.BingExcelBuilder;
+import java.util.ArrayList;
+import java.util.List;
 
-### 1.2 导出实体类到 Excel
-
-```java
+BingExcel bing = BingExcelBuilder.builderInstance();
 List<Person> list = new ArrayList<>();
-list.add(new Person(12, "张三", 5000.0));
-list.add(new Person(23, "李四", 8000.0));
+list.add(new Person("张三", 12, 5000.0));
+list.add(new Person("李四", 23, 8000.0));
 
 bing.writeExcel("/path/to/output.xlsx", list);
 ```
 
-导出为老格式 xls：
-
-```java
-bing.writeOldExcel("/path/to/output.xls", list);
-```
-
 ---
 
-## 二、核心注解
+## 二、核心概念与架构
 
-### 2.1 @CellConfig
+### 2.1 包结构
 
-用于实体类字段，标记该字段在 Excel 中的列位置及读取配置。
-
-| 属性 | 类型 | 说明 |
-|------|------|------|
-| `index` | int | Excel 列索引（从 0 开始），**读取时必须指定** |
-| `aliasName` | String | Excel 表头别名，用于导出时自定义列名 |
-| `readRequired` | boolean | 读取时该字段是否为必填，默认 false |
-
-```java
-@CellConfig(index = 0)
-private String name;
-
-@CellConfig(index = 1, aliasName = "年龄")
-private int age;
-
-@CellConfig(index = 2, readRequired = true, aliasName = "薪水")
-private Double salary;
+```
+com.bing.excel
+├── annotation          # 注解定义
+│   ├── CellConfig      # 字段映射注解
+│   ├── OutAlias        # 导出别名注解
+│   └── BingConvertor   # 转换器注解
+├── core                # 核心接口与类
+│   ├── BingExcel       # 主入口类
+│   ├── BingExcelBuilder# 构建器
+│   ├── SheetVo         # Sheet 数据封装
+│   ├── ReaderCondition # 读取条件配置
+│   └── SheetExcel      # 多 Sheet 导出封装
+├── converter           # 类型转换器
+│   ├── FieldValueConverter    # 转换器接口
+│   ├── AbstractFieldConvertor # 抽象基类
+│   └── converter.*             # 内置转换器实现
+├── reader              # 读取相关
+│   └── usermodel                 # 用户模式
+└── writer              # 写入相关
+    ├── ExcelWriterFactory       # 写入工厂
+    └── handler.*                 # 写入处理器
 ```
 
-### 2.2 @OutAlias
+### 2.2 核心类说明
 
-标注在类上，用于指定导出 Excel 时的 Sheet 名称。
+| 类名 | 包路径 | 说明 |
+|------|--------|------|
+| `BingExcel` | com.bing.excel.core | 主入口类，提供读写 Excel 的核心方法 |
+| `BingExcelBuilder` | com.bing.excel.core | 构建器，用于注册转换器和配置映射关系 |
+| `SheetVo<T>` | com.bing.excel.core | Sheet 数据封装类，包含 Sheet 名称和数据列表 |
+| `ReaderCondition<T>` | com.bing.excel.core | 读取条件配置类，可指定 Sheet 索引、起始行、结束行 |
+| `SheetExcel` | com.bing.excel.core | 多 Sheet 导出时的数据封装类 |
 
-```java
-@OutAlias("销售数据")
-public class SaleRecord {
-    @CellConfig(index = 0)
-    private String product;
-    // ...
-}
+### 2.3 核心接口
+
+| 接口 | 包路径 | 说明 | 扩展点 |
+|------|--------|------|--------|
+| `FieldValueConverter` | com.bing.excel.converter | 类型转换器接口，用于字符串与目标类型的双向转换 | 自定义类型转换 |
+| `WriteHandler` | com.bing.excel.writer.handler | 低级写入处理器 | 精细控制单元格写入 |
+| `ReadHandler` | com.bing.excel.reader.handler | 低级读取处理器 | 精细控制单元格读取 |
+
+### 2.4 数据流转图
+
 ```
+┌─────────────────────────────────────────────────────────────────┐
+│                           读取流程                               │
+├─────────────────────────────────────────────────────────────────┤
+│  Excel File ──► POI 解析 ──► CellValue ──► FieldValueConverter │
+│                                                              ──► 实体对象
+└─────────────────────────────────────────────────────────────────┘
 
-### 2.3 @BingConvertor
-
-用于字段上，指定自定义转换器。
-
-```java
-@BingConvertor(value = MyConverter.class, strings = { "是", "否" }, booleans = { true })
-private boolean valid;
+┌─────────────────────────────────────────────────────────────────┐
+│                           写入流程                               │
+├─────────────────────────────────────────────────────────────────┤
+│  实体对象 ──► FieldValueConverter ──► CellValue ──► POI 写入    │
+│                                                              ──► Excel File
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## 三、读取 Excel
 
-### 3.1 基础读取
+### 3.1 核心注解
+
+#### @CellConfig
+
+用于实体类字段，标记该字段在 Excel 中的列位置及读取配置。
+
+| 属性 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| `index` | int | 是 | - | Excel 列索引（从 0 开始） |
+| `aliasName` | String | 否 | 字段名 | 导出时的列名 |
+| `readRequired` | boolean | 否 | false | 读取时是否必填 |
 
 ```java
-// 读取第一个 Sheet，从第2行开始
-SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
+import com.bing.excel.annotation.CellConfig;
 
-// 读取指定 Sheet
-ReaderCondition<Person> condition = new ReaderCondition<>(0, Person.class); // sheetIndex=0
-condition.setStartRow(2); // 从第3行开始
-SheetVo<Person> vo = bing.readFile(file, condition);
+public class User {
+    @CellConfig(index = 0)
+    private String name;
+
+    @CellConfig(index = 1, aliasName = "年龄")
+    private int age;
+
+    @CellConfig(index = 2, readRequired = true, aliasName = "薪水")
+    private Double salary;
+}
 ```
 
-### 3.2 条件读取（ReaderCondition）
+#### @OutAlias
+
+标注在类上，指定导出 Excel 时的 Sheet 名称。
 
 ```java
-// 指定 Sheet 索引、起始行、结束行
-ReaderCondition<Person> condition = new ReaderCondition<>(0, Person.class);
-condition.setStartRow(2);   // 从第3行开始（0-based，排除表头）
-condition.setEndRow(100);    // 读到第100行
+import com.bing.excel.annotation.OutAlias;
 
+@OutAlias("销售数据")
+public class SaleRecord {
+    @CellConfig(index = 0)
+    private String product;
+}
+```
+
+#### @BingConvertor
+
+用于字段上，指定自定义转换器。
+
+```java
+import com.bing.excel.annotation.BingConvertor;
+import com.bing.excel.converter.custom.YesNoConverter;
+
+@BingConvertor(value = YesNoConverter.class, strings = { "是", "否" }, booleans = { true })
+private boolean valid;
+```
+
+### 3.2 基础读取
+
+```java
+// 方式一：读取指定 Sheet，从指定行开始
+SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
+
+// 方式二：使用 ReaderCondition 精确控制
+ReaderCondition<Person> condition = new ReaderCondition<>(0, Person.class);
+condition.setStartRow(2);  // 从第 3 行开始（行索引从 0 开始）
+condition.setEndRow(100);   // 读到第 100 行结束
 SheetVo<Person> vo = bing.readFile(file, condition);
 ```
 
@@ -154,36 +247,40 @@ ReaderCondition[] conditions = new ReaderCondition[] {
 List<SheetVo> voList = bing.readFileToList(file, conditions);
 ```
 
-### 3.4 SAX 模式大文件读取（节省内存）
-
-适合读取超大 Excel 文件，基于 SAX 事件解析，不占用大量内存：
+### 3.4 从 InputStream 读取
 
 ```java
-@Test
-public void testSAX() throws Exception {
-    File f = new File("test.xlsx");
-    ReadHandler saxHandler = ExcelReaderFactory.create(f, new ExcelReadListener() {
-        @Override
-        public void startSheet(int sheetIndex, String name) {
-            System.out.println("开始读取 Sheet: " + name);
-        }
+import java.io.InputStream;
+import com.bing.excel.core.SheetReader;
 
-        @Override
-        public void optRow(int curRow, ListRow rowList) {
-            // rowList 是当前行的数据列表，全部为 String 类型
-            System.out.println("第 " + curRow + " 行: " + rowList);
-        }
+// 读取 xlsx 格式
+InputStream in = new FileInputStream("person.xlsx");
+SheetVo<Person> vo = bing.readStream(in, Person.class, 1);
 
-        @Override
-        public void endWorkBook() {
-            System.out.println("读取完成");
-        }
+// 读取 xls 格式（老格式）
+InputStream in = getClass().getResourceAsStream("/person.xls");
+SheetReader<Person> reader = bing.readOldStream(in, Person.class, 1);
+```
 
-        @Override
-        public void endSheet(int sheetIndex, String name) {
-        }
-    }, true);
-    saxHandler.readSheets();
+### 3.5 异常处理
+
+读取操作可能抛出以下异常：
+
+| 异常类型 | 说明 |
+|----------|------|
+| `ExcelException` | 通用 Excel 处理异常 |
+| `FileNotFoundException` | 文件不存在 |
+| `IOException` | IO 读写错误 |
+
+```java
+try {
+    SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
+} catch (ExcelException e) {
+    // 处理 Excel 解析错误
+    e.printStackTrace();
+} catch (FileNotFoundException e) {
+    // 处理文件不存在
+    e.printStackTrace();
 }
 ```
 
@@ -194,14 +291,32 @@ public void testSAX() throws Exception {
 ### 4.1 基础导出
 
 ```java
-List<Person> list = Lists.newArrayList();
-list.add(new Person(12, "nihoa", 23434.9));
-list.add(new Person(23, "nihoa", 234.9));
+import java.util.ArrayList;
+import java.util.List;
 
+List<Person> list = new ArrayList<>();
+list.add(new Person("张三", 12, 5000.0));
+list.add(new Person("李四", 23, 8000.0));
+
+// 导出为 xlsx 格式
 bing.writeExcel("/path/to/output.xlsx", list);
+
+// 导出为 xls 格式（老格式）
+bing.writeOldExcel("/path/to/output.xls", list);
 ```
 
-### 4.2 多 Sheet 导出
+### 4.2 导出到 OutputStream
+
+```java
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+
+OutputStream os = new FileOutputStream("output.xlsx");
+bing.writeExcel(os, list);
+os.close();
+```
+
+### 4.3 多 Sheet 导出
 
 ```java
 SheetExcel sheet1 = new SheetExcel();
@@ -215,12 +330,12 @@ sheet2.setList(deptList);
 bing.writeSheetsExcel("/path/to/output.xlsx", sheet1, sheet2);
 ```
 
-### 4.3 导出到 OutputStream
+### 4.4 导出配置
 
-```java
-OutputStream os = new FileOutputStream("output.xlsx");
-bing.writeExcel(os, list);
-```
+| 配置项 | 说明 |
+|--------|------|
+| `@OutAlias` | 指定 Sheet 名称 |
+| `@CellConfig(aliasName)` | 指定列名称 |
 
 ---
 
@@ -232,27 +347,68 @@ bing.writeExcel(os, list);
 bing.writeCSV("/path/to/output.csv", list);
 ```
 
-### 5.2 自定义分隔符和 BOM
+### 5.2 自定义配置
 
 ```java
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+
+OutputStream os = new FileOutputStream("output.csv");
 bing.writeCSV(os, list, ',', true, true);
-// 参数：输出流, 数据, 分隔符, 是否带表头, 是否带BOM
+// 参数说明：
+//   os      - 输出流
+//   list    - 数据列表
+//   ','     - 分隔符（默认逗号）
+//   true    - 是否带表头
+//   true    - 是否带 BOM（解决 Excel 打开中文乱码）
 ```
 
 ---
 
 ## 六、自定义转换器
 
-### 6.1 全局转换器（Builder 方式）
-
-实现 `FieldValueConverter` 接口，并通过 `BingExcelBuilder` 注册：
+### 6.1 转换器接口
 
 ```java
-// 1. 定义转换器
-public class MyDateConverter extends AbstractFieldConvertor {
+import com.bing.excel.converter.FieldValueConverter;
+import com.bing.excel.converter ConverterHandler;
+import com.bing.excel.converter.OutValue;
+import java.lang.reflect.Type;
+
+public interface FieldValueConverter {
+    /**
+     * 判断是否支持该类型的转换
+     */
+    boolean canConvert(Class<?> clz);
+
+    /**
+     * 将字符串转换为目标类型（读取时调用）
+     */
+    Object fromString(String cell, ConverterHandler converterHandler, Type type);
+
+    /**
+     * 将目标类型转换为 OutValue（导出时调用）
+     */
+    OutValue toObject(Object source, ConverterHandler converterHandler);
+}
+```
+
+### 6.2 实现自定义转换器
+
+```java
+import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.converter.ConverterHandler;
+import com.bing.excel.converter.OutValue;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import org.apache.commons.lang3.StringUtils;
+
+public class CustomDateConverter extends AbstractFieldConvertor {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     @Override
     public boolean canConvert(Class<?> clz) {
-        return EmploryAttribute.class.equals(clz);
+        return LocalDate.class.equals(clz);
     }
 
     @Override
@@ -260,149 +416,223 @@ public class MyDateConverter extends AbstractFieldConvertor {
         if (StringUtils.isBlank(cell)) {
             return null;
         }
-        String[] split = cell.split(":");
-        EmploryAttribute attr = new EmploryAttribute();
-        attr.key = split[0];
-        attr.value = split[1];
-        return attr;
+        return LocalDate.parse(cell, FORMATTER);
     }
 
     @Override
     public OutValue toObject(Object source, ConverterHandler converterHandler) {
-        // 导出时的转换逻辑
-        return new OutValue(source.toString());
+        if (source == null) {
+            return new OutValue("");
+        }
+        LocalDate date = (LocalDate) source;
+        return new OutValue(date.format(FORMATTER));
     }
 }
-
-// 2. 注册并使用
-BingExcel bing = BingExcelBuilder.toBuilder()
-    .registerFieldConverter(EmploryAttribute.class, new MyDateConverter())
-    .builder();
-
-SheetVo<Salary> vo = bing.readFile(file, condition);
 ```
 
-### 6.2 内置转换器
-
-框架内置了以下类型转换器，直接可用：
-
-- `BooleanFieldConverter` — 布尔类型
-- `ByteFieldConverter` — 字节类型
-- `CharacterFieldConverter` — 字符类型
-- `DateFieldConverter` — 日期类型
-- `DoubleFieldConverter` — 双精度浮点
-- `FloatFieldConverter` — 单精度浮点
-- `IntegerFieldConverter` — 整型
-- `LongFieldConverter` — 长整型
-- `ShortFieldConverter` — 短整型
-- `StringFieldConverter` — 字符串
-- `EnumConVerter` — 枚举类型
-- `ArrayConverter` — 数组类型
-- `CollectionConverter` — 集合类型
-
-### 6.3 枚举转换示例
-
-字段声明枚举类型，框架会自动处理：
+### 6.3 注册并使用转换器
 
 ```java
-@CellConfig(index = 0)
-private Status status;
+BingExcel bing = BingExcelBuilder.toBuilder()
+    .registerFieldConverter(LocalDate.class, new CustomDateConverter())
+    .builder();
+
+SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
+```
+
+### 6.4 内置转换器
+
+框架已内置以下类型转换器，无需额外注册：
+
+| 转换器 | 支持类型 |
+|--------|----------|
+| `BooleanFieldConverter` | boolean, Boolean |
+| `ByteFieldConverter` | byte, Byte |
+| `CharacterFieldConverter` | char, Character |
+| `DateFieldConverter` | Date, java.sql.Date |
+| `DoubleFieldConverter` | double, Double |
+| `FloatFieldConverter` | float, Float |
+| `IntegerFieldConverter` | int, Integer |
+| `LongFieldConverter` | long, Long |
+| `ShortFieldConverter` | short, Short |
+| `StringFieldConverter` | String |
+| `EnumConVerter` | 所有枚举类型 |
+| `ArrayConverter` | 数组类型（如 String[]） |
+| `CollectionConverter` | 集合类型（List, Set 等） |
+
+### 6.5 枚举转换示例
+
+字段声明枚举类型，框架会自动根据枚举名称进行转换：
+
+```java
+public class User {
+    @CellConfig(index = 0)
+    private Status status;
+}
 
 public enum Status {
     ACTIVE, INACTIVE
 }
+
+// Excel 中 "ACTIVE" → Status.ACTIVE
+// Status.ACTIVE → Excel 中 "ACTIVE"
 ```
 
 ---
 
-## 七、低级写入（WriteHandler）
+## 七、低级 API（流式读写）
 
-如果需要更细粒度地控制单元格写入，可以使用 `WriteHandler`：
+### 7.1 WriteHandler - 精细控制写入
+
+适用于需要完全控制单元格写入的场景，如设置数据有效性、合并单元格等。
 
 ```java
-@Test
-public void testWriteHandler() {
-    WriteHandler handler = ExcelWriterFactory.createXSSF("/path/to/output.xlsx");
-    handler.createSheet("数据");
+import com.bing.excel.writer.ExcelWriterFactory;
+import com.bing.excel.writer.handler.WriteHandler;
+import com.bing.excel.writer.handler.ListLine;
 
-    // 写入表头
-    ListLine header = new ListLine()
-        .addValue(0, "姓名")
-        .addValue(1, "性别");
-    handler.writeHeader(header);
+WriteHandler handler = ExcelWriterFactory.createXSSF("/path/to/output.xlsx");
+handler.createSheet("数据");
 
-    // 写入数据行
-    handler.writeLine(new ListLine().addValue(0, "张三").addValue(1, "男"));
-    handler.writeLine(new ListLine().addValue(0, "李四").addValue(1, "女"));
+// 写入表头
+ListLine header = new ListLine()
+    .addValue(0, "姓名")
+    .addValue(1, "性别")
+    .addValue(2, "年龄");
+handler.writeHeader(header);
 
-    // 数据有效性（下拉框）
-    handler.setDataValidationList((short)1, (short)1000, (short)1, (short)1,
-        new String[]{"男", "女", "其他"});
+// 写入数据行
+handler.writeLine(new ListLine().addValue(0, "张三").addValue(1, "男").addValue(2, 25));
+handler.writeLine(new ListLine().addValue(0, "李四").addValue(1, "女").addValue(2, 30));
 
-    handler.flush();
-}
+// 设置数据有效性（下拉框）
+// 参数：起始行, 结束行, 起始列, 结束列, 选项数组
+handler.setDataValidationList((short)1, (short)1000, (short)1, (short)1,
+    new String[]{"男", "女", "其他"});
+
+handler.flush();
 ```
+
+### 7.2 ReadHandler - 精细控制读取
+
+使用 `ReadHandler` 配合 `ExcelReadListener` 进行精细化读取控制。
 
 ---
 
-## 八、字段映射别名（运行时覆盖注解）
+## 八、运行时配置
 
-如果不想用注解指定列名，也可以在运行时通过 Builder 指定：
+### 8.1 运行时字段映射
+
+如果不希望使用注解，可以在运行时通过 Builder 指定字段映射关系：
 
 ```java
 BingExcel bing = BingExcelBuilder.toBuilder()
     .addFieldConversionMapper(Person.class, "name", 0, "姓名")
     .addFieldConversionMapper(Person.class, "age", 1, "年龄")
+    .addFieldConversionMapper(Person.class, "salary", 2, "薪水")
     .builder();
+```
+
+**方法参数说明：**
+- 第一个参数：实体类 Class
+- 第二个参数：字段名
+- 第三个参数：Excel 列索引
+- 第四个参数：导出时的列名（可选）
+
+### 8.2 全局 Builder 模式
+
+```java
+// 创建可复用的 BingExcel 实例
+BingExcel bing = BingExcelBuilder.toBuilder()
+    .registerFieldConverter(LocalDate.class, new CustomDateConverter())
+    .addFieldConversionMapper(Person.class, "name", 0, "姓名")
+    .builder();
+
+// 后续可直接使用
+SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
 ```
 
 ---
 
-## 九、支持的类型
+## 九、扩展开发指南
 
-| 类型 | 备注 |
-|------|------|
-| 基本类型 | int, long, double, float, boolean, byte, char, short |
-| 包装类型 | Integer, Long, Double 等 |
-| String | — |
-| Date | 支持多种日期格式 |
-| 枚举 | 自动转换 |
-| 数组 | 如 String[] |
-| 集合 | List, Set 等 |
-| 自定义类型 | 需注册转换器 |
+本节介绍如何基于 BingExcel 进行二次开发。
 
----
+### 9.1 添加新的类型转换器
 
-## 十、完整示例
+1. 继承 `AbstractFieldConvertor` 抽象类
+2. 实现 `canConvert`、`fromString`、`toObject` 方法
+3. 通过 `BingExcelBuilder.registerFieldConverter()` 注册
 
-### 10.1 读取并导出
+### 9.2 集成 Spring 框架
 
 ```java
-public class ExcelDemo {
-    public static void main(String[] args) throws Exception {
-        BingExcel bing = BingExcelBuilder.builderInstance();
+@Configuration
+public class ExcelConfig {
 
-        // 读取
-        File input = new File("person.xlsx");
-        SheetVo<Person> vo = bing.readFile(input, Person.class, 1);
-        List<Person> persons = vo.getObjectList();
-
-        // 处理数据...
-
-        // 导出
-        File output = new File("output.xlsx");
-        bing.writeExcel(output, persons);
+    @Bean
+    public BingExcel bingExcel() {
+        return BingExcelBuilder.toBuilder()
+            .registerFieldConverter(LocalDate.class, new CustomDateConverter())
+            // 添加其他全局配置
+            .builder();
     }
 }
 ```
 
+### 9.3 注意事项
+
+| 项目 | 说明 |
+|------|------|
+| 线程安全 | `BingExcel` 实例创建后不建议在多线程间共享 |
+| 内存管理 | 处理大文件时注意内存使用 |
+| 类型转换 | 自定义转换器需考虑 null 值和空字符串的处理 |
+
 ---
 
-## 更新日志
+## 十、常见问题
+
+### Q1: 读取时如何跳过表头？
+
+在 `readFile` 方法中指定起始行索引：
+
+```java
+// 从第 2 行开始读取（跳过第 1 行表头）
+SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
+```
+
+### Q2: 如何处理空值？
+
+字段声明为包装类型或使用 `@CellConfig(readRequired = false)`：
+
+```java
+@CellConfig(index = 2, readRequired = false)
+private Double salary;  // 可为 null
+```
+
+### Q3: Excel 打开 CSV 中文乱码？
+
+导出时设置 BOM 参数：
+
+```java
+bing.writeCSV(os, list, ',', true, true);  // 最后一个参数 true 表示添加 BOM
+```
+
+### Q4: 如何自定义日期格式？
+
+实现自定义转换器（见 [六、自定义转换器](#六自定义转换器)）。
+
+### Q5: 多个 Sheet 如何读取？
+
+使用 `readFileToList` 方法（见 [3.3 多 Sheet 读取](#33-多-sheet-读取)）。
+
+---
+
+## 十一、更新日志
 
 ### v4.0
 - 升级依赖版本至最新稳定版
-- 启用 Maven Central 发布配置（Sonatype Nexus Staging）
+- 启用 Maven Central 发布配置
 - 支持快照版本发布
 
 ### v3.0
