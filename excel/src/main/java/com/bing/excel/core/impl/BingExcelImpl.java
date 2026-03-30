@@ -110,15 +110,11 @@ public class BingExcelImpl implements BingExcel {
     BingExcelReaderListener listner = new BingExcelReaderListener(conditions, resultList);
     ReadHandler handler = ExcelReaderFactory.create(file, listner, true);
     int[] indexArr = new int[conditions.length];
-    int minNum = -1;
+    int minNum = Integer.MAX_VALUE;
     for (int i = 0; i < conditions.length; i++) {
       int sheetNum = conditions[i].getSheetIndex();
       indexArr[i] = sheetNum;
-      if (minNum == -1) {
-        minNum = conditions[i].getEndRow();
-      } else if (minNum > conditions[i].getEndRow()) {
-        minNum = conditions[i].getEndRow();
-      }
+      minNum = Math.min(minNum, conditions[i].getEndRow());
     }
     handler.readSheet(indexArr, minNum);
     return resultList.size() == 0 ? Collections.emptyList() : resultList;
