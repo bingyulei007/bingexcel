@@ -305,6 +305,26 @@ bing.writeExcel("/path/to/output.xlsx", list);
 bing.writeOldExcel("/path/to/output.xls", list);
 ```
 
+**导出API完整列表：**
+
+| 方法 | 说明 |
+|------|------|
+| `writeExcel(String path, Iterable... iterables)` | 导出xlsx格式，支持多个Iterable（每个Iterable一个Sheet） |
+| `writeOldExcel(String path, Iterable... iterables)` | 导出xls老格式 |
+| `writeExcel(OutputStream stream, Iterable... iterables)` | 导出到输出流（xlsx） |
+| `writeOldExcel(OutputStream stream, Iterable... iterables)` | 导出到输出流（xls） |
+| `writeSheetsExcel(String path, SheetExcel... sheetExcels)` | 多Sheet导出，支持不同类型的对象列表 |
+
+**多数据集直接导出（无需SheetExcel封装）：**
+
+```java
+// 第一个Iterable导出到第一个Sheet，第二个Iterable导出到第二个Sheet
+List<Person> personList = Arrays.asList(new Person("张三", 25), new Person("李四", 30));
+List<Department> deptList = Arrays.asList(new Department("研发部", 50));
+
+bing.writeExcel("/path/to/output.xlsx", personList, deptList);
+```
+
 ### 4.2 导出到 OutputStream
 
 ```java
@@ -314,6 +334,11 @@ import java.io.FileOutputStream;
 OutputStream os = new FileOutputStream("output.xlsx");
 bing.writeExcel(os, list);
 os.close();
+
+// 或者使用try-with-resources自动关闭
+try (OutputStream os = new FileOutputStream("output.xlsx")) {
+    bing.writeExcel(os, list);
+}
 ```
 
 ### 4.3 多 Sheet 导出
@@ -336,6 +361,33 @@ bing.writeSheetsExcel("/path/to/output.xlsx", sheet1, sheet2);
 |--------|------|
 | `@OutAlias` | 指定 Sheet 名称 |
 | `@CellConfig(aliasName)` | 指定列名称 |
+| `@CellConfig(index)` | 指定列索引（从0开始） |
+| `@BingConvertor` | 指定自定义转换器 |
+
+### 4.5 使用 @BingConvertor 自定义导出转换
+
+通过 `@BingConvertor` 注解可以在字段级别指定自定义转换器，将Java类型转换为Excel单元格值：
+
+```java
+import com.bing.excel.annotation.BingConvertor;
+import com.bing.excel.converter.base.BooleanFieldConverter;
+
+public class User {
+    @CellConfig(index = 0)
+    private String name;
+
+    // 布尔值导出时转换为"是"/"否"，读取时反向转换
+    @CellConfig(index = 1)
+    @BingConvertor(value = BooleanFieldConverter.class, strings = {"是", "否"}, booleans = {true})
+    private boolean active;
+}
+```
+
+### 4.6 空列表和null值处理
+
+- **空列表**：导出仅有表头的Excel文件
+- **null值**：对于引用类型字段，null值会输出为空单元格
+- **基本类型**：建议使用包装类型（Integer、Double等）以便正确处理null值
 
 ---
 
@@ -486,10 +538,24 @@ public enum Status {
 
 适用于需要完全控制单元格写入的场景，如设置数据有效性、合并单元格等。
 
+**WriteHandler API 列表：**
+
+| 方法 | 说明 |
+|------|------|
+| `createSheet(String name)` | 创建指定名称的Sheet |
+| `writeHeader(ListLine)` | 写入表头行 |
+| `writeLine(ListLine)` | 写入数据行 |
+| `setDataValidationList(short, short, short, short, String[])` | 设置下拉数据有效性 |
+| `setDataValidationList(int, int, int, int, String[])` | 设置下拉数据有效性（int版） |
+| `flush()` | 刷新并关闭流 |
+| `close()` | 关闭处理器 |
+
+**示例代码：**
+
 ```java
 import com.bing.excel.writer.ExcelWriterFactory;
 import com.bing.excel.writer.handler.WriteHandler;
-import com.bing.excel.writer.handler.ListLine;
+import com.bing.excel.vo.ListLine;
 
 WriteHandler handler = ExcelWriterFactory.createXSSF("/path/to/output.xlsx");
 handler.createSheet("数据");
@@ -506,11 +572,21 @@ handler.writeLine(new ListLine().addValue(0, "张三").addValue(1, "男").addVal
 handler.writeLine(new ListLine().addValue(0, "李四").addValue(1, "女").addValue(2, 30));
 
 // 设置数据有效性（下拉框）
-// 参数：起始行, 结束行, 起始列, 结束列, 选项数组
+// 参数：起始行索引, 结束行索引, 起始列索引, 结束列索引, 选项数组
 handler.setDataValidationList((short)1, (short)1000, (short)1, (short)1,
     new String[]{"男", "女", "其他"});
 
 handler.flush();
+```
+
+**创建不同格式的处理器：**
+
+```java
+// 创建xlsx格式处理器（2007+格式）
+WriteHandler xssfHandler = ExcelWriterFactory.createXSSF("/path/to/output.xlsx");
+
+// 创建xls格式处理器（老格式）
+WriteHandler hssfHandler = ExcelWriterFactory.createHSSF("/path/to/output.xls");
 ```
 
 ### 7.2 ReadHandler - 精细控制读取
