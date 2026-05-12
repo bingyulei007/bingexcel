@@ -97,6 +97,7 @@ public interface BingExcel {
 
   /**
    * 写出xls格式的excel文件
+   *
    */
   void writeOldExcel(String path, Iterable... iterables);
 
