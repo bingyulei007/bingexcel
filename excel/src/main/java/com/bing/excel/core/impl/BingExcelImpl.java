@@ -72,7 +72,7 @@ public class BingExcelImpl implements BingExcel {
   }
 
 
-  public UserDefineMapperHandler getUserDefineMapperHandler() {
+  public synchronized UserDefineMapperHandler getUserDefineMapperHandler() {
     if (userDefineMapperHandler == null) {
       userDefineMapperHandler = new UserDefineMapperHandler(ConversionMapperBuilder.toBuilder());
     }
@@ -407,10 +407,6 @@ public class BingExcelImpl implements BingExcel {
   }
 
   private void registeAdapter(Class<?> type) {
-    // 已注册则直接返回
-    if (typeTokenCache.containsKey(type)) {
-      return;
-    }
     // 转换的类型不可能对应的是基本类型
     if (type.isPrimitive()) {
       return;
@@ -420,16 +416,22 @@ public class BingExcelImpl implements BingExcel {
       return;
     }
 
-    Constructor<?> constructor;
-    try {
-      constructor = type.getDeclaredConstructor();
-    } catch (NoSuchMethodException | SecurityException e) {
-      throw new IllegalEntityException(type,
-          "Gets the default constructor failed,the Objet must contains a  [no-args&public constructor] ",
-          e);
+    synchronized (type) {
+      // 已注册则直接返回
+      if (typeTokenCache.containsKey(type)) {
+        return;
+      }
+      Constructor<?> constructor;
+      try {
+        constructor = type.getDeclaredConstructor();
+      } catch (NoSuchMethodException | SecurityException e) {
+        throw new IllegalEntityException(type,
+            "Gets the default constructor failed,the Objet must contains a  [no-args&public constructor] ",
+            e);
+      }
+      final Field[] fields = type.getDeclaredFields();
+      typeTokenCache.put(type, new TypeAdapterConverter<>(constructor, fields, localConverterHandler));
     }
-    final Field[] fields = type.getDeclaredFields();
-    typeTokenCache.put(type, new TypeAdapterConverter<>(constructor, fields, localConverterHandler));
   }
 
   /**

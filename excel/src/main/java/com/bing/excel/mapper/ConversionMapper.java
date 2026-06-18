@@ -2,13 +2,13 @@ package com.bing.excel.mapper;
 
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.common.FieldRelation;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ConversionMapper {
 
-  private final Map<FieldRelation, FieldConverterMapper> fieldMapper = new HashMap<>();
-  private final Map<Class<?>, String> modelAlias = new HashMap<>();
+  private final Map<FieldRelation, FieldConverterMapper> fieldMapper = new ConcurrentHashMap<>();
+  private final Map<Class<?>, String> modelAlias = new ConcurrentHashMap<>();
 
   public ConversionMapper() {
   }
