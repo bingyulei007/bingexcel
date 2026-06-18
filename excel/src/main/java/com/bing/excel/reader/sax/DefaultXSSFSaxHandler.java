@@ -360,10 +360,8 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 				String formattedValue, XSSFComment comment)
 				 {
 			
-			if (!Strings.isNullOrEmpty(formattedValue)) {
-				int column = nameToColumn(cellReference);
-				rowList.add(new CellKV<String>(column, formattedValue));
-			}
+			int column = nameToColumn(cellReference);
+			rowList.add(new CellKV<String>(column, Strings.isNullOrEmpty(formattedValue) ? null : formattedValue));
 			
 		}
 

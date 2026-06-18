@@ -226,7 +226,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 			thisRow = brec.getRow();
 			thisColumn = brec.getColumn();
-			thisStr = "";
+			rowlist.add(new CellKV<String>(thisColumn, null));
 		} else if (BoolErrRecord.sid == sid) {
 			BoolErrRecord berec = (BoolErrRecord) record;
 
@@ -322,7 +322,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			MissingCellDummyRecord mc = (MissingCellDummyRecord) record;
 			curRow = thisRow = mc.getRow();
 			thisColumn = mc.getColumn();
-			//rowlist.add(new CellKV(thisColumn, ""));
+			rowlist.add(new CellKV<String>(thisColumn, null));
 		}
 		// 如果str非空
 			if(!Strings.isNullOrEmpty(thisStr)){
