@@ -48,9 +48,10 @@ bing.writeExcel("/path/to/output.xlsx", list);
 - [六、自定义转换器](#六自定义转换器)
 - [七、低级 API（流式读写）](#七低级-api流式读写)
 - [八、运行时配置](#八运行时配置)
-- [九、扩展开发指南](#九扩展开发指南)
-- [十、常见问题](#十常见问题)
-- [十一、更新日志](#十一更新日志)
+- [九、映射与转换器优先级](#九映射与转换器优先级)
+- [十、扩展开发指南](#十扩展开发指南)
+- [十一、常见问题](#十一常见问题)
+- [十二、更新日志](#十二更新日志)
 
 ---
 
@@ -237,7 +238,8 @@ public class User {
 - 仅**读取**方向支持 `aliasName` 匹配；**写入**时 `index` 必须 >= 0（否则抛 `IllegalCellConfigException`）。
 - 表头比较为严格相等匹配，不做 trim 或大小写无关。Excel 表头包含前后空格时匹配失败。
 - 同时设置 `index` 和 `aliasName` 时，`index` 优先（不会查表头）。
-- `startRow` 必须 >= 1（默认值），保证存在标题行可读取。
+- 通过 `addFieldConversionMapper(clazz, field, index, ...)` 给出显式 `index >= 0` 时，同样会覆盖 aliasName 匹配（详见 [§九 映射与转换器优先级](#九映射与转换器优先级)）。
+- `startRow` 必须 >= 1（默认值），保证存在标题行可读取；若所有 aliasName 字段都已被显式 index 覆盖，则 `startRow=0` 也可正常读取。
 - 表头匹配失败时抛出 `IllegalCellConfigException`，异常消息中包含 `available titles=[...]` 便于排查。
 
 #### @OutAlias
@@ -464,21 +466,22 @@ bing.writeCSV(os, list, ',', true, true);
 ### 6.1 转换器接口
 
 ```java
-import com.bing.excel.converter.FieldValueConverter;
-import com.bing.excel.converter ConverterHandler;
-import com.bing.excel.converter.OutValue;
+import com.bing.excel.converter.ConverterMatcher;
+import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.vo.OutValue;
 import java.lang.reflect.Type;
 
-public interface FieldValueConverter {
+// canConvert 继承自父接口 ConverterMatcher
+public interface FieldValueConverter extends ConverterMatcher {
     /**
-     * 判断是否支持该类型的转换
+     * 判断是否支持该类型的转换（来自 ConverterMatcher）
      */
     boolean canConvert(Class<?> clz);
 
     /**
      * 将字符串转换为目标类型（读取时调用）
      */
-    Object fromString(String cell, ConverterHandler converterHandler, Type type);
+    Object fromString(String cell, ConverterHandler converterHandler, Type targetType);
 
     /**
      * 将目标类型转换为 OutValue（导出时调用）
@@ -529,7 +532,7 @@ public class CustomDateConverter extends AbstractFieldConvertor {
 ```java
 BingExcel bing = BingExcelBuilder.toBuilder()
     .registerFieldConverter(LocalDate.class, new CustomDateConverter())
-    .builder();
+    .build();
 
 SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
 ```
@@ -648,7 +651,7 @@ BingExcel bing = BingExcelBuilder.toBuilder()
     .addFieldConversionMapper(Person.class, "name", 0, "姓名")
     .addFieldConversionMapper(Person.class, "age", 1, "年龄")
     .addFieldConversionMapper(Person.class, "salary", 2, "薪水")
-    .builder();
+    .build();
 ```
 
 **方法参数说明：**
@@ -664,7 +667,7 @@ BingExcel bing = BingExcelBuilder.toBuilder()
 BingExcel bing = BingExcelBuilder.toBuilder()
     .registerFieldConverter(LocalDate.class, new CustomDateConverter())
     .addFieldConversionMapper(Person.class, "name", 0, "姓名")
-    .builder();
+    .build();
 
 // 后续可直接使用
 SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
@@ -672,7 +675,67 @@ SheetVo<Person> vo = bing.readFile(file, Person.class, 1);
 
 ---
 
-## 九、扩展开发指南
+## 九、映射与转换器优先级
+
+BingExcel 提供四种配置方式：`@CellConfig`、`@BingConvertor`（注解），以及
+`addFieldConversionMapper`、`registerFieldConverter`（Builder 运行时注册）。当它们
+同时存在时，按以下三条相互独立的轴决定最终生效结果。
+
+### 9.1 字段映射来源：用户注册 > 注解（整字段替换）
+
+同一个字段的映射（列位置、别名、转换器）来源按优先级为：
+
+1. **`addFieldConversionMapper(...)`** —— Builder 运行时注册（用户自定义）
+2. **`@CellConfig` / `@BingConvertor`** —— 注解
+
+二者都存在时取**用户注册**，且这是**整字段替换**而非按属性合并：一旦对某字段调用了
+`addFieldConversionMapper`，该字段的注解映射会被**整体屏蔽**——你传入的 index / alias /
+converter 直接生效，未显式提供的属性**不会**回退到注解值（例如该字段上的 `@BingConvertor`
+会被一并丢弃）。因此用 Builder 注册某字段时，请在一次调用中给全它的完整映射。
+
+> **使用约定：同一字段（建议同一个类）只用一种方式 —— 注解或 Builder，不要混用。**
+> 能改实体类源码时优先用注解；不能改源码、或列序随场景变化、或希望把映射配置外置时，
+> 用 `addFieldConversionMapper` 并让整个类都走 Builder。
+
+### 9.2 列定位：显式 index > aliasName 表头匹配
+
+单个字段内部，列位置的确定规则：
+
+- `@CellConfig(index = N)` 且 `N >= 0` —— 直接按列索引 N 读取，**不查表头**；
+- 仅 `@CellConfig(aliasName = "...")`（index 为默认 -1）—— 读取时按表头文本匹配列。
+
+注意 9.1 与 9.2 的交叉：若通过 `addFieldConversionMapper(clazz, field, index, ...)` 给了
+显式 `index >= 0`，它会覆盖注解的 aliasName 匹配（用户注册整体替换了注解映射）。
+
+### 9.3 转换器：字段级 > 按类型注册 > 内置默认
+
+转换器的选择分三档，由高到低：
+
+1. **字段级转换器** —— `@BingConvertor`，或 `addFieldConversionMapper(..., converter)`
+   传入的转换器。两者都会让该字段“自带”转换器，优先级最高。
+2. **按类型注册** —— `registerFieldConverter(type, converter)`，按**字段类型**索引，
+   仅用于那些没有字段级转换器的字段。
+3. **内置全局默认** —— 框架自带的按类型默认转换器（见 [§六 内置转换器](#六自定义转换器)）。
+
+由此可推出一个易错点：若对某字段调用了不带 converter 的 `addFieldConversionMapper`
+重载（converter 为 null），该字段的注解 `@BingConvertor` 会因整字段替换而失效，转换器
+退回到第 2 / 3 档（按类型注册或内置默认），而非沿用注解里的转换器。这也是 9.1 “二选一”
+约定的又一理由。
+
+### 9.4 小结
+
+| 轴 | 高 → 低 |
+|----|---------|
+| 字段映射来源 | `addFieldConversionMapper` ＞ 注解（整字段替换） |
+| 列定位 | 显式 `index` ＞ `aliasName` 表头匹配 |
+| 转换器 | 字段级（`@BingConvertor` / Builder 传入）＞ `registerFieldConverter`（按类型）＞ 内置默认 |
+
+> 注：流式/事件读取（`BingExcelEvent`，已废弃）仅使用注解 mapper，不支持 Builder 注册的
+> 用户自定义映射；如需用户自定义映射请使用 `BingExcelImpl`（即 `BingExcelBuilder` 构建的实例）。
+
+---
+
+## 十、扩展开发指南
 
 本节介绍如何基于 BingExcel 进行二次开发。
 
@@ -693,7 +756,7 @@ public class ExcelConfig {
         return BingExcelBuilder.toBuilder()
             .registerFieldConverter(LocalDate.class, new CustomDateConverter())
             // 添加其他全局配置
-            .builder();
+            .build();
     }
 }
 ```
@@ -708,7 +771,7 @@ public class ExcelConfig {
 
 ---
 
-## 十、常见问题
+## 十一、常见问题
 
 ### Q1: 读取时如何跳过表头？
 
@@ -746,10 +809,16 @@ bing.writeCSV(os, list, ',', true, true);  // 最后一个参数 true 表示添�
 
 ---
 
-## 十一、更新日志
+## 十二、更新日志
 
 ### v4.1
 - 支持 `@CellConfig(aliasName=...)` 通过表头匹配列（仅读取方向，写入仍需显式 index）
+- aliasName 表头解析改为遵循与读取一致的 mapper 优先级（用户自定义 mapper 优先于注解）；
+  当用户通过 `addFieldConversionMapper` 提供显式 index 时，覆盖 aliasName 匹配，
+  且 `startRow=0` 时不再误判为“无表头可解析”而报错
+- 写出方向（Excel 数据/表头、CSV）遇到字段 index < 0 时统一抛 `IllegalCellConfigException`，
+  不再把负 index 继续向下传递
+- 新增“映射与转换器优先级”章节，说明注解与 Builder 注册并存时的生效规则
 
 ### v4.0
 - 升级依赖版本至最新稳定版

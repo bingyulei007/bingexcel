@@ -8,8 +8,16 @@ import java.io.InputStream;
 
 
 /**
- * @author shizhongtao
+ * Event-driven / streaming Excel read-write API.
  *
+ * <p><b>Deprecated.</b> This API only honours annotation-based mappers
+ * ({@code @CellConfig} / {@code @BingConvertor}); it has no entry point for
+ * registering user-defined mappers, so field overrides added via a builder do
+ * not apply here. For user-defined mapper support (custom index/alias/converter
+ * overrides), use {@link BingExcelBuilder} together with
+ * {@link com.bing.excel.core.impl.BingExcelImpl} instead.
+ *
+ * @author shizhongtao
  */
 @Deprecated
 public interface BingExcelEvent {

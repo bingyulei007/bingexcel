@@ -69,6 +69,20 @@ public class BingExcelBuilder implements ExcleBuilder<BingExcel> {
     return this;
   }
 
+  /**
+   * Registers a user-defined mapper for a single field. This builder is an
+   * <em>alternative</em> to annotations — a code-side way to declare alias,
+   * column index and converter without {@code @CellConfig}/{@code @BingConvertor}.
+   *
+   * <p><b>Use one mechanism per field — annotations OR this builder, not both;</b>
+   * prefer keeping a whole class on a single mechanism. A user mapper takes
+   * precedence over the annotation mapper as a per-field whole-replacement, not a
+   * per-property merge: once a field is registered here its {@code @CellConfig}
+   * mapper is fully masked — the supplied index/alias/converter are used as-is and
+   * unspecified properties do <em>not</em> fall back to annotation values (e.g. a
+   * {@code @BingConvertor} on the same field is dropped). Always provide the
+   * field's complete mapping in one call.
+   */
   @Override
   public ExcleBuilder<BingExcel> addFieldConversionMapper(Class<?> clazz,
       String filedName, int index) {

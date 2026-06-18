@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -127,6 +125,37 @@ public class ReadTestAlias {
     }
   }
 
+  @Test
+  public void readByAlias_userDefinedIndexOverridesMissingTitle() throws Exception {
+    BingExcel bing = BingExcelBuilder.toBuilder()
+        .addFieldConversionMapper(Person.class, "name", 0, "Name")
+        .addFieldConversionMapper(Person.class, "age", 1, "Age")
+        .addFieldConversionMapper(Person.class, "salary", 2, "Salary")
+        .build();
+    try (InputStream in = buildExcelStream("WrongName", "WrongAge", "WrongSalary")) {
+      SheetVo<Person> vo = bing.readStream(in, Person.class, 1);
+      List<Person> list = vo.getObjectList();
+      org.junit.Assert.assertEquals(3, list.size());
+      org.junit.Assert.assertEquals("Alice", list.get(0).getName());
+      org.junit.Assert.assertEquals(28, list.get(0).getAge());
+      org.junit.Assert.assertEquals(Double.valueOf(9000.0), list.get(0).getSalary());
+    }
+  }
+
+  @Test
+  public void readByAlias_userDefinedIndexAllowsStartRowZero() throws Exception {
+    BingExcel bing = BingExcelBuilder.toBuilder()
+        .addFieldConversionMapper(NameOnly.class, "name", 0, "Name")
+        .build();
+    try (InputStream in = buildExcelStream("WrongName", "WrongAge", "WrongSalary")) {
+      SheetVo<NameOnly> vo = bing.readStream(in, NameOnly.class, 0);
+      List<NameOnly> list = vo.getObjectList();
+      org.junit.Assert.assertEquals(4, list.size());
+      org.junit.Assert.assertEquals("WrongName", list.get(0).getName());
+      org.junit.Assert.assertEquals("Alice", list.get(1).getName());
+    }
+  }
+
   @Test(expected = IllegalCellConfigException.class)
   public void writeAliasOnly_throws() throws Exception {
     BingExcel bing = BingExcelBuilder.builderInstance();
@@ -135,6 +164,16 @@ public class ReadTestAlias {
     File tmp = File.createTempFile("alias_only_write", ".xlsx");
     tmp.deleteOnExit();
     bing.writeExcel(new FileOutputStream(tmp), list);
+  }
+
+  @Test(expected = IllegalCellConfigException.class)
+  public void writeCsvAliasOnly_throws() throws Exception {
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    List<Person> list = Lists.newArrayList();
+    list.add(new Person());
+    File tmp = File.createTempFile("alias_only_write", ".csv");
+    tmp.deleteOnExit();
+    bing.writeCSV(tmp.getAbsolutePath(), list);
   }
 
   @Test(expected = IllegalCellConfigException.class)
@@ -163,6 +202,13 @@ public class ReadTestAlias {
       return MoreObjects.toStringHelper(this).add("name", name)
           .add("age", age).add("salary", salary).toString();
     }
+  }
+
+  public static class NameOnly {
+    @CellConfig(aliasName = "Name")
+    private String name;
+
+    public String getName() { return name; }
   }
 
   /** Both index and aliasName set: index must take precedence. */

@@ -340,6 +340,15 @@ public class BingExcelImpl implements BingExcel {
 
   }
 
+  /**
+   * Registers a user-defined field mapper into {@link #userDefineMapperHandler}.
+   *
+   * <p>The user mapper wins over the annotation mapper via first-non-null handler
+   * precedence (see {@code unmarshal}/{@code marshal}). This is a whole-field
+   * replacement: the registered index/alias/converter fully mask the field's
+   * {@code @CellConfig} mapper and unspecified properties are not merged back
+   * from the annotation.
+   */
   @Override
   public void fieldConverter(Class<?> clazz, String filedName, int index, String alias,
       FieldValueConverter converter) {
@@ -455,8 +464,8 @@ public class BingExcelImpl implements BingExcel {
       if (tagertClazz != null && startRow >= 1 && curRow == startRow - 1
           && titleAliasResolver != null && !titleAliasResolver.isResolved()) {
         titleAliasResolver.captureTitleRow(rowList);
-        titleAliasResolver.resolve(tagertClazz, annotationMapperHandler,
-            currentSheetVo.getSheetIndex());
+        titleAliasResolver.resolve(tagertClazz, currentSheetVo.getSheetIndex(),
+            userDefineMapperHandler, annotationMapperHandler);
         return;
       }
       if (curRow < startRow) {
@@ -485,7 +494,9 @@ public class BingExcelImpl implements BingExcel {
           int conditionStartRow = conditions[i].getStartRow();
           if (tagertClazz != null) {
             registeAdapter(tagertClazz);
-            if (conditionStartRow == 0 && TitleAliasResolver.hasAliasOnlyFields(tagertClazz)) {
+            if (conditionStartRow == 0
+                && TitleAliasResolver.hasAliasOnlyFields(tagertClazz, userDefineMapperHandler,
+                    annotationMapperHandler)) {
               throw new IllegalCellConfigException("class[" + tagertClazz.getName()
                   + "] declares aliasName-based fields but startRow=0 means there is "
                   + "no title row to resolve against; set startRow>=1 or set an explicit "

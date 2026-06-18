@@ -49,6 +49,13 @@ import com.google.common.base.MoreObjects;
  * @version 1.0
  * @since JDK 1.7 文件名称：BingExcelImpl.java 类说明：
  * 初衷是建立一个大数据读写的操作类，最后综合考虑，暂时废弃
+ *
+ * <p><b>Deprecated.</b> Only the annotation mapper ({@link #ormMapper}, an
+ * {@link com.bing.excel.mapper.AnnotationMapperHandler}) is used here — there is
+ * no user-defined mapper handler, so {@code @CellConfig} / {@code @BingConvertor}
+ * annotations are honoured but builder-registered field overrides are not. Use
+ * {@link com.bing.excel.core.BingExcelBuilder} + {@link BingExcelImpl} for
+ * user-defined mapper support.
  */
 @Deprecated
 public class BingExcelEventImpl implements BingExcelEvent {
@@ -353,7 +360,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
             if (tagertClazz != null && startRow >= 1 && curRow == startRow - 1
                     && titleAliasResolver != null && !titleAliasResolver.isResolved()) {
                 titleAliasResolver.captureTitleRow(rowList);
-                titleAliasResolver.resolve(tagertClazz, ormMapper, sheetIndexOfCurrent());
+                titleAliasResolver.resolve(tagertClazz, sheetIndexOfCurrent(), ormMapper);
                 return;
             }
             if (curRow < startRow) {
@@ -389,7 +396,8 @@ public class BingExcelEventImpl implements BingExcelEvent {
                     int conditionStartRow = conditions[i].getStartRow();
                     if (tagertClazz != null) {
                         registeAdapter(tagertClazz);
-                        if (conditionStartRow == 0 && TitleAliasResolver.hasAliasOnlyFields(tagertClazz)) {
+                        if (conditionStartRow == 0
+                            && TitleAliasResolver.hasAliasOnlyFields(tagertClazz, ormMapper)) {
                             throw new IllegalCellConfigException("class["
                                 + tagertClazz.getName()
                                 + "] declares aliasName-based fields but startRow=0 means "

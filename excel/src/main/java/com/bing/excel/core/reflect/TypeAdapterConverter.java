@@ -112,6 +112,11 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
       if (fieldConverterMapper == null) {
         continue;
       }
+      if (fieldConverterMapper.getIndex() < 0) {
+        throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
+            + kv.getKey() + "] has no index and cannot be written; "
+            + "set an explicit index on @CellConfig for write direction.");
+      }
       line.addValue(fieldConverterMapper.getIndex(),
           fieldConverterMapper.getAlias());
     }
