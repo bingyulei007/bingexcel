@@ -366,7 +366,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 				optRows(sheetIndex, curRow, rowlist);
 
-			rowlist.clear();
+			rowlist = new ListRow();
 			if (lastRowNumber >= maxReadLine) {
 				startRead = false;
 			}
