@@ -15,6 +15,7 @@ import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,14 +25,17 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.xml.sax.SAXException;
 
+import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.reflect.TypeAdapterConverter;
+import com.bing.excel.exception.IllegalCellConfigException;
 import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.mapper.AnnotationMapperHandler;
+import com.bing.excel.mapper.ConversionMapper;
 import com.bing.excel.mapper.ConversionMapperBuilder;
 import com.bing.excel.mapper.UserDefineMapperHandler;
 import com.bing.excel.reader.AbstractExcelReadListener;
@@ -43,6 +47,7 @@ import com.bing.excel.vo.ListRow;
 import com.bing.excel.writer.ExcelWriterFactory;
 import com.bing.excel.writer.WriteHandler;
 import com.bing.utils.FileCreateUtils;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**
@@ -434,6 +439,8 @@ public class BingExcelImpl implements BingExcel {
     private int startRow = 0;// start to read from first lines;
     private List<SheetVo> list;
     private SheetVo currentSheetVo;
+    private Map<String, Integer> titleAliasToIndex;
+    private boolean titleResolved;
 
     public BingExcelReaderListener(ReaderCondition[] conditions, List<SheetVo> resultList) {
       super();
@@ -448,6 +455,13 @@ public class BingExcelImpl implements BingExcel {
 
     @Override
     public void optRow(int curRow, ListRow rowList) {
+      // aliasName → index resolution: capture the title row BEFORE the startRow skip,
+      // because startRow is "data starts here" — the title sits at startRow-1 when startRow>=1.
+      if (tagertClazz != null && startRow >= 1 && curRow == startRow - 1
+          && !titleResolved) {
+        captureTitleRow(rowList);
+        return;
+      }
       if (curRow < startRow) {
         return;
       }
@@ -467,16 +481,78 @@ public class BingExcelImpl implements BingExcel {
 
       tagertClazz = null;
       startRow = 0;
+      titleAliasToIndex = null;
+      titleResolved = false;
       for (int i = 0; i < conditions.length; i++) {
         if (conditions[i].getSheetIndex() == sheetIndex) {
           tagertClazz = conditions[i].getTargetClazz();
+          int conditionStartRow = conditions[i].getStartRow();
           if (tagertClazz != null) {
             registeAdapter(tagertClazz);
+            if (conditionStartRow == 0 && hasAliasOnlyFields(tagertClazz)) {
+              throw new IllegalCellConfigException("class[" + tagertClazz.getName()
+                  + "] declares aliasName-based fields but startRow=0 means there is "
+                  + "no title row to resolve against; set startRow>=1 or set an explicit "
+                  + "index on every @CellConfig.");
+            }
           }
-          startRow = conditions[i].getStartRow();
+          startRow = conditionStartRow;
           currentSheetVo = new SheetVo<>(sheetIndex, name);
           break;
         }
+      }
+    }
+
+    private void captureTitleRow(ListRow rowList) {
+      titleAliasToIndex = new HashMap<>();
+      for (CellKV<String> kv : rowList) {
+        if (kv.getValue() != null) {
+          titleAliasToIndex.put(kv.getValue(), kv.getIndex());
+        }
+      }
+      resolveAliasNamesToIndices(tagertClazz);
+      titleResolved = true;
+    }
+
+    /**
+     * Returns true if any @CellConfig-annotated declared field of clazz has index < 0
+     * and a non-empty aliasName. Used to fail fast when startRow=0 means no title row
+     * can resolve the aliasNames.
+     */
+    private boolean hasAliasOnlyFields(Class<?> clazz) {
+      for (Field field : clazz.getDeclaredFields()) {
+        CellConfig cellConfig = field.getAnnotation(CellConfig.class);
+        if (cellConfig == null) {
+          continue;
+        }
+        if (cellConfig.index() < 0 && !Strings.isNullOrEmpty(cellConfig.aliasName())) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void resolveAliasNamesToIndices(Class<?> clazz) {
+      for (Field field : clazz.getDeclaredFields()) {
+        CellConfig cellConfig = field.getAnnotation(CellConfig.class);
+        if (cellConfig == null) {
+          continue;
+        }
+        ConversionMapper.FieldConverterMapper mapper =
+            annotationMapperHandler.getLocalFieldConverterMapper(clazz, field.getName());
+        if (mapper == null || mapper.getIndex() >= 0) {
+          continue;
+        }
+        String userAlias = cellConfig.aliasName();
+        Integer found = titleAliasToIndex.get(userAlias);
+        if (found == null) {
+          throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
+              + field.getName() + "] with aliasName[" + userAlias
+              + "] was not found in the title row of sheet["
+              + currentSheetVo.getSheetIndex() + "]; available titles="
+              + titleAliasToIndex.keySet());
+        }
+        mapper.setIndex(found);
       }
     }
 

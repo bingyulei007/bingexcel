@@ -192,14 +192,13 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
     } else {
       index = cellConfig.index();
       //omitOutput=cellConfig.omitOutput();
-      alias = cellConfig.aliasName();
+      String userAlias = cellConfig.aliasName();
       readRequired = cellConfig.readRequired();
-      if (Strings.isNullOrEmpty(alias)) {
-        alias = field.getName();
-      }
-      if (index < 0) {
-        throw new IllegalCellConfigException("field[" + field.getName()
-            + "] has an error cellConfig,illegal index");
+      alias = Strings.isNullOrEmpty(userAlias) ? field.getName() : userAlias;
+      if (index < 0 && Strings.isNullOrEmpty(userAlias)) {
+        throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
+            + field.getName() + "] has an error cellConfig: either index>=0 "
+            + "or a non-empty aliasName is required");
       }
     }
     FieldValueConverter converter = null;

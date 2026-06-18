@@ -15,6 +15,7 @@ import com.bing.excel.converter.HeaderReflectConverter;
 import com.bing.excel.converter.ModelAdapter;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
+import com.bing.excel.exception.IllegalCellConfigException;
 import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.exception.illegalValueException;
 import com.bing.excel.mapper.ExcelConverterMapperHandler;
@@ -91,6 +92,11 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
       if (fieldConverterMapper == null) {
         continue;
       }
+      if (fieldConverterMapper.getIndex() < 0) {
+        throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
+            + kv.getKey() + "] has no index and cannot be written; "
+            + "set an explicit index on @CellConfig for write direction.");
+      }
       list.add(new CellKV<String>(fieldConverterMapper.getIndex(),
           fieldConverterMapper.getAlias()));
     }
@@ -119,6 +125,11 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
           fieldHandler);
       if (fieldConverterMapper == null) {
         continue;
+      }
+      if (fieldConverterMapper.getIndex() < 0) {
+        throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
+            + kv.getKey() + "] has no index and cannot be written; "
+            + "set an explicit index on @CellConfig for write direction.");
       }
 
       BoundField boundField = kv.getValue();

@@ -73,6 +73,10 @@ public class ConversionMapper {
       return index;
     }
 
+    public void setIndex(int index) {
+      this.index = index;
+    }
+
     public boolean isPrimitive() {
       return isPrimitive;
     }

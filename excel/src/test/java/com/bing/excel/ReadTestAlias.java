@@ -1,0 +1,189 @@
+package com.bing.excel;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.Test;
+
+import com.bing.excel.annotation.CellConfig;
+import com.bing.excel.core.BingExcel;
+import com.bing.excel.core.BingExcelBuilder;
+import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
+import com.bing.excel.exception.IllegalCellConfigException;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.Lists;
+
+/**
+ * Tests for the aliasName-based column matching feature.
+ *
+ * Excel fixtures are generated on-the-fly via POI to avoid committing binary files.
+ * Layout used: row 0 = header (Name, Age, Salary), rows 1-3 = data.
+ */
+public class ReadTestAlias {
+
+  private static final String[] HEADER = {"Name", "Age", "Salary"};
+  private static final Object[][] DATA = {
+      {"Alice", 28, 9000.0},
+      {"Bob", 35, 12500.5},
+      {"Carol", 42, 18000.75}};
+
+  private static InputStream buildExcelStream(String... titles) throws IOException {
+    XSSFWorkbook wb = new XSSFWorkbook();
+    Sheet sheet = wb.createSheet();
+    Row header = sheet.createRow(0);
+    for (int i = 0; i < titles.length; i++) {
+      header.createCell(i).setCellValue(titles[i]);
+    }
+    for (int r = 0; r < DATA.length; r++) {
+      Row row = sheet.createRow(r + 1);
+      for (int c = 0; c < titles.length && c < DATA[r].length; c++) {
+        Cell cell = row.createCell(c);
+        Object v = DATA[r][c];
+        if (v instanceof Number) {
+          cell.setCellValue(((Number) v).doubleValue());
+        } else {
+          cell.setCellValue(String.valueOf(v));
+        }
+      }
+    }
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    wb.write(baos);
+    wb.close();
+    return new ByteArrayInputStream(baos.toByteArray());
+  }
+
+  @Test
+  public void readByAlias_succeeds() throws Exception {
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream(HEADER)) {
+      SheetVo<Person> vo = bing.readStream(in, Person.class, 1);
+      List<Person> list = vo.getObjectList();
+      org.junit.Assert.assertEquals(3, list.size());
+      org.junit.Assert.assertEquals("Alice", list.get(0).getName());
+      org.junit.Assert.assertEquals(28, list.get(0).getAge());
+      org.junit.Assert.assertEquals(Double.valueOf(9000.0), list.get(0).getSalary());
+      org.junit.Assert.assertEquals("Bob", list.get(1).getName());
+      org.junit.Assert.assertEquals("Carol", list.get(2).getName());
+    }
+  }
+
+  @Test
+  public void readByAlias_explicitIndexWins() throws Exception {
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream(HEADER)) {
+      SheetVo<IndexedPerson> vo = bing.readStream(in, IndexedPerson.class, 1);
+      List<IndexedPerson> list = vo.getObjectList();
+      org.junit.Assert.assertEquals(3, list.size());
+      // index=0 → first column → "Alice", "Bob", "Carol"
+      org.junit.Assert.assertEquals("Alice", list.get(0).getName());
+      org.junit.Assert.assertEquals(28, list.get(0).getAge());
+      org.junit.Assert.assertEquals(Double.valueOf(9000.0), list.get(0).getSalary());
+    }
+  }
+
+  @Test(expected = IllegalCellConfigException.class)
+  public void readByAlias_titleMissing_throws() throws Exception {
+    // Drop the "Salary" column from the header so the aliasName "Salary" cannot resolve.
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream("Name", "Age")) {
+      bing.readStream(in, Person.class, 1);
+    }
+  }
+
+  @Test
+  public void readByAlias_titleMissing_messageHasAvailableTitles() throws Exception {
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream("Name", "Age")) {
+      bing.readStream(in, Person.class, 1);
+      org.junit.Assert.fail("expected IllegalCellConfigException");
+    } catch (IllegalCellConfigException e) {
+      String msg = e.getMessage();
+      org.junit.Assert.assertTrue(
+          "message should mention aliasName 'Salary': " + msg,
+          msg.contains("Salary"));
+      org.junit.Assert.assertTrue(
+          "message should mention 'available titles': " + msg,
+          msg.contains("available titles"));
+    }
+  }
+
+  @Test(expected = IllegalCellConfigException.class)
+  public void readByAlias_startRowZero_throws() throws Exception {
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream(HEADER)) {
+      // startRow=0 → no title row to resolve aliasNames against.
+      bing.readStream(in, Person.class, 0);
+    }
+  }
+
+  @Test(expected = IllegalCellConfigException.class)
+  public void writeAliasOnly_throws() throws Exception {
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    List<Person> list = Lists.newArrayList();
+    list.add(new Person());
+    File tmp = File.createTempFile("alias_only_write", ".xlsx");
+    tmp.deleteOnExit();
+    bing.writeExcel(new FileOutputStream(tmp), list);
+  }
+
+  @Test(expected = IllegalCellConfigException.class)
+  public void noIndexNoAlias_throwsAtRegistration() throws Exception {
+    // Without explicit index or aliasName, registration must fail.
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream(HEADER)) {
+      bing.readStream(in, BareFieldPerson.class, 1);
+    }
+  }
+
+  public static class Person {
+    @CellConfig(aliasName = "Name")
+    private String name;
+    @CellConfig(aliasName = "Age")
+    private int age;
+    @CellConfig(aliasName = "Salary")
+    private Double salary;
+
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public Double getSalary() { return salary; }
+
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this).add("name", name)
+          .add("age", age).add("salary", salary).toString();
+    }
+  }
+
+  /** Both index and aliasName set: index must take precedence. */
+  public static class IndexedPerson {
+    @CellConfig(index = 0, aliasName = "WrongName")
+    private String name;
+    @CellConfig(index = 1, aliasName = "WrongAge")
+    private int age;
+    @CellConfig(index = 2, aliasName = "WrongSalary")
+    private Double salary;
+
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public Double getSalary() { return salary; }
+  }
+
+  /** Neither index nor aliasName: registration must fail fast. */
+  public static class BareFieldPerson {
+    @CellConfig
+    private String name;
+
+    public String getName() { return name; }
+  }
+}
