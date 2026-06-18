@@ -230,9 +230,28 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 		} else if (BoolErrRecord.sid == sid) {
 			BoolErrRecord berec = (BoolErrRecord) record;
 
-			thisRow = berec.getRow();
+			curRow = thisRow = berec.getRow();
 			thisColumn = berec.getColumn();
-			thisStr = "";
+			String boolErrStr;
+			if (berec.isBoolean()) {
+				boolErrStr = String.valueOf(berec.getBooleanValue());
+			} else if (berec.isError()) {
+				switch (berec.getErrorValue()) {
+					case 0x00: boolErrStr = "#NULL!"; break;
+					case 0x07: boolErrStr = "#DIV/0!"; break;
+					case 0x0F: boolErrStr = "#VALUE!"; break;
+					case 0x17: boolErrStr = "#REF!"; break;
+					case 0x1D: boolErrStr = "#NAME?"; break;
+					case 0x24: boolErrStr = "#NUM!"; break;
+					case 0x2A: boolErrStr = "#N/A"; break;
+					default: boolErrStr = "#ERR(" + berec.getErrorValue() + ")"; break;
+				}
+			} else {
+				boolErrStr = null;
+			}
+			if (boolErrStr != null) {
+				rowlist.add(new CellKV<String>(thisColumn, boolErrStr));
+			}
 
 		} else if (FormulaRecord.sid == sid) {
 			FormulaRecord frec = (FormulaRecord) record;
@@ -306,9 +325,12 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 		} else if (RKRecord.sid == sid) {
 			RKRecord rkrec = (RKRecord) record;
 
-			thisRow = rkrec.getRow();
+			curRow = thisRow = rkrec.getRow();
 			thisColumn = rkrec.getColumn();
-			thisStr = '"' + "(TODO)" + '"';
+			value = String.valueOf(rkrec.getRKNumber());
+			if(!Strings.isNullOrEmpty(value)){
+				rowlist.add(new CellKV<String>(thisColumn, value));
+			}
 
 		}
 
