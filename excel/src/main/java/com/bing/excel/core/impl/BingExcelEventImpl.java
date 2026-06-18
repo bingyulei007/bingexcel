@@ -26,7 +26,6 @@ import com.bing.excel.vo.CellKV;
 import com.bing.excel.writer.ExcelWriterFactory;
 import com.bing.excel.writer.SXSSFWriterHandler;
 import com.bing.excel.writer.WriteHandler;
-import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingReadListener;
 import com.bing.excel.core.ReaderCondition;
@@ -35,7 +34,6 @@ import com.bing.excel.core.reflect.TypeAdapterConverter;
 import com.bing.excel.exception.IllegalCellConfigException;
 import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.mapper.AnnotationMapperHandler;
-import com.bing.excel.mapper.ConversionMapper;
 import com.bing.excel.reader.AbstractExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.ReadHandler;
@@ -43,7 +41,6 @@ import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.ListRow;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
 
 /**
  * 创建时间：2015-12-8上午11:56:30 项目名称：excel
@@ -337,8 +334,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
         private Class tagertClazz = null;
         private int startRow = 0;// start to read from first lines;
         private ModelInfo modelInfo;
-        private Map<String, Integer> titleAliasToIndex;
-        private boolean titleResolved;
+        private TitleAliasResolver titleAliasResolver;
 
         public BingExcelReaderListener(ReaderCondition[] conditions) {
             super();
@@ -355,8 +351,9 @@ public class BingExcelEventImpl implements BingExcelEvent {
             // aliasName → index resolution: capture the title row BEFORE the startRow skip,
             // because startRow is "data starts here" — the title sits at startRow-1 when startRow>=1.
             if (tagertClazz != null && startRow >= 1 && curRow == startRow - 1
-                    && !titleResolved) {
-                captureTitleRow(rowList);
+                    && titleAliasResolver != null && !titleAliasResolver.isResolved()) {
+                titleAliasResolver.captureTitleRow(rowList);
+                titleAliasResolver.resolve(tagertClazz, ormMapper, sheetIndexOfCurrent());
                 return;
             }
             if (curRow < startRow) {
@@ -372,7 +369,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
                         throw new NullPointerException("没有对应的适配器，无法转换");
                     }
                 } else {
-                    Object object = typeAdapter.unmarshal(rowList, ormMapper);
+                    Object object = typeAdapter.unmarshal(rowList, titleAliasResolver, ormMapper);
                     modelInfo.setRow(curRow);
                     listener.readModel(object, modelInfo);
                 }
@@ -385,73 +382,28 @@ public class BingExcelEventImpl implements BingExcelEvent {
 
             tagertClazz = null;
             startRow = 0;
-            titleAliasToIndex = null;
-            titleResolved = false;
+            titleAliasResolver = null;
             for (int i = 0; i < conditions.length; i++) {
                 if (conditions[i].getSheetIndex() == sheetIndex) {
                     tagertClazz = conditions[i].getTargetClazz();
                     int conditionStartRow = conditions[i].getStartRow();
                     if (tagertClazz != null) {
                         registeAdapter(tagertClazz);
-                        if (conditionStartRow == 0 && hasAliasOnlyFields(tagertClazz)) {
+                        if (conditionStartRow == 0 && TitleAliasResolver.hasAliasOnlyFields(tagertClazz)) {
                             throw new IllegalCellConfigException("class["
                                 + tagertClazz.getName()
                                 + "] declares aliasName-based fields but startRow=0 means "
                                 + "there is no title row to resolve against; set startRow>=1 "
                                 + "or set an explicit index on every @CellConfig.");
                         }
+                        if (conditionStartRow >= 1) {
+                            titleAliasResolver = new TitleAliasResolver();
+                        }
                     }
                     startRow = conditionStartRow;
                     modelInfo = new ModelInfo(sheetIndex, name);
                     break;
                 }
-            }
-        }
-
-        private void captureTitleRow(ListRow rowList) {
-            titleAliasToIndex = new HashMap<>();
-            for (CellKV<String> kv : rowList) {
-                if (kv.getValue() != null) {
-                    titleAliasToIndex.put(kv.getValue(), kv.getIndex());
-                }
-            }
-            resolveAliasNamesToIndices(tagertClazz);
-            titleResolved = true;
-        }
-
-        private boolean hasAliasOnlyFields(Class<?> clazz) {
-            for (Field field : clazz.getDeclaredFields()) {
-                CellConfig cellConfig = field.getAnnotation(CellConfig.class);
-                if (cellConfig == null) {
-                    continue;
-                }
-                if (cellConfig.index() < 0 && !Strings.isNullOrEmpty(cellConfig.aliasName())) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void resolveAliasNamesToIndices(Class<?> clazz) {
-            for (Field field : clazz.getDeclaredFields()) {
-                CellConfig cellConfig = field.getAnnotation(CellConfig.class);
-                if (cellConfig == null) {
-                    continue;
-                }
-                ConversionMapper.FieldConverterMapper mapper =
-                    ormMapper.getLocalFieldConverterMapper(clazz, field.getName());
-                if (mapper == null || mapper.getIndex() >= 0) {
-                    continue;
-                }
-                String userAlias = cellConfig.aliasName();
-                Integer found = titleAliasToIndex.get(userAlias);
-                if (found == null) {
-                    throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
-                        + field.getName() + "] with aliasName[" + userAlias
-                        + "] was not found in the title row of sheet[" + sheetIndexOfCurrent()
-                        + "]; available titles=" + titleAliasToIndex.keySet());
-                }
-                mapper.setIndex(found);
             }
         }
 

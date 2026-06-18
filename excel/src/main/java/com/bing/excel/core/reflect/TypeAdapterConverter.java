@@ -18,6 +18,7 @@ import com.bing.excel.exception.ConversionException;
 import com.bing.excel.exception.IllegalCellConfigException;
 import com.bing.excel.exception.IllegalEntityException;
 import com.bing.excel.exception.illegalValueException;
+import com.bing.excel.core.impl.TitleAliasResolver;
 import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
@@ -145,6 +146,15 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
 
   @Override
   public T unmarshal(ListRow source, ExcelConverterMapperHandler... fieldHandler) {
+    return unmarshal(source, null, fieldHandler);
+  }
+
+  /**
+   * Unmarshal with alias-name resolution. When {@code resolver} is non-null and has
+   * resolved indices, those take precedence over the cached mapper's index.
+   */
+  public T unmarshal(ListRow source, TitleAliasResolver resolver,
+      ExcelConverterMapperHandler... fieldHandler) {
     final Object obj;
     try {
       obj = constructor.newInstance();
@@ -168,7 +178,9 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
           setLocalConverter(converterMapper);
         }
 
-        int index = converterMapper.getIndex();
+        int index = resolver != null
+            ? resolver.getResolvedIndex(kv.getKey(), converterMapper)
+            : converterMapper.getIndex();
         String fieldValue = length > index ? fullArray[index] : null;
         boundField.initializeValue(obj, fieldValue, converterMapper);
       }
