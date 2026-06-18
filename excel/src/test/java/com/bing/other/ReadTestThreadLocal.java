@@ -57,7 +57,8 @@ public class ReadTestThreadLocal {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}*/
-			File f = new File("D:/50.8M.xlsx");
+			java.net.URL url = ThreadTest.class.getResource("/salary.xlsx");
+			File f = new File(url.getPath());
 			FileInputStream inputStream = null;
 			BufferedInputStream bufferedInputStream=null;
 			try {

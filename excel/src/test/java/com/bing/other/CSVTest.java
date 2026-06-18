@@ -21,7 +21,8 @@ import java.util.List;
 public class CSVTest {
   @Test
   public void csvWrite() throws IOException {
-    Writer out = new FileWriter(FileCreateUtils.createFile("/Users/shi/workspace/a.csv"));
+    String path = System.getProperty("java.io.tmpdir") + "CSVTest_a.csv";
+    Writer out = new FileWriter(FileCreateUtils.createFile(path));
     out.write(new String(new byte[] { (byte) 0xEF, (byte) 0xBB,(byte) 0xBF }));
 
     final String[] FILE_HEADER = {"ID", "我", "Gender", "Major"};
@@ -52,6 +53,7 @@ public class CSVTest {
 ps.add(new WriteTest2
         .Person(213,"你好",3.45));
 
-    excel.writeCSV("/Users/shi/workspace/ab.csv",ps);
+    String path = System.getProperty("java.io.tmpdir") + "CSVTest_ab.csv";
+    excel.writeCSV(path,ps);
   }
 }

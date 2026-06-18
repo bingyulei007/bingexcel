@@ -59,7 +59,7 @@ public class WriteTestSheetExcel {
 
    // bing.writeSheetsExcel("C:\\Users\\shi\\workspace/sheets.xlsx", seExcel1, seExcel2);
 
-     bing.writeSheetsExcel("/Users/shi/workspace/aa/adb.xlsx", seExcel2,seExcel1);
+     bing.writeSheetsExcel(System.getProperty("java.io.tmpdir") + "WriteTestSheetExcel_adb.xlsx", seExcel2,seExcel1);
     // bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);
   }
 

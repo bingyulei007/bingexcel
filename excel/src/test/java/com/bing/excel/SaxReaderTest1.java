@@ -22,7 +22,8 @@ public class SaxReaderTest1 {
 		//InputStream stream = Salary.class.getResourceAsStream("/salary6.xls");
 		//File f = new File("E:/aoptest/gzb.xls");
 		//File f = new File("E:/aoptest/bc.xlsx");
-		File f = new File("E:/aoptest/b.xlsx");
+		java.net.URL url = SaxReaderTest1.class.getResource("/salary.xlsx");
+		File f = new File(url.getPath());
 		//
 		System.out.println(System.currentTimeMillis());
 		ReadHandler saxHandler = ExcelReaderFactory.create(f, new ExcelReadListener() {

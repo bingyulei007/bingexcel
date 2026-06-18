@@ -19,7 +19,8 @@ import java.util.UUID;
 public class WriteHandlerTest {
   @Test
   public void test() {
-    WriteHandler handler = ExcelWriterFactory.createXSSF("D:/aa.xlsx");
+    String path = System.getProperty("java.io.tmpdir") + "WriteHandlerTest_aa.xlsx";
+    WriteHandler handler = ExcelWriterFactory.createXSSF(path);
     List<CellKV<String>> listStr = new ArrayList<CellKV<String>>();
     listStr.add(new CellKV<String>(0, "diyi"));
     listStr.add(new CellKV<String>(1, "date"));
@@ -33,8 +34,9 @@ public class WriteHandlerTest {
   }
   @Test
   public void test2() {
-    FileCreateUtils.deleteFile("/Users/shi/workspace/aa/bb.xlsx");
-    WriteHandler handler = ExcelWriterFactory.createXSSF("/Users/shi/workspace/aa/bb.xlsx");
+    String path = System.getProperty("java.io.tmpdir") + "WriteHandlerTest_bb.xlsx";
+    FileCreateUtils.deleteFile(path);
+    WriteHandler handler = ExcelWriterFactory.createXSSF(path);
     handler.createSheet("列表视图");
     ListLine listLine = new ListLine();
     listLine.addValue(0,"姓名").addValue(1,"性别");

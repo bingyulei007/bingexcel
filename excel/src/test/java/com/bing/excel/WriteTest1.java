@@ -29,7 +29,7 @@ public class WriteTest1 {
 		list.add(new Person(23, "nihoa", 234.9));
 		list.add(new Person(122, "noa", 23434.9));
 
-		bing.writeExcel("/Users/shi/workspace/aa/adb.xlsx", list);
+		bing.writeExcel(System.getProperty("java.io.tmpdir") + "WriteTest1_adb.xlsx", list);
 
 	//	bing.writeExcel("/Users/shi/workspace/aa/adb.xls", list);
 		//bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);

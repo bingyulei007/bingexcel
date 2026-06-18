@@ -15,7 +15,8 @@ import com.bing.excel.writer.WriteHandler;
 public class TestTest {
 	@Test
 	public void testme() {
-		WriteHandler handler = ExcelWriterFactory.createSXSSF("E:/aoptest/big.xlsx");
+		String path = System.getProperty("java.io.tmpdir") + "TestTest_big.xlsx";
+		WriteHandler handler = ExcelWriterFactory.createSXSSF(path);
 List<CellKV<String>> listStr=new ArrayList<>();
 listStr.add(new CellKV<String>(0, "diyi"));
 		handler.createSheet("aa");

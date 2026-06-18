@@ -64,14 +64,13 @@ public class WriteTest2 {
 		@Override
 		public void run() {
 
+			String tmp = System.getProperty("java.io.tmpdir");
 			if (Math.random() > 0.4) {
-				bing.writeExcel("D:/aoptest/adb"
+				bing.writeExcel(tmp + "WriteTest2_adb"
 						+ Thread.currentThread().getName() + ".xlsx", list,
 						list);
 			} else {
-				// chinamobile.writeExcel("E:/aoptest/adb"+Thread.currentThread().getName()+".xlsx",
-				// list);
-				bing.writeOldExcel("D:/aoptest/adb"
+				bing.writeOldExcel(tmp + "WriteTest2_adb"
 						+ Thread.currentThread().getName() + ".xls", list);
 			}
 			System.out.println("end:" + Thread.currentThread().getName());

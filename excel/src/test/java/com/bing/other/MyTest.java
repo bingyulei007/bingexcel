@@ -116,7 +116,8 @@ public class MyTest {
     	    ));
 
     	    // Write the output to a file
-    	    FileOutputStream fileOut = new FileOutputStream(new File("E:/aoptest/gzb.xls"));
+    	    String path = System.getProperty("java.io.tmpdir") + "MyTest_gzb.xls";
+    	    FileOutputStream fileOut = new FileOutputStream(new File(path));
     	    wb.write(fileOut);
     	    fileOut.close();
     	 

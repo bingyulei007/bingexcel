@@ -29,8 +29,8 @@ public class SaxReaderTest3 {
      */
     @Test
     public void testReadXlsFile() throws Exception {
-        // 使用项目中的xssf-align.xlsx测试
-        URL url = SaxReaderTest3.class.getResource("/xssf-align.xlsx");
+        // 使用项目中的salary.xlsx测试
+        URL url = SaxReaderTest3.class.getResource("/salary.xlsx");
         File file = new File(url.toURI());
 
         ReadHandler handler = ExcelReaderFactory.create(file, new ExcelReadListener() {

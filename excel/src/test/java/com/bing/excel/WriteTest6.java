@@ -42,7 +42,7 @@ public class WriteTest6 {
     list.add(person);
 
     //bing.writeExcel("/Users/shi/workspace/gaoxinqu/student.xlsx",list);
-    bing.writeCSV("/Users/shi/workspace/aa/student.csv",list);
+    bing.writeCSV(System.getProperty("java.io.tmpdir") + "WriteTest6_student.csv",list);
 
 
   }
@@ -75,7 +75,7 @@ public class WriteTest6 {
     String result = new String(os.toByteArray());
     System.out.println(result);
 
-    File file = new File("E:\\test.csv");
+    File file = new File(System.getProperty("java.io.tmpdir") + "WriteTest6_test.csv");
     FileOutputStream fileOutputStream = new FileOutputStream(file);
     fileOutputStream.write(os.toByteArray());
     fileOutputStream.close();

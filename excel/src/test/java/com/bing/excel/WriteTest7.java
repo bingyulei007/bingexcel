@@ -48,7 +48,7 @@ public class WriteTest7 {
     @Test
     public void testWriteXlsx() throws IOException {
         List<Person> list = createPersonList();
-        String path = "/Users/shi/workspace/aa/write_test_basic.xlsx";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_basic.xlsx";
         bing.writeExcel(path, list);
         System.out.println("xlsx导出成功: " + path);
     }
@@ -59,7 +59,7 @@ public class WriteTest7 {
     @Test
     public void testWriteXls() throws IOException {
         List<Person> list = createPersonList();
-        String path = "/Users/shi/workspace/aa/write_test_basic.xls";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_basic.xls";
         bing.writeOldExcel(path, list);
         System.out.println("xls导出成功: " + path);
     }
@@ -70,7 +70,7 @@ public class WriteTest7 {
     @Test
     public void testWriteToOutputStream() throws IOException {
         List<Person> list = createPersonList();
-        String path = "/Users/shi/workspace/aa/write_test_stream.xlsx";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_stream.xlsx";
 
         try (FileOutputStream fos = new FileOutputStream(path)) {
             bing.writeExcel(fos, list);
@@ -96,7 +96,7 @@ public class WriteTest7 {
         );
         sheet2.setList(deptList);
 
-        String path = "/Users/shi/workspace/aa/write_test_multi_sheets.xlsx";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_multi_sheets.xlsx";
         bing.writeSheetsExcel(path, sheet1, sheet2);
         System.out.println("多Sheet导出成功: " + path);
     }
@@ -107,7 +107,7 @@ public class WriteTest7 {
     @Test
     public void testWriteCSV() throws IOException {
         List<Person> list = createPersonList();
-        String path = "/Users/shi/workspace/aa/write_test_basic.csv";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_basic.csv";
         bing.writeCSV(path, list);
         System.out.println("CSV导出成功: " + path);
     }
@@ -118,7 +118,7 @@ public class WriteTest7 {
     @Test
     public void testWriteCSVWithConfig() throws IOException {
         List<Person> list = createPersonList();
-        String path = "/Users/shi/workspace/aa/write_test_custom_csv.csv";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_custom_csv.csv";
 
         try (FileOutputStream fos = new FileOutputStream(path)) {
             // 参数: stream, list, 分隔符, 是否带表头, 是否带BOM
@@ -138,7 +138,7 @@ public class WriteTest7 {
             new User("李四", false),
             new User("王五", true)
         );
-        String path = "/Users/shi/workspace/aa/write_test_converter.xlsx";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_converter.xlsx";
         bing.writeExcel(path, list);
         System.out.println("自定义转换器导出成功: " + path);
     }
@@ -149,7 +149,7 @@ public class WriteTest7 {
     @Test
     public void testWriteEmptyList() throws IOException {
         List<Person> list = new ArrayList<>();
-        String path = "/Users/shi/workspace/aa/write_test_empty.xlsx";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_empty.xlsx";
         bing.writeExcel(path, list);
         System.out.println("空列表导出成功: " + path);
     }
@@ -160,7 +160,7 @@ public class WriteTest7 {
      */
     @Test
     public void testWriteWithHandler() throws IOException {
-        String path = "/Users/shi/workspace/aa/write_test_handler.xlsx";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_handler.xlsx";
         WriteHandler handler = ExcelWriterFactory.createXSSF(path);
         handler.createSheet("用户管理");
 
@@ -198,7 +198,7 @@ public class WriteTest7 {
             .build();
 
         List<Person> list = createPersonList();
-        String path = "/Users/shi/workspace/aa/write_test_runtime_mapping.xlsx";
+        String path = System.getProperty("java.io.tmpdir") + "write_test_runtime_mapping.xlsx";
         bingWithMapping.writeExcel(path, list);
         System.out.println("运行时映射导出成功: " + path);
     }
