@@ -65,18 +65,25 @@ public class BingExcelImpl implements BingExcel {
    */
   private final ConverterHandler localConverterHandler;
   private AnnotationMapperHandler annotationMapperHandler = new AnnotationMapperHandler();
-  private UserDefineMapperHandler userDefineMapperHandler;
+  private volatile UserDefineMapperHandler userDefineMapperHandler;
 
   public BingExcelImpl(ConverterHandler localConverterHandler) {
     this.localConverterHandler = localConverterHandler;
   }
 
 
-  public synchronized UserDefineMapperHandler getUserDefineMapperHandler() {
-    if (userDefineMapperHandler == null) {
-      userDefineMapperHandler = new UserDefineMapperHandler(ConversionMapperBuilder.toBuilder());
+  public UserDefineMapperHandler getUserDefineMapperHandler() {
+    UserDefineMapperHandler h = userDefineMapperHandler;
+    if (h == null) {
+      synchronized (this) {
+        h = userDefineMapperHandler;
+        if (h == null) {
+          h = new UserDefineMapperHandler(ConversionMapperBuilder.toBuilder());
+          userDefineMapperHandler = h;
+        }
+      }
     }
-    return this.userDefineMapperHandler;
+    return h;
   }
 
   public BingExcelImpl() {
