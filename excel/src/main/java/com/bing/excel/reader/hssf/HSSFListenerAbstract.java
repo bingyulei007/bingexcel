@@ -146,9 +146,8 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 		try {
 			factory.processWorkbookEvents(request, fs);
-		} catch (IOException e) {
+		} finally {
 			closeFs();
-			throw e;
 		}
 	}
 
