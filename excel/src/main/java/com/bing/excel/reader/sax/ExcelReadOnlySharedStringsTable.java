@@ -9,57 +9,37 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
+import org.apache.poi.xssf.usermodel.XSSFRelation;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author shizhongtao
  *
  * date 2016-1-26
  * Description:  解决读取mac上xlsx结尾的excel文件读取中文问题
+ *
+ * 不再继承 ReadOnlySharedStringsTable，避免字段遮蔽和双重状态问题。
+ * 使用独立的 SAXParserFactory 替代 POI 的 XMLHelper，以兼容 Mac 生成的 xlsx 文件。
  */
-public class ExcelReadOnlySharedStringsTable extends ReadOnlySharedStringsTable {
+public class ExcelReadOnlySharedStringsTable extends DefaultHandler {
+
+	private int count;
+	private int uniqueCount;
+	private List<String> strings;
 
 	public ExcelReadOnlySharedStringsTable(OPCPackage pkg) throws IOException,
 			SAXException {
-		super(pkg);
-
+		ArrayList<org.apache.poi.openxml4j.opc.PackagePart> parts =
+				pkg.getPartsByContentType(XSSFRelation.SHARED_STRINGS.getContentType());
+		if (!parts.isEmpty()) {
+			readFrom(parts.get(0).getInputStream());
+		}
 	}
 
-
-	/**
-	 * An integer representing the total count of strings in the workbook. This
-	 * count does not include any numbers, it counts only the total of text
-	 * strings in the workbook.
-	 */
-	private int count;
-
-	/**
-	 * An integer representing the total count of unique strings in the Shared
-	 * String Table. A string is unique even if it is a copy of another string,
-	 * but has different formatting applied at the character level.
-	 */
-	private int uniqueCount;
-
-	/**
-	 * The shared strings table.
-	 */
-	private List<String> strings;
-
-	/**
-	 * Read this shared strings table from an XML file.
-	 * 
-	 * @param is
-	 *            The input stream containing the XML document.
-	 * @throws IOException
-	 *             if an error occurs while reading.
-	 * @throws SAXException
-	 */
 	public void readFrom(InputStream is) throws IOException, SAXException {
 		if (is.available() > 0) {
 			InputSource sheetSource = new InputSource(is);
@@ -76,35 +56,14 @@ public class ExcelReadOnlySharedStringsTable extends ReadOnlySharedStringsTable 
 		}
 	}
 
-	/**
-	 * Return an integer representing the total count of strings in the
-	 * workbook. This count does not include any numbers, it counts only the
-	 * total of text strings in the workbook.
-	 * 
-	 * @return the total count of strings in the workbook
-	 */
 	public int getCount() {
 		return this.count;
 	}
 
-	/**
-	 * Returns an integer representing the total count of unique strings in the
-	 * Shared String Table. A string is unique even if it is a copy of another
-	 * string, but has different formatting applied at the character level.
-	 * 
-	 * @return the total count of unique strings in the workbook
-	 */
 	public int getUniqueCount() {
 		return this.uniqueCount;
 	}
 
-	/**
-	 * Return the string at a given index. Formatting is ignored.
-	 * 
-	 * @param idx
-	 *            index of item to return.
-	 * @return the item at the specified position in this Shared String table.
-	 */
 	public String getEntryAt(int idx) {
 		return strings.get(idx);
 	}
@@ -112,8 +71,6 @@ public class ExcelReadOnlySharedStringsTable extends ReadOnlySharedStringsTable 
 	public List<String> getItems() {
 		return strings;
 	}
-
-	// // ContentHandler methods ////
 
 	private StringBuffer characters;
 	private boolean rPhIsOpen = false;

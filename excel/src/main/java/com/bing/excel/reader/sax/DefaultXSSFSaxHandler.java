@@ -71,16 +71,31 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 			this.handler = new DefaultSheetContentsHandler(
 					excelReadListener);
 		} catch (IllegalArgumentException  e) {
-			//异常是open方法抛出的。确保io关闭
-			pkg.revert();
+			if (this.pkg != null) {
+				pkg.revert();
+			}
+			throw e;
+		} catch (InvalidFormatException e) {
+			if (this.pkg != null) {
+				pkg.revert();
+			}
 			throw e;
 		}
 	}
 
 	public DefaultXSSFSaxHandler(InputStream in, ExcelReadListener excelReadListener,
 			boolean ignoreNumFormat) throws InvalidFormatException, IOException {
-		// 不应该调用？异常没有处理
-		this(OPCPackage.open(in), excelReadListener,ignoreNumFormat);
+		OPCPackage p = OPCPackage.open(in);
+		try {
+			this.pkg = p;
+			this.excelReadListener = excelReadListener;
+			this.ignoreNumFormat = ignoreNumFormat;
+			this.handler = new DefaultSheetContentsHandler(
+					excelReadListener);
+		} catch (Exception e) {
+			p.revert();
+			throw e;
+		}
 	}
 	public DefaultXSSFSaxHandler(OPCPackage pkg, ExcelReadListener excelReadListener,
 			boolean ignoreNumFormat) throws InvalidFormatException {
@@ -103,47 +118,40 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 		if (pkg == null) {
 			throw new NullPointerException("OPCPackage 对象为空");
 		}
-		XSSFReader xssfReader;
-		XSSFReader.SheetIterator sheets;
-		ExcelReadOnlySharedStringsTable strings;
 		try {
-			xssfReader = new XSSFReader(pkg);
-			sheets = (XSSFReader.SheetIterator) xssfReader
+			XSSFReader xssfReader = new XSSFReader(pkg);
+			XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) xssfReader
 					.getSheetsData();
-			strings = new ExcelReadOnlySharedStringsTable(
+			ExcelReadOnlySharedStringsTable strings = new ExcelReadOnlySharedStringsTable(
 					pkg);
-		} catch (IllegalArgumentException e1) {
-			pkg.revert();
-			throw e1;
-		}
-		int sheetIndex = 0;
-		
-		ExcelXSSFSheetXMLHandler sheetXMLHandler = new ExcelXSSFSheetXMLHandler(
-				xssfReader.getStylesTable(), strings, handler, false);
-		// 是不按照格式化输出字符
-		sheetXMLHandler.ignoreNumFormat(ignoreNumFormat);
-		getParser().setContentHandler(sheetXMLHandler);
-		while (sheets.hasNext()) {
-			try (InputStream sheet = sheets.next()) {
-				String name = sheets.getSheetName();
-				excelReadListener.startSheet(sheetIndex, name);
-				InputSource sheetSource = new InputSource(sheet);
+			int sheetIndex = 0;
 			
-				try {
-					getParser().parse(sheetSource);
-				} catch (SAXException e) {
-					if (e instanceof BingSaxReadStopException) {
-						
-					} else {
-						throw e;
+			ExcelXSSFSheetXMLHandler sheetXMLHandler = new ExcelXSSFSheetXMLHandler(
+					xssfReader.getStylesTable(), strings, handler, false);
+			sheetXMLHandler.ignoreNumFormat(ignoreNumFormat);
+			getParser().setContentHandler(sheetXMLHandler);
+			while (sheets.hasNext()) {
+				try (InputStream sheet = sheets.next()) {
+					String name = sheets.getSheetName();
+					excelReadListener.startSheet(sheetIndex, name);
+					InputSource sheetSource = new InputSource(sheet);
+				
+					try {
+						getParser().parse(sheetSource);
+					} catch (SAXException e) {
+						if (e instanceof BingSaxReadStopException) {
+							
+						} else {
+							throw e;
+						}
 					}
+					excelReadListener.endSheet(sheetIndex, name);
+					sheetIndex++;
 				}
-				excelReadListener.endSheet(sheetIndex, name);
-				sheetIndex++;
 			}
+		} finally {
+			pkg.revert();
 		}
-		//Close the package WITHOUT saving its content. Reinitialize this package and cancel all changes done to it.
-		pkg.revert();
 		excelReadListener.endWorkBook();
 	}
 
@@ -186,45 +194,47 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 			}
 		}
 		ImmutableSet<Integer> setSheets = build.build();
- 		XSSFReader xssfReader = new XSSFReader(pkg);
-		XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) xssfReader
-				.getSheetsData();
-		ExcelReadOnlySharedStringsTable strings = new ExcelReadOnlySharedStringsTable(
-				pkg);
-		int sheetIndex = 0;
-		
-		ExcelXSSFSheetXMLHandler sheetXMLHandler = new ExcelXSSFSheetXMLHandler(
-				xssfReader.getStylesTable(), strings, handler, false);
-		// 是不按照格式化输出字符
-		sheetXMLHandler.ignoreNumFormat(ignoreNumFormat);
-		getParser().setContentHandler(sheetXMLHandler);
-		while (sheets.hasNext()) {
-			try (InputStream sheet = sheets.next()) {
-				String name = sheets.getSheetName();
-				if (!setSheets.contains(sheetIndex)) {
-					sheetIndex++;
-					continue;
-				}
-				
-				
-				excelReadListener.startSheet(sheetIndex, name);
-				InputSource sheetSource = new InputSource(sheet);
-				
-				try {
-					getParser().parse(sheetSource);
-				} catch (SAXException e) {
-					if (e instanceof BingSaxReadStopException) {
-						
-					} else {
-						throw e;
+		try {
+	 		XSSFReader xssfReader = new XSSFReader(pkg);
+			XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) xssfReader
+					.getSheetsData();
+			ExcelReadOnlySharedStringsTable strings = new ExcelReadOnlySharedStringsTable(
+					pkg);
+			int sheetIndex = 0;
+			
+			ExcelXSSFSheetXMLHandler sheetXMLHandler = new ExcelXSSFSheetXMLHandler(
+					xssfReader.getStylesTable(), strings, handler, false);
+			sheetXMLHandler.ignoreNumFormat(ignoreNumFormat);
+			getParser().setContentHandler(sheetXMLHandler);
+			while (sheets.hasNext()) {
+				try (InputStream sheet = sheets.next()) {
+					String name = sheets.getSheetName();
+					if (!setSheets.contains(sheetIndex)) {
+						sheetIndex++;
+						continue;
 					}
+					
+					
+					excelReadListener.startSheet(sheetIndex, name);
+					InputSource sheetSource = new InputSource(sheet);
+					
+					try {
+						getParser().parse(sheetSource);
+					} catch (SAXException e) {
+						if (e instanceof BingSaxReadStopException) {
+							
+						} else {
+							throw e;
+						}
+					}
+					excelReadListener.endSheet(sheetIndex, name);
+					sheetIndex++;
 				}
-				excelReadListener.endSheet(sheetIndex, name);
-				sheetIndex++;
 			}
+			excelReadListener.endWorkBook();
+		} finally {
+			pkg.revert();
 		}
-		excelReadListener.endWorkBook();
-		pkg.revert();
 	}
 
 	@Override
@@ -240,43 +250,45 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 		if (pkg == null) {
 			throw new NullPointerException("OPCPackage 对象为空");
 		}
-		XSSFReader xssfReader = new XSSFReader(pkg);
-		XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) xssfReader
-				.getSheetsData();
-		ExcelReadOnlySharedStringsTable strings = new ExcelReadOnlySharedStringsTable(
-				pkg);
-		int sheetIndex = 0;
-		
-		ExcelXSSFSheetXMLHandler sheetXMLHandler = new ExcelXSSFSheetXMLHandler(
-				xssfReader.getStylesTable(), strings, handler, false);
-		// 是不按照格式化输出字符
-		sheetXMLHandler.ignoreNumFormat(ignoreNumFormat);
-		getParser().setContentHandler(sheetXMLHandler);
-		while (sheets.hasNext()) {
-			try (InputStream sheet = sheets.next()) {
-				String name = sheets.getSheetName();
-				
-				if (!name.equals(sheetName)) {
-					sheetIndex++;
-					continue;
-				}
-				excelReadListener.startSheet(sheetIndex, name);
-				InputSource sheetSource = new InputSource(sheet);
-				try {
-					getParser().parse(sheetSource);
-				} catch (SAXException e) {
-					if (e instanceof BingSaxReadStopException) {
-					} else {
-						throw e;
+		try {
+			XSSFReader xssfReader = new XSSFReader(pkg);
+			XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) xssfReader
+					.getSheetsData();
+			ExcelReadOnlySharedStringsTable strings = new ExcelReadOnlySharedStringsTable(
+					pkg);
+			int sheetIndex = 0;
+			
+			ExcelXSSFSheetXMLHandler sheetXMLHandler = new ExcelXSSFSheetXMLHandler(
+					xssfReader.getStylesTable(), strings, handler, false);
+			sheetXMLHandler.ignoreNumFormat(ignoreNumFormat);
+			getParser().setContentHandler(sheetXMLHandler);
+			while (sheets.hasNext()) {
+				try (InputStream sheet = sheets.next()) {
+					String name = sheets.getSheetName();
+					
+					if (!name.equals(sheetName)) {
+						sheetIndex++;
+						continue;
 					}
+					excelReadListener.startSheet(sheetIndex, name);
+					InputSource sheetSource = new InputSource(sheet);
+					try {
+						getParser().parse(sheetSource);
+					} catch (SAXException e) {
+						if (e instanceof BingSaxReadStopException) {
+						} else {
+							throw e;
+						}
+					}
+					excelReadListener.endSheet(sheetIndex, name);
+					sheetIndex++;
+					break;
 				}
-				excelReadListener.endSheet(sheetIndex, name);
-				sheetIndex++;
-				break;
 			}
+			excelReadListener.endWorkBook();
+		} finally {
+			this.pkg.revert();
 		}
-		excelReadListener.endWorkBook();
-		this.pkg.revert();
 	}
 
 	public XMLReader getParser() throws SAXException {
@@ -367,5 +379,5 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 
 	}
 
-	
-}
+		
+	}

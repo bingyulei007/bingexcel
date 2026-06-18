@@ -42,7 +42,7 @@ import com.google.common.collect.ImmutableSet;
  * @author shizhongtao
  *
  * date 2016-2-17
- * Description:  
+ * Description:
  */
 public abstract class HSSFListenerAbstract implements HSSFListener {
 	private POIFSFileSystem fs;
@@ -103,7 +103,22 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 	public HSSFListenerAbstract(String filename, ExcelReadListener excelReader)
 			throws IOException, FileNotFoundException, SQLException {
-		this(new POIFSFileSystem(new FileInputStream(filename)), excelReader);
+		this(filename, excelReader, false);
+	}
+
+	public HSSFListenerAbstract(String filename, ExcelReadListener excelReader,
+			boolean ignoreNumFormat) throws IOException, FileNotFoundException, SQLException {
+		FileInputStream fis = new FileInputStream(filename);
+		try {
+			this.fs = new POIFSFileSystem(fis);
+		} catch (IOException e) {
+			fis.close();
+			throw e;
+		}
+		this.curRow = 0;
+		this.rowlist = new ListRow();
+		this.excelReader = excelReader;
+		this.ignoreNumFormat = ignoreNumFormat;
 	}
 
 	// excel记录行操作方法，以sheet索引，行索引和行元素列表为参数，对sheet的一行元素进行操作，元素为String类型
@@ -129,9 +144,12 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			request.addListenerForAllRecords(workbookBuildingListener);
 		}
 
-		factory.processWorkbookEvents(request, fs);
-		
-		
+		try {
+			factory.processWorkbookEvents(request, fs);
+		} catch (IOException e) {
+			closeFs();
+			throw e;
+		}
 	}
 
 	/**
@@ -156,14 +174,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			}
 			if(boundSheetRecords.size()==(sheetIndex+1)){
 				excelReader.endWorkBook();
-				if(fs!=null){
-					try {
-						fs.close();
-					} catch (IOException e) {
-						//TODO something
-						//e.printStackTrace();
-					}
-				}
+				closeFs();
 			}
 		}else if (BOFRecord.sid == sid) {
 			BOFRecord br = (BOFRecord) record;
@@ -173,7 +184,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 					stubWorkbook = workbookBuildingListener
 							.getStubHSSFWorkbook();
 				}
-				
+
 				// Works by ordering the BSRs by the location of
 				// their BOFRecords, and then knowing that we
 				// process BOFRecords in byte offset order
@@ -184,7 +195,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 				}
 				sheetName = orderedBSRs[sheetIndex].getSheetname();
 				startRead = true;
-				
+
 				if (aimSheetName != null) {
 					if (aimSheetName != sheetName) {
 						startRead = false;
@@ -202,7 +213,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 					excelReader.startSheet(sheetIndex, sheetName);
 				}
 			}else if(br.getType() == BOFRecord.TYPE_WORKBOOK){
-				
+
 			}
 		} else if (!startRead) {
 			return;
@@ -281,7 +292,6 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 			thisRow = nrec.getRow();
 			thisColumn = nrec.getColumn();
-			// TODO==sid){Find object to match nrec.getShapeId()
 			thisStr = '"' + "(TODO)" + '"';
 		} else if (NumberRecord.sid == sid) {
 			NumberRecord numrec = (NumberRecord) record;
@@ -330,14 +340,25 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 			// 行结束时， 调用 optRows() 方法
 			lastColumnNumber = -1;
-			
+
 
 				optRows(sheetIndex, curRow, rowlist);
-			
+
 			rowlist.clear();
 			if (lastRowNumber >= maxReadLine) {
 				startRead = false;
 			}
+		}
+	}
+
+	private void closeFs() {
+		if (fs != null) {
+			try {
+				fs.close();
+			} catch (IOException e) {
+				// ignore
+			}
+			fs = null;
 		}
 	}
 
@@ -360,7 +381,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 	}
 
 	public void setAimSheetIndex(int[] aimSheetIndex) {
-		
+
 		ImmutableSet.Builder<Integer> build =ImmutableSet.builder();
 		for (int i = 0; i < aimSheetIndex.length; i++) {
 			if(aimSheetIndex[i]<0){

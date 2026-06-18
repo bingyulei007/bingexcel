@@ -72,8 +72,8 @@ public class DefaultHSSFHandler extends HSSFListenerAbstract implements
 	public DefaultHSSFHandler(String path, ExcelReadListener excelReader,
 			boolean ignoreNumFormat) throws FileNotFoundException, IOException,
 			SQLException {
-		this(new FileInputStream(path), excelReader, ignoreNumFormat);
-
+		super(path, excelReader, ignoreNumFormat);
+		this.excelReader = excelReader;
 	}
 
 	public DefaultHSSFHandler(InputStream in, ExcelReadListener excelReader,

@@ -18,7 +18,7 @@ import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
  * @author shizhongtao
  *
  * date 2016-3-1
- * Description:  
+ * Description:
  */
 public class ExcelReaderFactory {
 	/**
@@ -35,7 +35,12 @@ public class ExcelReaderFactory {
 		}
 		try {
 			POIFSFileSystem fs = new POIFSFileSystem(file);
-			return create(fs, excelReadListener, ignoreNumFormat);
+			try {
+				return create(fs, excelReadListener, ignoreNumFormat);
+			} catch (Exception e) {
+				fs.close();
+				throw e;
+			}
 		} catch (OfficeXmlFileException e) {
 			OPCPackage pkg = OPCPackage.open(file, PackageAccess.READ);
 			try {
@@ -59,8 +64,8 @@ public class ExcelReaderFactory {
 		return create(file, excelReader, false);
 
 	}
-	
-	
+
+
 	/**
 	 * @param inp
 	 * @param excelReader
@@ -76,7 +81,7 @@ public class ExcelReaderFactory {
 	/**
 	 * @param inp
 	 * @param excelReader
-	 * @param ignoreNumFormat 是否忽略数据格式  (default=false，按照格式读取) 
+	 * @param ignoreNumFormat 是否忽略数据格式  (default=false，按照格式读取)
 	 * @return  jie
 	 * @throws InvalidFormatException
 	 * @throws IOException
@@ -85,36 +90,46 @@ public class ExcelReaderFactory {
 	public static ReadHandler create(InputStream inp,
 			ExcelReadListener excelReader, boolean ignoreNumFormat)
 			throws InvalidFormatException, IOException, SQLException {
-		 // If clearly doesn't do mark/reset, wrap up
+			 // If clearly doesn't do mark/reset, wrap up
 
-        if (! inp.markSupported()) {
-            inp = new PushbackInputStream(inp, 8);
-        }
-		BufferedInputStream bis = new BufferedInputStream(inp);
-        // Ensure that there is at least some data there
-        byte[] header8 = IOUtils.peekFirst8Bytes(bis);
+	        if (! inp.markSupported()) {
+	            inp = new PushbackInputStream(inp, 8);
+	        }
+			BufferedInputStream bis = new BufferedInputStream(inp);
+	        // Ensure that there is at least some data there
+	        byte[] header8 = IOUtils.peekFirst8Bytes(bis);
 
 
 
-//        if (POIXMLDocument.hasOOXMLHeader(bis)) {
-//             OPCPackage pkg = OPCPackage.open(bis);
-//             return create(pkg, excelReader, ignoreNumFormat);
-//        }
+	//        if (POIXMLDocument.hasOOXMLHeader(bis)) {
+	//             OPCPackage pkg = OPCPackage.open(bis);
+	//             return create(pkg, excelReader, ignoreNumFormat);
+	//        }
 
-		InputStream is = FileMagic.prepareToCheckMagic(bis);
+			InputStream is = FileMagic.prepareToCheckMagic(bis);
 
-		FileMagic fm = FileMagic.valueOf(is);
+			FileMagic fm = FileMagic.valueOf(is);
 
-		switch (fm) {
-			case OLE2:
-				POIFSFileSystem fs = new POIFSFileSystem(is);
-				return create(fs, excelReader,ignoreNumFormat);
-			case OOXML:
-				return create(OPCPackage.open(is), excelReader, ignoreNumFormat);
-						//new XSSFWorkbook(OPCPackage.open(is));
-			default:
-				throw new InvalidFormatException("Your InputStream was neither an OLE2 stream, nor an OOXML stream");
-		}
+			switch (fm) {
+				case OLE2:
+					POIFSFileSystem fs = new POIFSFileSystem(is);
+					try {
+						return create(fs, excelReader,ignoreNumFormat);
+					} catch (Exception e) {
+						fs.close();
+						throw e;
+					}
+				case OOXML:
+					OPCPackage pkg = OPCPackage.open(is);
+					try {
+						return create(pkg, excelReader, ignoreNumFormat);
+					} catch (Exception e) {
+						pkg.revert();
+						throw e;
+					}
+				default:
+					throw new InvalidFormatException("Your InputStream was neither an OLE2 stream, nor an OOXML stream");
+			}
 	}
 
 	/**
@@ -145,7 +160,7 @@ public class ExcelReaderFactory {
 			InvalidFormatException, IOException {
 		DefaultXSSFSaxHandler handler = new DefaultXSSFSaxHandler(pkg,
 				excelReadListener, ignoreNumFormat);
-		
+
 		return handler;
 	}
 
@@ -166,7 +181,7 @@ public class ExcelReaderFactory {
 			ExcelReadListener excelReader, boolean ignoreNumFormat) throws SQLException {
 		DefaultHSSFHandler handler = new DefaultHSSFHandler(fs, excelReader,
 				ignoreNumFormat);
-		
+
 		return handler;
 	}
 }
