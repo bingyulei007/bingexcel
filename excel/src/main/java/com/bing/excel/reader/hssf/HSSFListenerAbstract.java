@@ -197,7 +197,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 				startRead = true;
 
 				if (aimSheetName != null) {
-					if (aimSheetName != sheetName) {
+					if (!aimSheetName.equals(sheetName)) {
 						startRead = false;
 					}
 				}
