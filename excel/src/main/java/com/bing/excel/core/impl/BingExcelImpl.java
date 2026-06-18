@@ -159,7 +159,7 @@ public class BingExcelImpl implements BingExcel {
       }
     }
     handler.readSheet(indexArr, minNum);
-    return resultList;
+    return resultList.size() == 0 ? Collections.emptyList() : resultList;
   }
 
   @Override
