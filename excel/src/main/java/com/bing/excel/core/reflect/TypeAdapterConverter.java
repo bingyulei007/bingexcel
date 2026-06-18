@@ -26,8 +26,6 @@ import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
 import com.google.common.primitives.Primitives;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * @author shizhongtao
  */
@@ -160,34 +158,8 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
         }
 
         int index = converterMapper.getIndex();
-        //add by leilei start
-        if(index < 0 && StringUtils.isNotBlank(converterMapper.getAlias())){
-        	for(CellKV<String> kv1 : source.getList()){
-        		if(kv1.getValue().equals(converterMapper.getAlias())){
-        			index = kv1.getIndex(); 
-        			try {
-						Field field = converterMapper.getClass().getDeclaredField("index");
-						field.setAccessible(true);
-						field.set(converterMapper, index);
-					} catch (NoSuchFieldException e) {
-						e.printStackTrace();
-					} catch (SecurityException e) {
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
-					}
-//						BeanUtils.setProperty(converterMapper, "index", index);
-        			break;
-        		}
-        	}
-        }
-       //add by leilei end
-        if(index >= 0){
-        	String fieldValue = length > index ? fullArray[index] : null;
-        	boundField.initializeValue(obj, fieldValue, converterMapper);
-        }
+        String fieldValue = length > index ? fullArray[index] : null;
+        boundField.initializeValue(obj, fieldValue, converterMapper);
       }
     }
     return (T) obj;

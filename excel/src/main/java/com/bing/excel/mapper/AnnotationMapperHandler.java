@@ -197,10 +197,10 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
       if (Strings.isNullOrEmpty(alias)) {
         alias = field.getName();
       }
-      /*if (index < 0) {
+      if (index < 0) {
         throw new IllegalCellConfigException("field[" + field.getName()
             + "] has an error cellConfig,illegal index");
-      }*/
+      }
     }
     FieldValueConverter converter = null;
     if (bingConvertor != null) {
