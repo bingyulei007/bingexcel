@@ -26,3 +26,12 @@ _config.yml
 
 # Claude Code
 CLAUDE.md
+
+# Local tooling
+.codegraph/
+.qoder/
+AGENTS.md
+
+# Build outputs
+target/
+**/target/

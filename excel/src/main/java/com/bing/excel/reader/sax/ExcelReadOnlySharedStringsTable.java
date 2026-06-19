@@ -29,7 +29,7 @@ public class ExcelReadOnlySharedStringsTable extends DefaultHandler {
 
 	private int count;
 	private int uniqueCount;
-	private List<String> strings;
+	private List<String> strings = new ArrayList<String>();
 
 	public ExcelReadOnlySharedStringsTable(OPCPackage pkg) throws IOException,
 			SAXException {
