@@ -27,6 +27,7 @@ BingExcel 是一个基于 Apache POI 的轻量级 Java Excel 工具库，用注�
 - [配置优先级](#配置优先级)
 - [底层 Handler API](#底层-handler-api)
 - [常见问题](#常见问题)
+- [作者与许可](#作者与许可)
 - [更新日志](#更新日志)
 
 ## 特性
@@ -498,6 +499,12 @@ bingExcel.writeCSV(output, people, ',', true, true);
 ### Q6：注解和 Builder 可以混用吗？
 
 不建议对同一个字段混用。Builder 注册字段映射后会整体替换该字段的注解映射，字段上的 `@BingConvertor` 也不会自动继承。
+
+## 作者与许可
+
+- 作者：shizhongtao（bingyulei008@gmail.com）
+- 版权：Copyright 2015 http://bingExcel.svend.cc
+- 许可协议：本项目基于 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) 开源发布，完整许可条款请参见 [LICENCE](LICENCE)。
 
 ## 更新日志
 
