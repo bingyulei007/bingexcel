@@ -22,8 +22,8 @@ import java.util.Queue;
 
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.poi.xssf.model.CommentsTable;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -43,8 +43,8 @@ import com.bing.excel.reader.usermodel.ExcelBuiltinFormats;
  * file, and generates row and cell events for it.
  */
 public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
-	private static final POILogger logger = POILogFactory
-			.getLogger(ExcelXSSFSheetXMLHandler.class);
+	private static final Logger logger = Logger
+			.getLogger(ExcelXSSFSheetXMLHandler.class.getName());
 
 	/**
 	 * These are the different kinds of cells we support. We keep track of the
@@ -225,7 +225,7 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 					// TODO Retrieve the shared formula and tweak it to
 					// match the current cell
 					if (formulasNotResults) {
-						logger.log(POILogger.WARN,
+						logger.log(Level.WARNING,
 								"shared formulas not yet supported!");
 					} else {
 						// It's a shared formula, so we can't get at the formula
@@ -348,7 +348,7 @@ public class ExcelXSSFSheetXMLHandler extends DefaultHandler {
 						thisStr = rtss.toString();
 					}
 					catch (NumberFormatException ex) {
-						logger.log(POILogger.ERROR, "Failed to parse SST index '" + sstIndex, ex);
+						logger.log(Level.SEVERE, "Failed to parse SST index '" + sstIndex, ex);
 					}
 					break;
 

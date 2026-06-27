@@ -44,25 +44,31 @@ BingExcel 是一个基于 Apache POI 的轻量级 Java Excel 工具库，用注�
 
 | 组件 | 版本 |
 | --- | --- |
-| JDK | 1.8+ |
-| Apache POI | 4.1.2 |
-| commons-lang3 | 3.14.0 |
-| commons-csv | 1.10.0 |
+| JDK | 17+ |
+| Apache POI | 5.4.1 |
+| commons-lang3 | 3.17.0 |
+| commons-csv | 1.11.0 |
 | JUnit（测试） | 4.13.2 |
 
 ## 安装
 
-Maven：
+本项目不再发布到 Maven 中央仓库，请在本地构建安装：
+
+```bash
+mvn clean install
+```
+
+这会将 `cn.com.binging:excel:5.0-SNAPSHOT` 安装到本地 `~/.m2` 仓库，随后可在本地其他工程中引用：
 
 ```xml
 <dependency>
     <groupId>cn.com.binging</groupId>
     <artifactId>excel</artifactId>
-    <version>4.0</version>
+    <version>5.0-SNAPSHOT</version>
 </dependency>
 ```
 
-> 如果你使用的是源码仓库中的最新未发布改动，请以 `excel/pom.xml` 中的版本号和本地构建产物为准。
+> 如需跳过测试加快安装：`mvn clean install -DskipTests`。
 
 ## 快速开始
 
@@ -510,6 +516,13 @@ bingExcel.writeCSV(output, people, ',', true, true);
 - 许可协议：本项目基于 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) 开源发布，完整许可条款请参见 [LICENCE](LICENCE)。
 
 ## 更新日志
+
+### v5.0-SNAPSHOT（未发布）
+
+- 升级 JDK 基线至 17；
+- Apache POI 升级至 5.4.1，并适配 4→5 的 API 变更；
+- commons-lang3 升级至 3.17.0、commons-csv 升级至 1.11.0；
+- 不再发布到 Maven 中央仓库，改为本地 `mvn install` 安装。
 
 ### v4.1（未发布）
 

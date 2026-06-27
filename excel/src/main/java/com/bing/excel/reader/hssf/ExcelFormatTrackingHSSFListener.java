@@ -32,8 +32,8 @@ import org.apache.poi.hssf.record.FormulaRecord;
 import org.apache.poi.hssf.record.NumberRecord;
 import org.apache.poi.hssf.record.Record;
 import org.apache.poi.util.LocaleUtil;
-import org.apache.poi.util.POILogFactory;
-import org.apache.poi.util.POILogger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.bing.excel.reader.usermodel.ExcelHSSFDataFormatter;
 import com.bing.excel.reader.usermodel.ExcelHSSFDataFormat;
@@ -51,7 +51,7 @@ import com.bing.excel.reader.usermodel.ExcelHSSFDataFormat;
  * Description:  
  */
 public class ExcelFormatTrackingHSSFListener implements HSSFListener {
-	private static POILogger logger = POILogFactory.getLogger(ExcelFormatTrackingHSSFListener.class);
+	private static Logger logger = Logger.getLogger(ExcelFormatTrackingHSSFListener.class.getName());
 	private final HSSFListener _childListener;
 	private final ExcelHSSFDataFormatter _formatter;
 	private final NumberFormat _defaultFormat;
@@ -151,7 +151,7 @@ public class ExcelFormatTrackingHSSFListener implements HSSFListener {
 		if (formatIndex >= ExcelHSSFDataFormat.getNumberOfBuiltinBuiltinFormats()) {
 			FormatRecord tfr = _customFormatRecords.get(Integer.valueOf(formatIndex));
 			if (tfr == null) {
-				logger.log( POILogger.ERROR, "Requested format at index " + formatIndex
+				logger.log(Level.SEVERE, "Requested format at index " + formatIndex
 						+ ", but it wasn't found");
 			} else {
 				format = tfr.getFormatString();
@@ -181,7 +181,7 @@ public class ExcelFormatTrackingHSSFListener implements HSSFListener {
 	public int getFormatIndex(CellValueRecordInterface cell) {
 		ExtendedFormatRecord xfr = _xfRecords.get(cell.getXFIndex());
 		if (xfr == null) {
-			logger.log( POILogger.ERROR, "Cell " + cell.getRow() + "," + cell.getColumn()
+			logger.log(Level.SEVERE, "Cell " + cell.getRow() + "," + cell.getColumn()
 					+ " uses XF with index " + cell.getXFIndex() + ", but we don't have that");
 			return -1;
 		}
