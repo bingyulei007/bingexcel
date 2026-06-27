@@ -25,6 +25,7 @@ E:/
 _config.yml
 
 # Claude Code
+.claude/
 CLAUDE.md
 
 # Local tooling

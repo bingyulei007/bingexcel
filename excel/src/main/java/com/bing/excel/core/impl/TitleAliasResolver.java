@@ -2,6 +2,7 @@ package com.bing.excel.core.impl;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import com.bing.excel.annotation.CellConfig;
@@ -41,7 +42,10 @@ public class TitleAliasResolver {
         titleAliasToIndex = new HashMap<>();
         for (CellKV<String> kv : rowList) {
             if (kv.getValue() != null) {
-                titleAliasToIndex.put(kv.getValue(), kv.getIndex());
+                String key = normalize(kv.getValue());
+                if (!key.isEmpty()) {
+                    titleAliasToIndex.put(key, kv.getIndex());
+                }
             }
         }
     }
@@ -70,7 +74,7 @@ public class TitleAliasResolver {
                 continue;
             }
             String userAlias = cellConfig.aliasName();
-            Integer found = titleAliasToIndex.get(userAlias);
+            Integer found = titleAliasToIndex.get(normalize(userAlias));
             if (found == null) {
                 throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
                     + field.getName() + "] with aliasName[" + userAlias
@@ -115,6 +119,19 @@ public class TitleAliasResolver {
             }
         }
         return mapper.getIndex();
+    }
+
+    /**
+     * Normalizes a title/alias for matching: trims surrounding whitespace and
+     * lower-cases using {@link Locale#ROOT} so that header cells like {@code " Name "}
+     * or {@code "name"} match an {@code aliasName = "Name"}. Returns the empty
+     * string for {@code null} or blank input.
+     */
+    private static String normalize(String title) {
+        if (title == null) {
+            return "";
+        }
+        return title.trim().toLowerCase(Locale.ROOT);
     }
 
     /**

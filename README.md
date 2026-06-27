@@ -214,9 +214,10 @@ public class User {
 注意：
 
 - 该能力仅用于读取；写出 Excel / CSV 时字段必须有合法的 `index`；
-- 表头按文本严格匹配，不会自动 trim，也不忽略大小写；
+- 表头匹配时会自动去除前后空白并忽略大小写，例如表头 ` Name ` 或 `name` 都能匹配 `aliasName = "Name"`；
+- 表头行必须位于 `startRow - 1`：常见用法是第 1 行为表头、`startRow = 1` 从第 2 行开始读取。若该行缺失或为空，按表头匹配的字段无法解析，读取数据行时会抛出 `IllegalCellConfigException`，而不会读到错位的数据；
+- 当表头中存在重名列时，`aliasName` 会绑定到最后一个同名列；
 - 同时配置 `index` 与 `aliasName` 时，优先使用 `index`，不会再查找表头；
-- `startRow` 需要让框架能够读取到表头。常见用法是第 1 行为表头、`startRow = 1` 从第 2 行开始读取；
 - 表头匹配失败时会抛出 `IllegalCellConfigException`，异常信息中包含可用表头，便于排查。
 
 ### 读取多个 Sheet
@@ -413,6 +414,8 @@ BingExcel 的映射和转换器配置由三条独立规则决定。
 
 需要特别注意：Builder 是“整字段替换”，不是“按属性合并”。一旦某个字段通过 `addFieldConversionMapper(...)` 注册，字段上的注解映射会被整体屏蔽，未传入的属性不会回退到注解值。
 
+> 以上优先级适用于 `BingExcel` 的 `readFile` / `readStream` 等读取接口。底层事件模型 `BingExcelEvent` 仅使用注解映射，不会应用 Builder 通过 `addFieldConversionMapper(...)` 注册的字段映射；需要 Builder 映射生效时请使用 `BingExcel` 的常规读取方法。
+
 ### 2. 列定位：显式 `index` 高于 `aliasName`
 
 读取时：
@@ -511,6 +514,8 @@ bingExcel.writeCSV(output, people, ',', true, true);
 ### v4.1（未发布）
 
 - 支持 `@CellConfig(aliasName = "...")` 通过表头匹配列（仅读取方向）；
+- 表头匹配时自动去除前后空白并忽略大小写；
+- 读取时若按表头匹配的字段未能解析出列索引（如表头行缺失），改为抛出 `IllegalCellConfigException`，不再以 `ArrayIndexOutOfBoundsException` 形式暴露；
 - 统一说明并修正注解映射、Builder 映射和转换器之间的优先级；
 - 写出 Excel / CSV 时遇到非法字段索引会抛出 `IllegalCellConfigException`，避免负索引继续向下传递。
 

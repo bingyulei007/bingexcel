@@ -61,6 +61,32 @@ public class ReadTestAlias {
     return new ByteArrayInputStream(baos.toByteArray());
   }
 
+  /**
+   * Builds a sheet with no header row: data rows start at {@code firstDataRow}, so row 0
+   * (the title row when startRow=1) is genuinely absent from the serialized XML and is
+   * never delivered to optRow.
+   */
+  private static InputStream buildExcelStreamDataOnly(int firstDataRow) throws IOException {
+    XSSFWorkbook wb = new XSSFWorkbook();
+    Sheet sheet = wb.createSheet();
+    for (int r = 0; r < DATA.length; r++) {
+      Row row = sheet.createRow(firstDataRow + r);
+      for (int c = 0; c < DATA[r].length; c++) {
+        Cell cell = row.createCell(c);
+        Object v = DATA[r][c];
+        if (v instanceof Number) {
+          cell.setCellValue(((Number) v).doubleValue());
+        } else {
+          cell.setCellValue(String.valueOf(v));
+        }
+      }
+    }
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    wb.write(baos);
+    wb.close();
+    return new ByteArrayInputStream(baos.toByteArray());
+  }
+
   @Test
   public void readByAlias_succeeds() throws Exception {
     BingExcel bing = BingExcelBuilder.builderInstance();
@@ -122,6 +148,50 @@ public class ReadTestAlias {
     try (InputStream in = buildExcelStream(HEADER)) {
       // startRow=0 → no title row to resolve aliasNames against.
       bing.readStream(in, Person.class, 0);
+    }
+  }
+
+  @Test
+  public void readByAlias_headerWithSurroundingSpaces_matches() throws Exception {
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream(" Name ", " Age ", " Salary ")) {
+      SheetVo<Person> vo = bing.readStream(in, Person.class, 1);
+      List<Person> list = vo.getObjectList();
+      org.junit.Assert.assertEquals(3, list.size());
+      org.junit.Assert.assertEquals("Alice", list.get(0).getName());
+      org.junit.Assert.assertEquals(28, list.get(0).getAge());
+      org.junit.Assert.assertEquals(Double.valueOf(9000.0), list.get(0).getSalary());
+    }
+  }
+
+  @Test
+  public void readByAlias_headerCaseDiffers_matches() throws Exception {
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream("name", "age", "salary")) {
+      SheetVo<Person> vo = bing.readStream(in, Person.class, 1);
+      List<Person> list = vo.getObjectList();
+      org.junit.Assert.assertEquals(3, list.size());
+      org.junit.Assert.assertEquals("Alice", list.get(0).getName());
+      org.junit.Assert.assertEquals(28, list.get(0).getAge());
+      org.junit.Assert.assertEquals(Double.valueOf(9000.0), list.get(0).getSalary());
+    }
+  }
+
+  @Test
+  public void readByAlias_titleRowAbsent_throwsReadable_notAioobe() throws Exception {
+    // The title row at startRow-1 (=0) is absent: data starts at row 1, so resolve()
+    // never runs and the alias-only fields keep index -1. Reading the first data row
+    // must throw IllegalCellConfigException, not ArrayIndexOutOfBoundsException.
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStreamDataOnly(1)) {
+      bing.readStream(in, Person.class, 1);
+      org.junit.Assert.fail("expected IllegalCellConfigException");
+    } catch (ArrayIndexOutOfBoundsException e) {
+      org.junit.Assert.fail("should throw IllegalCellConfigException, not AIOOBE: " + e);
+    } catch (IllegalCellConfigException e) {
+      org.junit.Assert.assertTrue(
+          "message should mention the unresolved field: " + e.getMessage(),
+          e.getMessage().contains("name"));
     }
   }
 

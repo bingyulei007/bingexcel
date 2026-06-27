@@ -186,6 +186,13 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
         int index = resolver != null
             ? resolver.getResolvedIndex(kv.getKey(), converterMapper)
             : converterMapper.getIndex();
+        if (index < 0) {
+          throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
+              + kv.getKey() + "] has no column index to read; if it relies on "
+              + "aliasName, the title row was not found at startRow-1 or did not "
+              + "contain '" + converterMapper.getAlias() + "'. Set startRow>=1 with "
+              + "a title row, or set an explicit index on @CellConfig.");
+        }
         String fieldValue = length > index ? fullArray[index] : null;
         boundField.initializeValue(obj, fieldValue, converterMapper);
       }
