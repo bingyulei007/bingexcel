@@ -9,7 +9,7 @@ import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
 import com.bing.excel.vo.OutValue;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author shizhongtao
@@ -70,7 +70,7 @@ public class ArrayConverter extends AbstractFieldConvertor {
 
 	@Override
 	public Object fromString(String cell,ConverterHandler converterHandler,Type targetType) {
-		if(Strings.isNullOrEmpty(cell)){
+		if(StringUtils.isEmpty(cell)){
 			return null;
 		}
 		if(targetType==null){

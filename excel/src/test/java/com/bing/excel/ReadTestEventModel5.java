@@ -19,7 +19,7 @@ import com.bing.excel.core.BingReadListener;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelEventImpl.ModelInfo;
 import com.bing.utils.StringParseUtil;
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 /**
  * @author shizhongtao
@@ -70,7 +70,7 @@ public class ReadTestEventModel5 {
 		
 
 		public String toString() {
-			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+			return ToStringHelper.of(this.getClass()).omitNullValues()
 					.add("employID", employID)
 					.add("atypiaDate", atypiaDate)
 					.add("entryTime", entryTime).toString();

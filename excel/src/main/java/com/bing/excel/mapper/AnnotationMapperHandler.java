@@ -14,8 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 
@@ -27,9 +25,9 @@ import com.bing.excel.exception.InitializationException;
 import com.bing.excel.annotation.BingConvertor;
 import com.bing.utils.ReflectDependencyFactory;
 
-import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import org.apache.commons.lang3.StringUtils;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * 创建时间：2015-12-11下午8:33:01 项目名称：excel
@@ -50,7 +48,7 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
   // private transient Object[] arguments;
 
   public AnnotationMapperHandler() {
-    converterCache = CacheBuilder.newBuilder().maximumSize(500)
+    converterCache = Caffeine.newBuilder().maximumSize(500)
         .expireAfterAccess(2, TimeUnit.MINUTES).build();
   }
 
@@ -194,8 +192,8 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
       //omitOutput=cellConfig.omitOutput();
       String userAlias = cellConfig.aliasName();
       readRequired = cellConfig.readRequired();
-      alias = Strings.isNullOrEmpty(userAlias) ? field.getName() : userAlias;
-      if (index < 0 && Strings.isNullOrEmpty(userAlias)) {
+      alias = StringUtils.isEmpty(userAlias) ? field.getName() : userAlias;
+      if (index < 0 && StringUtils.isEmpty(userAlias)) {
         throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
             + field.getName() + "] has an error cellConfig: either index>=0 "
             + "or a non-empty aliasName is required");
@@ -207,7 +205,7 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
       if (value != null) {
         try {
           converter = cacheConverter(bingConvertor, field.getType());
-        } catch (ExecutionException e) {
+        } catch (RuntimeException e) {
           throw new InitializationException("No " + value
               + " available");
         }
@@ -220,7 +218,7 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
   }
 
   private FieldValueConverter cacheConverter(final BingConvertor annotation,
-      final Class targetType) throws ExecutionException {
+      final Class targetType) {
     FieldValueConverter result = null;
     final Object[] args;
     final List<Object> parameter = new ArrayList<Object>();
@@ -250,18 +248,7 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
     final Class<? extends ConverterMatcher> converterType = annotation
         .value();
     Map<List<Object>, FieldValueConverter> converterMapping = converterCache
-        .get(converterType,
-            new Callable<Map<List<Object>, FieldValueConverter>>() {
-
-              @Override
-              public Map<List<Object>, FieldValueConverter> call()
-                  throws Exception {
-
-                Map<List<Object>, FieldValueConverter> converterMappingTemp = new HashMap<List<Object>, FieldValueConverter>();
-                return converterMappingTemp;
-              }
-
-            });
+        .get(converterType, k -> new HashMap<List<Object>, FieldValueConverter>());
     result = converterMapping.get(parameter);
     if (result == null) {
       int size = parameter.size();

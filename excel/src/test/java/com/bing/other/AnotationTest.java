@@ -15,9 +15,6 @@ import org.junit.Test;
 
 import com.bing.excel.annotation.OutAlias;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 public class AnotationTest {
 
 	@Test
@@ -55,11 +52,11 @@ public class AnotationTest {
 			return null;
 		}
 		if(type.equals(ArrayList.class)||type.equals(List.class)){
-			return Lists.newArrayList();
+			return new ArrayList<>();
 		}else if(type.equals(HashSet.class)||type.equals(Set.class)){
-			return Sets.newHashSet();
+			return new HashSet<>();
 		}else if(type.equals(LinkedList.class)){
-			return Lists.newArrayList();
+			return new ArrayList<>();
 		}else{
 			return null;
 		}

@@ -9,7 +9,7 @@ import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingExcelEventBuilder;
 import com.bing.excel.core.rw.BingWriterHandler;
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 /**
  * @author shizhongtao
@@ -93,7 +93,7 @@ public class WriteTest4 {
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this.getClass()).omitNullValues().add("name", name)
+      return ToStringHelper.of(this.getClass()).omitNullValues().add("name", name)
           .add("age", age).add("salary", salary).toString();
     }
   }
@@ -116,7 +116,7 @@ public class WriteTest4 {
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this).omitNullValues().add("schoolName", schoolName)
+      return ToStringHelper.of(this).omitNullValues().add("schoolName", schoolName)
           .add("className", className).add("name", name).toString();
     }
   }

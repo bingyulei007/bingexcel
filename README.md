@@ -48,6 +48,7 @@ BingExcel 是一个基于 Apache POI 的轻量级 Java Excel 工具库，用注�
 | Apache POI | 5.4.1 |
 | commons-lang3 | 3.17.0 |
 | commons-csv | 1.11.0 |
+| Caffeine | 3.2.3 |
 | JUnit（测试） | 4.13.2 |
 
 ## 安装
@@ -522,6 +523,7 @@ bingExcel.writeCSV(output, people, ',', true, true);
 - 升级 JDK 基线至 17；
 - Apache POI 升级至 5.4.1，并适配 4→5 的 API 变更；
 - commons-lang3 升级至 3.17.0、commons-csv 升级至 1.11.0；
+- 移除 Guava 依赖：缓存改用 Caffeine 3.2.3，工具类改用 JDK 与 commons-lang3；
 - 不再发布到 Maven 中央仓库，改为本地 `mvn install` 安装。
 
 ### v4.1（未发布）

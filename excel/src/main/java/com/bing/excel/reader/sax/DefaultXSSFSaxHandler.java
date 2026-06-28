@@ -22,8 +22,10 @@ import com.bing.excel.vo.CellKV;
 import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.reader.sax.ExcelXSSFSheetXMLHandler.BingSheetContentsHandler;
 import com.bing.excel.vo.ListRow;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author shizhongtao
@@ -185,7 +187,7 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 			throw new NullPointerException("OPCPackage is null");
 		}
 		//ImmutableCollection<Integer> sheetSelect=
-		ImmutableSet.Builder<Integer> build =ImmutableSet.builder();
+		Set<Integer> build = new HashSet<>();
 		for (int i : indexs) {
 			if(i<0){
 				throw new IllegalArgumentException("index of sheet is a number greater than 0");
@@ -193,7 +195,7 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 				build.add(i);
 			}
 		}
-		ImmutableSet<Integer> setSheets = build.build();
+		Set<Integer> setSheets = Set.copyOf(build);
 		try {
 	 		XSSFReader xssfReader = new XSSFReader(pkg);
 			XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) xssfReader
@@ -361,7 +363,7 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 				 {
 			
 			int column = nameToColumn(cellReference);
-			rowList.add(new CellKV<String>(column, Strings.isNullOrEmpty(formattedValue) ? null : formattedValue));
+			rowList.add(new CellKV<String>(column, StringUtils.isEmpty(formattedValue) ? null : formattedValue));
 			
 		}
 

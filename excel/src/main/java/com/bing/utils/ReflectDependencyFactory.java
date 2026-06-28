@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import com.google.common.primitives.Primitives;
+import org.apache.commons.lang3.ClassUtils;
 
 /**
  * @author shizhongtao
@@ -52,7 +52,7 @@ public class ReflectDependencyFactory {
 				Object dependency = args[i];
 				Class depType = dependency.getClass();
 				if (depType.isPrimitive()) {
-					depType = Primitives.wrap(depType);
+					depType = ClassUtils.primitiveToWrapper(depType);
 				} 
 				//传入之前，没有考虑null值的转换。
 
@@ -81,7 +81,7 @@ public class ReflectDependencyFactory {
 
 				for (int j = 0; j < parameterTypes.length; j++) {
 					if (parameterTypes[j].isPrimitive()) {
-						parameterTypes[j] = Primitives.wrap(parameterTypes[j]);
+						parameterTypes[j] = ClassUtils.primitiveToWrapper(parameterTypes[j]);
 					}
 				}
 

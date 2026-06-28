@@ -8,8 +8,8 @@ import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.Lists;
+import com.bing.utils.ToStringHelper;
+import java.util.ArrayList;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,7 +33,7 @@ public class WriteTest6 {
 
   @Test
   public void testWrite() throws IOException {
-    List<Person>  list= Lists.newArrayList();
+    List<Person>  list= new ArrayList<>();
 
     Person person = new Person(23, "wori",2.0);
     Person person2 = new Person(20, "lily",13.5);
@@ -51,7 +51,7 @@ public class WriteTest6 {
   public void csvWrite_semiColon_noHead() throws IOException {
     BingExcel bingExcel = BingExcelBuilder.toBuilder().build();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    List<ApiUsedNumForCSV>  list= Lists.newArrayList();
+    List<ApiUsedNumForCSV>  list= new ArrayList<>();
     ApiUsedNumForCSV api1 = new ApiUsedNumForCSV();
     api1.setDate("2018-10");
     api1.setOwnerId("5632643255427352877312350");
@@ -179,7 +179,7 @@ public class WriteTest6 {
       super();
     }
     public String toString() {
-      return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+      return ToStringHelper.of(this.getClass()).omitNullValues()
           .add("name", name).add("age", age).add("salary", salary)
           .toString();
     }
@@ -204,7 +204,7 @@ public class WriteTest6 {
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this).omitNullValues()
+      return ToStringHelper.of(this).omitNullValues()
           .add("schoolName", schoolName)
           .add("className", className)
           .add("name", name)

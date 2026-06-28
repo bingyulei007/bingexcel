@@ -13,8 +13,7 @@ import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.impl.BingExcelImpl.SheetExcel;
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.Lists;
+import com.bing.utils.ToStringHelper;
 
 /**
  * @author liluzhong
@@ -36,7 +35,7 @@ public class WriteTestSheetExcel {
 
     // 造数据 List<Person>
     SheetExcel seExcel1 = new SheetExcel();
-    List<Person> list = Lists.newArrayList();
+    List<Person> list = new ArrayList<>();
     list.add(new Person(23, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
     list.add(new Person(24, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
     list.add(new Person(25, RandomStringUtils.randomAlphanumeric(4), Math.random() * 1000));
@@ -44,7 +43,7 @@ public class WriteTestSheetExcel {
     seExcel1.setList(list);
 
     SheetExcel seExcel2 = new SheetExcel(); // 造数据 List<Student>
-    List<Student> list1 = Lists.newArrayList();
+    List<Student> list1 = new ArrayList<>();
 
     list1.add(new Student(RandomStringUtils.randomAlphanumeric(4),
         RandomStringUtils.randomAlphanumeric(4), RandomStringUtils.randomAlphanumeric(4)));
@@ -115,7 +114,7 @@ public class WriteTestSheetExcel {
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this.getClass()).omitNullValues().add("name", name)
+      return ToStringHelper.of(this.getClass()).omitNullValues().add("name", name)
           .add("age", age).add("salary", salary).toString();
     }
   }
@@ -138,7 +137,7 @@ public class WriteTestSheetExcel {
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this).omitNullValues().add("schoolName", schoolName)
+      return ToStringHelper.of(this).omitNullValues().add("schoolName", schoolName)
           .add("className", className).add("name", name).toString();
     }
   }

@@ -10,7 +10,7 @@ import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.exception.ConversionException;
 import com.bing.excel.mapper.BaseGlobalConverterMapper;
 
-import com.google.common.primitives.Primitives;
+import org.apache.commons.lang3.ClassUtils;
 
 public class LocalConverterHandler implements ConverterHandler {
 	private final Map<Class<?>, FieldValueConverter> defaultLocalConverter = Collections
@@ -23,7 +23,7 @@ public class LocalConverterHandler implements ConverterHandler {
 		if (converter.canConvert(clazz)) {
 
 			if (clazz.isPrimitive()) {
-				defaultLocalConverter.put(Primitives.wrap(clazz), converter);
+				defaultLocalConverter.put(ClassUtils.primitiveToWrapper(clazz), converter);
 			} else {
 				defaultLocalConverter.put(clazz, converter);
 			}

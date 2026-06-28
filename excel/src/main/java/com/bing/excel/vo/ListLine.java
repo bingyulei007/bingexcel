@@ -1,7 +1,5 @@
 package com.bing.excel.vo;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.ArrayList;
@@ -25,27 +23,27 @@ public class ListLine {
   @SuppressWarnings("unchecked")
   public List<CellKV<String>> getListStr() {
 
-    return listStr == null ? Collections.EMPTY_LIST : ImmutableList.copyOf(listStr);
+    return listStr == null ? Collections.EMPTY_LIST : List.copyOf(listStr);
   }
 
   @SuppressWarnings("unchecked")
   public List<CellKV<Double>> getListDouble() {
-    return listDouble == null ? Collections.EMPTY_LIST : ImmutableList.copyOf(listDouble);
+    return listDouble == null ? Collections.EMPTY_LIST : List.copyOf(listDouble);
   }
 
   @SuppressWarnings("unchecked")
   public List<CellKV<Boolean>> getListBoolean() {
-    return listBoolean == null ? Collections.EMPTY_LIST : ImmutableList.copyOf(listBoolean);
+    return listBoolean == null ? Collections.EMPTY_LIST : List.copyOf(listBoolean);
   }
 
   @SuppressWarnings("unchecked")
   public List<CellKV<Date>> getListDate() {
-    return listDate == null ? Collections.EMPTY_LIST : ImmutableList.copyOf(listDate);
+    return listDate == null ? Collections.EMPTY_LIST : List.copyOf(listDate);
   }
 
   @SuppressWarnings("unchecked")
   public List<CellKV<Long>> getListLong() {
-    return listLong == null ? Collections.EMPTY_LIST : ImmutableList.copyOf(listLong);
+    return listLong == null ? Collections.EMPTY_LIST : List.copyOf(listLong);
   }
   public Object[] toFullArray() {
     int maxIndex = this.getMaxIndex();

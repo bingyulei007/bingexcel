@@ -17,7 +17,7 @@ import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 /**
  * @author shizhongtao
@@ -63,7 +63,7 @@ public class ReadTestGlobalConverter6 {
 		private EmploryAttribute attribute;// 枚举类型
 
 		public String toString() {
-			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+			return ToStringHelper.of(this.getClass()).omitNullValues()
 					.add("id", id).add("employNum", employNum)
 					.add("attribute", attribute).toString();
 		}
@@ -74,7 +74,7 @@ public class ReadTestGlobalConverter6 {
 		private String value;
 
 		public String toString() {
-			return MoreObjects.toStringHelper(getClass()).add("key", key)
+			return ToStringHelper.of(getClass()).add("key", key)
 					.add("value", value).toString();
 		}
 

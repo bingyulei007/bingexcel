@@ -40,7 +40,7 @@ import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.ListRow;
 
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 /**
  * 创建时间：2015-12-8上午11:56:30 项目名称：excel
@@ -478,7 +478,7 @@ public class BingExcelEventImpl implements BingExcelEvent {
         @Override
         public String toString() {
 
-            return MoreObjects.toStringHelper(getClass()).omitNullValues()
+            return ToStringHelper.of(getClass()).omitNullValues()
                     .add("sheetName", sheetName).add("sheetIndex", sheetIndex)
                     .add("row", row).toString();
         }

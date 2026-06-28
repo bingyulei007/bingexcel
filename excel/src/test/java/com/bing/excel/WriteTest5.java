@@ -7,11 +7,11 @@ import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.annotation.OutAlias;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
 
 import java.util.List;
 
@@ -31,8 +31,8 @@ public class WriteTest5 {
 
   @Test
   public void testWrite() {
-    List<Person>  list= Lists.newArrayList();
-    List<Student>  listFriend= Lists.newArrayList();
+    List<Person>  list= new ArrayList<>();
+    List<Student>  listFriend= new ArrayList<>();
 
     Person person = new Person(23, "wori",3.45);
     Student obj1 = new Student("高中", "friends1","3.45");
@@ -97,7 +97,7 @@ public class WriteTest5 {
     }
 
     public String toString() {
-      return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+      return ToStringHelper.of(this.getClass()).omitNullValues()
           .add("name", name).add("age", age).add("salary", salary)
           .toString();
     }
@@ -122,7 +122,7 @@ public class WriteTest5 {
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this).omitNullValues()
+      return ToStringHelper.of(this).omitNullValues()
           .add("schoolName", schoolName)
           .add("className", className)
           .add("name", name)

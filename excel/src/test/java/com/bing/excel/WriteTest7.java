@@ -10,8 +10,7 @@ import com.bing.excel.core.impl.BingExcelImpl.SheetExcel;
 import com.bing.excel.vo.ListLine;
 import com.bing.excel.writer.ExcelWriterFactory;
 import com.bing.excel.writer.WriteHandler;
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.Lists;
+import com.bing.utils.ToStringHelper;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -243,7 +242,7 @@ public class WriteTest7 {
 
         @Override
         public String toString() {
-            return MoreObjects.toStringHelper(this)
+            return ToStringHelper.of(this)
                 .add("name", name)
                 .add("age", age)
                 .add("salary", salary)
@@ -273,7 +272,7 @@ public class WriteTest7 {
 
         @Override
         public String toString() {
-            return MoreObjects.toStringHelper(this)
+            return ToStringHelper.of(this)
                 .add("deptName", deptName)
                 .add("employeeCount", employeeCount)
                 .toString();
@@ -303,7 +302,7 @@ public class WriteTest7 {
 
         @Override
         public String toString() {
-            return MoreObjects.toStringHelper(this)
+            return ToStringHelper.of(this)
                 .add("name", name)
                 .add("active", active)
                 .toString();

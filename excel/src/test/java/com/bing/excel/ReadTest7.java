@@ -20,7 +20,7 @@ import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.utils.StringParseUtil;
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 /**
  * @author shizhongtao
@@ -64,7 +64,7 @@ public class ReadTest7 {
 		private String[] team;
 
 		public String toString() {
-			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+			return ToStringHelper.of(this.getClass()).omitNullValues()
 					.add("employNum", employNum)
 					.add("workingTime", workingTime).add("team", team)
 					.toString();

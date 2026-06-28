@@ -19,8 +19,8 @@ import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.excel.exception.IllegalCellConfigException;
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.Lists;
+import com.bing.utils.ToStringHelper;
+import java.util.ArrayList;
 
 /**
  * Tests for the aliasName-based column matching feature.
@@ -229,7 +229,7 @@ public class ReadTestAlias {
   @Test(expected = IllegalCellConfigException.class)
   public void writeAliasOnly_throws() throws Exception {
     BingExcel bing = BingExcelBuilder.builderInstance();
-    List<Person> list = Lists.newArrayList();
+    List<Person> list = new ArrayList<>();
     list.add(new Person());
     File tmp = File.createTempFile("alias_only_write", ".xlsx");
     tmp.deleteOnExit();
@@ -239,7 +239,7 @@ public class ReadTestAlias {
   @Test(expected = IllegalCellConfigException.class)
   public void writeCsvAliasOnly_throws() throws Exception {
     BingExcel bing = BingExcelBuilder.builderInstance();
-    List<Person> list = Lists.newArrayList();
+    List<Person> list = new ArrayList<>();
     list.add(new Person());
     File tmp = File.createTempFile("alias_only_write", ".csv");
     tmp.deleteOnExit();
@@ -269,7 +269,7 @@ public class ReadTestAlias {
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this).add("name", name)
+      return ToStringHelper.of(this).add("name", name)
           .add("age", age).add("salary", salary).toString();
     }
   }

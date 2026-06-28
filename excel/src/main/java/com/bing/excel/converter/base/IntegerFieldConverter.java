@@ -6,7 +6,7 @@ import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author shizhongtao
@@ -26,7 +26,7 @@ public final class IntegerFieldConverter extends AbstractFieldConvertor {
 	@Override
 	public Object fromString(String cell,ConverterHandler converterHandler,Type targetType) {
 
-		if (Strings.isNullOrEmpty(cell)) {
+		if (StringUtils.isEmpty(cell)) {
 			return null;
 		}
 		long value= Long.decode(cell).longValue();

@@ -10,7 +10,7 @@ import com.bing.excel.core.BingExcelEvent;
 import com.bing.excel.core.BingExcelEventBuilder;
 import com.bing.excel.core.rw.BingWriterHandler;
 
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 /**
  * @author shizhongtao
@@ -77,7 +77,7 @@ public class WriteTest3 {
         }
 
         public String toString() {
-            return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+            return ToStringHelper.of(this.getClass()).omitNullValues()
                     .add("name", name).add("age", age).add("salary", salary)
                     .toString();
         }

@@ -12,8 +12,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.DateUtil;
 
-import com.google.common.base.Strings;
-
 /**
  * @author shizhongtao
  *
@@ -40,7 +38,7 @@ public class StringParseUtil {
 	 */
 	public static boolean parseBoolean(String s) {
 
-		return ((!Strings.isNullOrEmpty(s) )&& toBoolean(s));
+		return ((!StringUtils.isEmpty(s) )&& toBoolean(s));
 	}
 
 	private static boolean toBoolean(String name) {
@@ -225,7 +223,7 @@ public class StringParseUtil {
 	}
 
 	public static Long parseInteger(String string, int radix) throws ParseException {
-		if (Strings.isNullOrEmpty(string)) {
+		if (StringUtils.isEmpty(string)) {
 			return null;
 		}
 		if (radix == 10) {

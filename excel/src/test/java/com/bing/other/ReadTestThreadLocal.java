@@ -14,7 +14,7 @@ import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.reader.ExcelReaderFactory;
 import com.bing.excel.reader.ReadHandler;
 import com.bing.excel.vo.ListRow;
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 public class ReadTestThreadLocal {
 
@@ -118,7 +118,7 @@ public class ReadTestThreadLocal {
 		}
 
 		public String toString() {
-			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+			return ToStringHelper.of(this.getClass()).omitNullValues()
 					.add("date", date).toString();
 		}
 	}

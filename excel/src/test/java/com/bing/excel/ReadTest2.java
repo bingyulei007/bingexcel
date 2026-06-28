@@ -19,7 +19,7 @@ import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 import com.bing.utils.StringParseUtil;
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 public class ReadTest2 {
 
@@ -77,7 +77,7 @@ public class ReadTest2 {
 		private transient String test;
 
 		public String toString() {
-			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+			return ToStringHelper.of(this.getClass()).omitNullValues()
 					.add("id", id).add("employNum", employNum)
 					.add("salary", salary).add("trueSalary", trueSalary)
 					.add("trueDate", trueDate)

@@ -1,7 +1,5 @@
 package com.bing.excel.vo;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -29,7 +27,7 @@ public class ListRow implements Iterable<CellKV<String>> {
 	public List<CellKV<String>> getList() {
 		if (list == null)
 			return Collections.emptyList();
-		return ImmutableList.copyOf(list);
+		return List.copyOf(list);
 	}
 
 	public ListRow add(CellKV<String> kv) {

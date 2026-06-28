@@ -13,7 +13,7 @@ import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
 
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 /**
  * @author shizhongtao
@@ -65,7 +65,7 @@ public class ReadTest4 {
 
 
 		public String toString() {
-			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+			return ToStringHelper.of(this.getClass()).omitNullValues()
 					.add("id", id).add("employNum", employNum)
 					.add("department", department)
 					.toString();
@@ -81,7 +81,7 @@ public class ReadTest4 {
 		private String num;
 
 		public String toString() {
-			return MoreObjects.toStringHelper(getClass()).add("name", name)
+			return ToStringHelper.of(getClass()).add("name", name)
 					.add("id", id).add("num", num).toString();
 		}
 	}

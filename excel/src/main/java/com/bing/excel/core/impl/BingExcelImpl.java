@@ -44,7 +44,6 @@ import com.bing.excel.vo.ListRow;
 import com.bing.excel.writer.ExcelWriterFactory;
 import com.bing.excel.writer.WriteHandler;
 import com.bing.utils.FileCreateUtils;
-import com.google.common.collect.Lists;
 
 /**
  * 创建时间：2015-12-8上午11:56:30 项目名称：excel
@@ -114,7 +113,7 @@ public class BingExcelImpl implements BingExcel {
   @SuppressWarnings({"rawtypes"})
   @Override
   public List<SheetVo> readFileToList(File file, ReaderCondition[] conditions) throws Exception {
-    List<SheetVo> resultList = Lists.newArrayList();
+    List<SheetVo> resultList = new ArrayList<>();
     BingExcelReaderListener listner = new BingExcelReaderListener(conditions, resultList);
     ReadHandler handler = ExcelReaderFactory.create(file, listner, true);
     int[] indexArr = new int[conditions.length];
@@ -146,7 +145,7 @@ public class BingExcelImpl implements BingExcel {
   @Override
   public List<SheetVo> readStreamToList(InputStream stream, ReaderCondition[] conditions)
       throws IOException, SQLException, OpenXML4JException, SAXException {
-    List<SheetVo> resultList = Lists.newArrayList();
+    List<SheetVo> resultList = new ArrayList<>();
     BingExcelReaderListener listner = new BingExcelReaderListener(conditions, resultList);
     ReadHandler handler = ExcelReaderFactory.create(stream, listner, true);
     int[] indexArr = new int[conditions.length];

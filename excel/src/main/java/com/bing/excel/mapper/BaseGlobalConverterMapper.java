@@ -19,7 +19,9 @@ import com.bing.excel.converter.base.LongFieldConverter;
 import com.bing.excel.converter.base.StringFieldConverter;
 import com.bing.excel.converter.collections.ArrayConverter;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 默认的全局转换类，先静态吧，容我想想
@@ -31,28 +33,25 @@ import com.google.common.collect.ImmutableMap;
  */
 public class BaseGlobalConverterMapper {
 
-  static ImmutableMap.Builder<Class<?>, FieldValueConverter> builder;
+  public final static Map<Class<?>, FieldValueConverter> globalFieldConverterMapper;
 
   static {
-    builder = ImmutableMap.builder();
-    builder.put(String.class, new StringFieldConverter());
-    builder.put(Date.class, new DateFieldConverter());
-    builder.put(Enum.class, new EnumConVerter());
-   // builder.put(Array.class, new ArrayConverter());
-    //builder.put(Collections.class,new ArrayConverter());
-
-    builder.put(Integer.class, new IntegerFieldConverter());
-    builder.put(Long.class, new LongFieldConverter());
-    builder.put(Boolean.class, new BooleanFieldConverter());
-    builder.put(Byte.class, new ByteFieldConverter());
-    builder.put(Character.class, new CharacterFieldConverter());
-    builder.put(Double.class, new DoubleFieldConverter());
-    builder.put(Float.class, new FloatFieldConverter());
-    builder.put(Short.class, new ShortFieldConverter());
-  //  builder.put(Collection.class, new CollectionConverter());
+    Map<Class<?>, FieldValueConverter> m = new HashMap<>();
+    m.put(String.class, new StringFieldConverter());
+    m.put(Date.class, new DateFieldConverter());
+    m.put(Enum.class, new EnumConVerter());
+    // m.put(Array.class, new ArrayConverter());
+    //m.put(Collections.class,new ArrayConverter());
+    m.put(Integer.class, new IntegerFieldConverter());
+    m.put(Long.class, new LongFieldConverter());
+    m.put(Boolean.class, new BooleanFieldConverter());
+    m.put(Byte.class, new ByteFieldConverter());
+    m.put(Character.class, new CharacterFieldConverter());
+    m.put(Double.class, new DoubleFieldConverter());
+    m.put(Float.class, new FloatFieldConverter());
+    m.put(Short.class, new ShortFieldConverter());
+    //  m.put(Collection.class, new CollectionConverter());
+    globalFieldConverterMapper = Collections.unmodifiableMap(m);
   }
-
-  public final static ImmutableMap<Class<?>, FieldValueConverter> globalFieldConverterMapper = builder
-      .build();
 
 }

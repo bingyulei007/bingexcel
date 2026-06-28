@@ -2,7 +2,7 @@ package com.bing.excel.vo;
 
 import javax.management.RuntimeOperationsException;
 
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 /**
  * @author shizhongtao
@@ -68,7 +68,7 @@ public class CellKV <T>{
 	 * return the same string if and only if they are equal.
 	 */
 	public String toString() {
-		return MoreObjects.toStringHelper(this).omitNullValues()
+		return ToStringHelper.of(this).omitNullValues()
 				.add("index", index).add("value", value).toString();
 	}
 

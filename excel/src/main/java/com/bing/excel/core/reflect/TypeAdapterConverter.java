@@ -26,7 +26,7 @@ import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.ListRow;
 import com.bing.excel.vo.OutValue;
 import com.bing.excel.vo.OutValue.OutType;
-import com.google.common.primitives.Primitives;
+import org.apache.commons.lang3.ClassUtils;
 
 /**
  * @author shizhongtao
@@ -219,9 +219,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
 
   private void setLocalConverter(FieldConverterMapper converterMapper) {
     // it is not good for wrap clazz in this place
-    Class<?> keyFieldType = converterMapper.isPrimitive() ? Primitives
-        .wrap(converterMapper.getFieldClass()) : converterMapper
-        .getFieldClass();
+    Class<?> keyFieldType = converterMapper.isPrimitive() ? ClassUtils.primitiveToWrapper(converterMapper.getFieldClass()) : converterMapper.getFieldClass();
     FieldValueConverter fieldValueConverter = defaultLocalConverterHandler
         .getLocalConverter(keyFieldType);
 

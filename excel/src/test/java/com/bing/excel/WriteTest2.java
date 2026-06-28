@@ -12,7 +12,7 @@ import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
-import com.google.common.base.MoreObjects;
+import com.bing.utils.ToStringHelper;
 
 public class WriteTest2 {
 	BingExcel bing;
@@ -122,7 +122,7 @@ public class WriteTest2 {
 		}
 
 		public String toString() {
-			return MoreObjects.toStringHelper(this.getClass()).omitNullValues()
+			return ToStringHelper.of(this.getClass()).omitNullValues()
 					.add("name", name).add("age", age).add("salary", salary)
 					.toString();
 		}

@@ -35,8 +35,10 @@ import com.bing.excel.reader.ExcelReadListener;
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListRow;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author shizhongtao
@@ -82,7 +84,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 	private boolean ignoreNumFormat = false;
 
 	private String aimSheetName = null;
-	ImmutableSet<Integer> aimSheetIndex;
+	Set<Integer> aimSheetIndex;
 	/**
 	 * 开始读取exclesheet标识
 	 */
@@ -288,7 +290,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			curRow = thisRow = lrec.getRow();
 			thisColumn = lrec.getColumn();
 			value = lrec.getValue().trim();
-			if(!Strings.isNullOrEmpty(value)){
+			if(!StringUtils.isEmpty(value)){
 				rowlist.add(new CellKV<String>(thisColumn, value));
 				}
 		} else if (LabelSSTRecord.sid == sid) {
@@ -301,7 +303,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			} else {
 				value = sstRecord.getString(lsrec.getSSTIndex()).toString()
 						.trim();
-				if(!Strings.isNullOrEmpty(value)){
+				if(!StringUtils.isEmpty(value)){
 					rowlist.add(new CellKV<String>(thisColumn, value));
 					}
 			}
@@ -318,7 +320,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			thisColumn = numrec.getColumn();
 			value = formatListener.formatNumberDateCell(numrec).trim();
 			// Format
-			if(!Strings.isNullOrEmpty(value)){
+			if(!StringUtils.isEmpty(value)){
 			rowlist.add(new CellKV<String>(thisColumn, value));
 			}
 		} else if (RKRecord.sid == sid) {
@@ -327,7 +329,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			curRow = thisRow = rkrec.getRow();
 			thisColumn = rkrec.getColumn();
 			value = String.valueOf(rkrec.getRKNumber());
-			if(!Strings.isNullOrEmpty(value)){
+			if(!StringUtils.isEmpty(value)){
 				rowlist.add(new CellKV<String>(thisColumn, value));
 			}
 
@@ -346,7 +348,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			rowlist.add(new CellKV<String>(thisColumn, null));
 		}
 		// 如果str非空
-			if(!Strings.isNullOrEmpty(thisStr)){
+			if(!StringUtils.isEmpty(thisStr)){
 				rowlist.add(new CellKV<String>(thisColumn, thisStr));
 				}
 
@@ -403,7 +405,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 	public void setAimSheetIndex(int[] aimSheetIndex) {
 
-		ImmutableSet.Builder<Integer> build =ImmutableSet.builder();
+		Set<Integer> build = new HashSet<>();
 		for (int i = 0; i < aimSheetIndex.length; i++) {
 			if(aimSheetIndex[i]<0){
 				throw new IllegalArgumentException("sheet 表的下标不能为负数");
@@ -411,7 +413,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 				build.add(aimSheetIndex[i]);
 			}
 		}
-		ImmutableSet<Integer> setSheets = build.build();
+		Set<Integer> setSheets = Set.copyOf(build);
 		this.aimSheetIndex = setSheets;
 	}
 

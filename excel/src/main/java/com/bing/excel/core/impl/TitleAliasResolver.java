@@ -11,7 +11,7 @@ import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListRow;
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Resolves {@link CellConfig#aliasName()} to actual column indices by reading
@@ -163,7 +163,7 @@ public class TitleAliasResolver {
             if (mapper != null && mapper.getIndex() >= 0) {
                 continue;
             }
-            if (cellConfig.index() < 0 && !Strings.isNullOrEmpty(cellConfig.aliasName())) {
+            if (cellConfig.index() < 0 && !StringUtils.isEmpty(cellConfig.aliasName())) {
                 return true;
             }
         }

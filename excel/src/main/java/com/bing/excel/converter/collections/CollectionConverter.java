@@ -14,9 +14,8 @@ import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.vo.OutValue;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author shizhongtao
@@ -67,7 +66,7 @@ public class CollectionConverter extends AbstractFieldConvertor {
 	@Override
 	public Object fromString(String cell, ConverterHandler converterHandler,
 			Type targetType) {
-		if(Strings.isNullOrEmpty(cell)){
+		if(StringUtils.isEmpty(cell)){
 			return null;
 		}
 		if(targetType==null){
@@ -99,11 +98,11 @@ public class CollectionConverter extends AbstractFieldConvertor {
 			return null;
 		}
 		if(type.equals(ArrayList.class)||type.equals(List.class)){
-			return Lists.newArrayList();
+			return new ArrayList<>();
 		}else if(type.equals(HashSet.class)||type.equals(Set.class)){
-			return Sets.newHashSet();
+			return new HashSet<>();
 		}else if(type.equals(LinkedList.class)){
-			return Lists.newArrayList();
+			return new ArrayList<>();
 		}else{
 			return null;
 		}

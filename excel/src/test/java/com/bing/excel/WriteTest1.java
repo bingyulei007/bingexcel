@@ -13,8 +13,8 @@ import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.converter.base.BooleanFieldConverter;
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.Lists;
+import com.bing.utils.ToStringHelper;
+import java.util.ArrayList;
 
 public class WriteTest1 {
 	BingExcel	 bing;
@@ -24,7 +24,7 @@ public class WriteTest1 {
 	}
 	@Test
 	public void testWrite() throws IOException {
-		List<Person> list = Lists.newArrayList();
+		List<Person> list = new ArrayList<>();
 		list.add(new Person(12, "nihoa", 23434.9));
 		list.add(new Person(23, "nihoa", 234.9));
 		list.add(new Person(122, "noa", 23434.9));
@@ -84,7 +84,7 @@ public class WriteTest1 {
 		}
 
 		public String toString() {
-			return MoreObjects.toStringHelper(this.getClass()).omitNullValues().add("name", name).add("age", age)
+			return ToStringHelper.of(this.getClass()).omitNullValues().add("name", name).add("age", age)
 					.add("salary", salary).toString();
 		}
 	}
