@@ -31,7 +31,6 @@ CLAUDE.md
 # Local tooling
 .codegraph/
 .qoder/
-AGENTS.md
 
 # Build outputs
 target/
