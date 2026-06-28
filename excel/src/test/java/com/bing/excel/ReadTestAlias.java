@@ -190,8 +190,8 @@ public class ReadTestAlias {
       org.junit.Assert.fail("should throw IllegalCellConfigException, not AIOOBE: " + e);
     } catch (IllegalCellConfigException e) {
       org.junit.Assert.assertTrue(
-          "message should mention the unresolved field: " + e.getMessage(),
-          e.getMessage().contains("name"));
+          "message should mention the unresolved required field: " + e.getMessage(),
+          e.getMessage().contains("salary") || e.getMessage().contains("Salary"));
     }
   }
 
@@ -260,7 +260,7 @@ public class ReadTestAlias {
     private String name;
     @CellConfig(aliasName = "Age")
     private int age;
-    @CellConfig(aliasName = "Salary")
+    @CellConfig(aliasName = "Salary", readRequired = true)
     private Double salary;
 
     public String getName() { return name; }
@@ -301,5 +301,48 @@ public class ReadTestAlias {
     private String name;
 
     public String getName() { return name; }
+  }
+
+  // ---- Tests for optional aliasName fields (not readRequired) ----
+
+  @Test
+  public void readByAlias_optionalFieldMissing_returnsNull() throws Exception {
+    // Non-required aliasName fields should NOT throw when the header column is
+    // missing; the field simply stays null.
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream("NameOnly")) {
+      SheetVo<OptionalPerson> vo = bing.readStream(in, OptionalPerson.class, 1);
+      List<OptionalPerson> list = vo.getObjectList();
+      org.junit.Assert.assertEquals(3, list.size());
+      org.junit.Assert.assertEquals("Alice", list.get(0).getName());
+      // "Age" column is missing → should be null (not throw)
+      org.junit.Assert.assertNull(list.get(0).getAge());
+      org.junit.Assert.assertEquals("Bob", list.get(1).getName());
+      org.junit.Assert.assertNull(list.get(1).getAge());
+    }
+  }
+
+  @Test
+  public void readByAlias_optionalFieldMissing_requiredStillThrows() throws Exception {
+    // Person has Salary with readRequired=true → missing "Salary" header still throws.
+    BingExcel bing = BingExcelBuilder.builderInstance();
+    try (InputStream in = buildExcelStream("Name", "Age")) {
+      bing.readStream(in, Person.class, 1);
+      org.junit.Assert.fail("expected IllegalCellConfigException for required field Salary");
+    } catch (IllegalCellConfigException e) {
+      org.junit.Assert.assertTrue(
+          "message should mention 'required': " + e.getMessage(),
+          e.getMessage().contains("required"));
+    }
+  }
+
+  public static class OptionalPerson {
+    @CellConfig(aliasName = "NameOnly")
+    private String name;
+    @CellConfig(aliasName = "Age")
+    private Integer age;
+
+    public String getName() { return name; }
+    public Integer getAge() { return age; }
   }
 }

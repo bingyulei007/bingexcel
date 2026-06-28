@@ -76,10 +76,15 @@ public class TitleAliasResolver {
             String userAlias = cellConfig.aliasName();
             Integer found = titleAliasToIndex.get(normalize(userAlias));
             if (found == null) {
-                throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
-                    + field.getName() + "] with aliasName[" + userAlias
-                    + "] was not found in the title row of sheet[" + sheetIndex
-                    + "]; available titles=" + titleAliasToIndex.keySet());
+                // 仅对必填字段报错，可选字段允许列缺失（字段保持 null）
+                if (mapper.isReadRequired()) {
+                    throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
+                        + field.getName() + "] with aliasName[" + userAlias
+                        + "] is required but was not found in the title row of sheet["
+                        + sheetIndex + "]; available titles=" + titleAliasToIndex.keySet());
+                }
+                // optional field with alias not found → skip (remain null)
+                continue;
             }
             resolvedFieldIndices.put(field.getName(), found);
         }

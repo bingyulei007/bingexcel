@@ -222,10 +222,8 @@ public class User {
 
 - 该能力仅用于读取；写出 Excel / CSV 时字段必须有合法的 `index`；
 - 表头匹配时会自动去除前后空白并忽略大小写，例如表头 ` Name ` 或 `name` 都能匹配 `aliasName = "Name"`；
-- 表头行必须位于 `startRow - 1`：常见用法是第 1 行为表头、`startRow = 1` 从第 2 行开始读取。若该行缺失或为空，按表头匹配的字段无法解析，读取数据行时会抛出 `IllegalCellConfigException`，而不会读到错位的数据；
-- 当表头中存在重名列时，`aliasName` 会绑定到最后一个同名列；
-- 同时配置 `index` 与 `aliasName` 时，优先使用 `index`，不会再查找表头；
-- 表头匹配失败时会抛出 `IllegalCellConfigException`，异常信息中包含可用表头，便于排查。
+- 表头行必须位于 `startRow - 1`：常见用法是第 1 行为表头、`startRow = 1` 从第 2 行开始读取；
+- 表头匹配失败时：如果字段的 `readRequired = false`（默认），跳过该字段、值保持 `null`；如果 `readRequired = true`，抛出 `IllegalCellConfigException`，异常信息中包含可用表头，便于排查；
 
 ### 读取多个 Sheet
 
@@ -356,9 +354,9 @@ public class LocalDateConverter extends AbstractFieldConvertor {
     @Override
     public OutValue toObject(Object source, ConverterHandler converterHandler) {
         if (source == null) {
-            return new OutValue("");
+            return OutValue.stringValue("");
         }
-        return new OutValue(((LocalDate) source).format(FORMATTER));
+        return OutValue.stringValue(((LocalDate) source).format(FORMATTER));
     }
 }
 ```
@@ -465,7 +463,8 @@ handler.writeLine(new ListLine()
     .addValue(1, "男")
     .addValue(2, 25));
 
-handler.setDataValidationList(1, 1000, 1, 1, new String[] {"男", "女", "其他"});
+handler.setDataValidationList((short) 1, (short) 1000, (short) 1, (short) 1,
+    new String[] {"男", "女", "其他"});
 handler.flush();
 ```
 
