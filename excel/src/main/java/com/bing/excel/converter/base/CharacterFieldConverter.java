@@ -25,9 +25,9 @@ public final class CharacterFieldConverter extends AbstractFieldConvertor {
 			return null;
 		}
 		 if (cell.length() == 0) {
-	            return new Character('\0');
-	        } else {
-	            return new Character(cell.charAt(0));
+            return '\0';
+        } else {
+            return cell.charAt(0);
 	        }
 	}
 

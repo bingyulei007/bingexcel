@@ -154,6 +154,7 @@ public class ExcelBuiltinFormats {
 	/**
 	 * @deprecated (May 2009) use {@link #getAll()}
 	 */
+	@Deprecated
 	public static Map<Integer, String> getBuiltinFormats() {
 		Map<Integer, String> result = new LinkedHashMap<Integer, String>();
 		for (int i=0; i<_formats.length; i++) {

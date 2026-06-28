@@ -23,7 +23,7 @@ public final class ShortFieldConverter extends AbstractFieldConvertor {
     	if(value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
     		throw new NumberFormatException("For input string: \"" + cell + '"');
     	}
-        return new Short((short)value);
+        return Short.valueOf((short)value);
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public final class ByteFieldConverter extends AbstractFieldConvertor {
     	if(value < Byte.MIN_VALUE || value > 0xFF) {
     		throw new NumberFormatException("For input string: \"" + cell + '"');
     	}
-        return new Byte((byte)value);
+        return Byte.valueOf((byte)value);
 	}
 
 

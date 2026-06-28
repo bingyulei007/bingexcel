@@ -33,7 +33,7 @@ public final class IntegerFieldConverter extends AbstractFieldConvertor {
     	if(value < Integer.MIN_VALUE || value > 0xFFFFFFFFl) {
     		throw new NumberFormatException("For input string: \"" + cell + '"');
     	}
-        return new Integer((int)value);
+        return Integer.valueOf((int)value);
 	}
 
 	@Override

@@ -754,7 +754,7 @@ public class ExcelDataFormatter implements Observer{
         if (numberFormat == null) {
             return String.valueOf(d);
         }
-        return numberFormat.format(new Double(d));
+        return numberFormat.format(Double.valueOf(d));
     }
 
     /**
@@ -833,7 +833,7 @@ public class ExcelDataFormatter implements Observer{
         String result;
         final String textValue = NumberToTextConverter.toText(value);
         if (textValue.indexOf('E') > -1) {
-            result = numberFormat.format(new Double(value));
+            result = numberFormat.format(Double.valueOf(value));
         }
         else {
             result = numberFormat.format(new BigDecimal(textValue));
