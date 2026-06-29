@@ -7,14 +7,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 import com.bing.excel.annotation.CellConfig;
@@ -26,8 +25,6 @@ import com.bing.excel.annotation.BingConvertor;
 import com.bing.utils.ReflectDependencyFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * 创建时间：2015-12-11下午8:33:01 项目名称：excel
@@ -40,17 +37,13 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 public class AnnotationMapperHandler implements ExcelConverterMapperHandler, AnnotationMapper {
 
   // 属性转换器的缓存
-  private Cache<Class<?>, Map<List<Object>, FieldValueConverter>> converterCache = null;
+  private final Map<Class<?>, Map<List<Object>, FieldValueConverter>> converterCache
+      = new ConcurrentHashMap<>();
   private ConversionMapper objConversionMapper = new ConversionMapper();
   private final Set<Class<?>> annotatedTypes = Collections
       .synchronizedSet(new HashSet<Class<?>>());
 
   // private transient Object[] arguments;
-
-  public AnnotationMapperHandler() {
-    converterCache = Caffeine.newBuilder().maximumSize(500)
-        .expireAfterAccess(2, TimeUnit.MINUTES).build();
-  }
 
   /*
    * (non-Javadoc)
@@ -248,7 +241,7 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
     final Class<? extends ConverterMatcher> converterType = annotation
         .value();
     Map<List<Object>, FieldValueConverter> converterMapping = converterCache
-        .get(converterType, k -> new HashMap<List<Object>, FieldValueConverter>());
+        .computeIfAbsent(converterType, k -> new ConcurrentHashMap<List<Object>, FieldValueConverter>());
     result = converterMapping.get(parameter);
     if (result == null) {
       int size = parameter.size();
@@ -273,8 +266,8 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
                 + targetType.getName() : ""), e);
       }
 
-      converterMapping.put(parameter, converter);
-      result = converter;
+      converterMapping.putIfAbsent(parameter, converter);
+      result = converterMapping.get(parameter);
     }
     return result;
   }
