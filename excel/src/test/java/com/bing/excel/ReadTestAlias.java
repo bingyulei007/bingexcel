@@ -243,7 +243,7 @@ public class ReadTestAlias {
     list.add(new Person());
     File tmp = File.createTempFile("alias_only_write", ".csv");
     tmp.deleteOnExit();
-    bing.writeCSV(tmp.getAbsolutePath(), list);
+    bing.writeCsv(tmp.getAbsolutePath(), list);
   }
 
   @Test(expected = IllegalCellConfigException.class)

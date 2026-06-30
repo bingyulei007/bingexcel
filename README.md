@@ -282,32 +282,34 @@ SheetExcel departmentSheet = new SheetExcel();
 departmentSheet.setSheetName("部门");
 departmentSheet.setList(departments);
 
-bingExcel.writeSheetsExcel("company.xlsx", peopleSheet, departmentSheet);
+bingExcel.writeXlsx("company.xlsx", peopleSheet, departmentSheet);
+// 如需写出 .xls：bingExcel.writeXls("company.xls", peopleSheet, departmentSheet);
 ```
 
 ### 常用写出 API
 
 | 方法 | 说明 |
 | --- | --- |
-| `writeXlsx(String path, Iterable... iterables)` | 写出 `.xlsx` 文件。 |
-| `writeXls(String path, Iterable... iterables)` | 写出 `.xls` 文件。 |
+| `writeXlsx(String path, Iterable... iterables)` | 写出 `.xlsx` 文件，每个集合写入一个 Sheet。 |
+| `writeXls(String path, Iterable... iterables)` | 写出 `.xls` 文件，每个集合写入一个 Sheet。 |
 | `writeXlsx(OutputStream stream, Iterable... iterables)` | 写出 `.xlsx` 到输出流。 |
 | `writeXls(OutputStream stream, Iterable... iterables)` | 写出 `.xls` 到输出流。 |
-| `writeSheetsExcel(String path, SheetExcel... sheetExcels)` | 按 `SheetExcel` 描述写出多个 Sheet。 |
+| `writeXlsx(String path, SheetExcel... sheetExcels)` | 按 `SheetExcel` 描述写出多个 Sheet 到 `.xlsx` 文件。 |
+| `writeXls(String path, SheetExcel... sheetExcels)` | 按 `SheetExcel` 描述写出多个 Sheet 到 `.xls` 文件。 |
 
 ## 写出 CSV
 
 ### 基础用法
 
 ```java
-bingExcel.writeCSV("output.csv", people);
+bingExcel.writeCsv("output.csv", people);
 ```
 
 ### 自定义分隔符、表头和 BOM
 
 ```java
 try (OutputStream output = new FileOutputStream("output.csv")) {
-    bingExcel.writeCSV(output, people, ',', true, true);
+    bingExcel.writeCsv(output, people, ',', true, true);
 }
 ```
 
@@ -502,7 +504,7 @@ SheetVo<Person> sheet = bingExcel.readFile(file, Person.class, 1);
 写出 CSV 时开启 BOM：
 
 ```java
-bingExcel.writeCSV(output, people, ',', true, true);
+bingExcel.writeCsv(output, people, ',', true, true);
 ```
 
 ### Q6：注解和 Builder 可以混用吗？
@@ -524,8 +526,9 @@ bingExcel.writeCSV(output, people, ',', true, true);
 - commons-lang3 升级至 3.18.0、commons-csv 升级至 1.11.0；
 - 移除 Guava 依赖，缓存改用 `ConcurrentHashMap`，工具类改用 JDK 与 commons-lang3；
 - 移除 Caffeine 与 log4j-core 依赖，主代码统一使用 `java.util.logging`；
-- commons-csv 标记为 `optional`，使用 `writeCSV` 时由调用方自行引入；
-- 写出 API 重命名：`writeExcel`→`writeXlsx`、`writeOldExcel`→`writeXls`，与 `writeCSV` 命名维度统一；
+- commons-csv 标记为 `optional`，使用 `writeCsv` 时由调用方自行引入；
+- 写出 API 重命名：`writeExcel`→`writeXlsx`、`writeOldExcel`→`writeXls`，并新增多 Sheet `writeXlsx` / `writeXls` 重载；
+- CSV 写出 API 统一为 camelCase 命名 `writeCsv`；
 - 修复 `writeXlsx(OutputStream)` 误用 `HSSFWorkbook` 导致实际写出 `.xls` 的问题；
 - 不再发布到 Maven 中央仓库，改为本地 `mvn install` 安装。
 

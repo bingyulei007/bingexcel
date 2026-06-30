@@ -108,12 +108,12 @@ public interface BingExcel {
 
   void writeXls(OutputStream stream, Iterable... iterables);
 
-  void writeCSV(String path, Iterable iterable) throws IOException;
+  void writeCsv(String path, Iterable iterable) throws IOException;
 
-  void writeCSV(OutputStream os, Iterable iterable) throws IOException;
+  void writeCsv(OutputStream os, Iterable iterable) throws IOException;
 
   /**
-   * 写出指定分隔符、指定是否写header的文件到输出流
+   * 写出指定分隔符、指定是否写header的CSV到输出流。
    *
    * @param os 输出流
    * @param iterable 带转换的对象
@@ -121,7 +121,7 @@ public interface BingExcel {
    * @param isWithHeader 是否写入header行
    * @param isWithBOM 是否带BOM
    */
-  void writeCSV(OutputStream os, Iterable iterable, char delimiter, boolean isWithHeader,
+  void writeCsv(OutputStream os, Iterable iterable, char delimiter, boolean isWithHeader,
       boolean isWithBOM) throws IOException;
 
   void modelName(Class<?> clazz, String alias);
@@ -130,10 +130,18 @@ public interface BingExcel {
       FieldValueConverter converter);
 
   /**
-   * 写出多sheet页的xls格式的excel文件暂时只支持xls格式,后续支持csv格式
+   * 写出多sheet页的xlsx格式excel文件。
    *
-   * 
-   * @param path
+   * @param path 文件路径
+   * @param sheetExcels sheet页描述
    */
-  void writeSheetsExcel(String path, SheetExcel... sheetExcels);
+  void writeXlsx(String path, SheetExcel... sheetExcels);
+
+  /**
+   * 写出多sheet页的xls格式excel文件。
+   *
+   * @param path 文件路径
+   * @param sheetExcels sheet页描述
+   */
+  void writeXls(String path, SheetExcel... sheetExcels);
 }

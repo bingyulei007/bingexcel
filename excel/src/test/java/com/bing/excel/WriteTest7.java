@@ -96,18 +96,40 @@ public class WriteTest7 {
         sheet2.setList(deptList);
 
         String path = System.getProperty("java.io.tmpdir") + "write_test_multi_sheets.xlsx";
-        bing.writeSheetsExcel(path, sheet1, sheet2);
-        System.out.println("多Sheet导出成功: " + path);
+        bing.writeXlsx(path, sheet1, sheet2);
+        System.out.println("多Sheet xlsx导出成功: " + path);
+    }
+
+    /**
+     * 测试4.1: xls格式多Sheet导出
+     */
+    @Test
+    public void testWriteMultiSheetsXls() throws IOException {
+        SheetExcel sheet1 = new SheetExcel();
+        sheet1.setSheetName("员工信息");
+        sheet1.setList(createPersonList());
+
+        SheetExcel sheet2 = new SheetExcel();
+        sheet2.setSheetName("部门信息");
+        sheet2.setList(Arrays.asList(
+            new Department("研发部", 50),
+            new Department("市场部", 30),
+            new Department("人事部", 10)
+        ));
+
+        String path = System.getProperty("java.io.tmpdir") + "write_test_multi_sheets.xls";
+        bing.writeXls(path, sheet1, sheet2);
+        System.out.println("多Sheet xls导出成功: " + path);
     }
 
     /**
      * 测试5: CSV导出（默认配置，逗号分隔，带表头和BOM）
      */
     @Test
-    public void testWriteCSV() throws IOException {
+    public void testWriteCsv() throws IOException {
         List<Person> list = createPersonList();
         String path = System.getProperty("java.io.tmpdir") + "write_test_basic.csv";
-        bing.writeCSV(path, list);
+        bing.writeCsv(path, list);
         System.out.println("CSV导出成功: " + path);
     }
 
@@ -115,13 +137,13 @@ public class WriteTest7 {
      * 测试6: CSV导出（自定义配置 - 分号分隔、不带表头、无BOM）
      */
     @Test
-    public void testWriteCSVWithConfig() throws IOException {
+    public void testWriteCsvWithConfig() throws IOException {
         List<Person> list = createPersonList();
         String path = System.getProperty("java.io.tmpdir") + "write_test_custom_csv.csv";
 
         try (FileOutputStream fos = new FileOutputStream(path)) {
             // 参数: stream, list, 分隔符, 是否带表头, 是否带BOM
-            bing.writeCSV(fos, list, ';', false, false);
+            bing.writeCsv(fos, list, ';', false, false);
         }
         System.out.println("自定义CSV导出成功: " + path);
     }

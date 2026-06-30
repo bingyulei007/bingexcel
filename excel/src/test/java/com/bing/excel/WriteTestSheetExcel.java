@@ -56,10 +56,10 @@ public class WriteTestSheetExcel {
     seExcel2.setList(list1);
 
 
-   // bing.writeSheetsExcel("C:\\Users\\shi\\workspace/sheets.xlsx", seExcel1, seExcel2);
+   // bing.writeXlsx("C:\\Users\\shi\\workspace/sheets.xlsx", seExcel1, seExcel2);
 
-     bing.writeSheetsExcel(System.getProperty("java.io.tmpdir") + "WriteTestSheetExcel_adb.xlsx", seExcel2,seExcel1);
-    // bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);
+     bing.writeXlsx(System.getProperty("java.io.tmpdir") + "WriteTestSheetExcel_adb.xlsx", seExcel2,seExcel1);
+    // bing.writeCsv("/Users/shi/workspace/aa/adb.csv", list);
   }
 
   @OutAlias("xiaoshou")

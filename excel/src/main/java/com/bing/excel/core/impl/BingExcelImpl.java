@@ -201,7 +201,7 @@ public class BingExcelImpl implements BingExcel {
 
   @Override
   // 临时使用下
-  public void writeCSV(String path, Iterable iterable) throws IOException {
+  public void writeCsv(String path, Iterable iterable) throws IOException {
     File file = FileCreateUtils.createFile(path);
     try (Writer out =
         new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))) {
@@ -249,7 +249,7 @@ public class BingExcelImpl implements BingExcel {
 
   @Override
   // 临时使用下,后面再改
-  public void writeCSV(OutputStream os, Iterable iterable) throws IOException {
+  public void writeCsv(OutputStream os, Iterable iterable) throws IOException {
 
     Writer out = new OutputStreamWriter(os, "UTF-8");
     out.write(new String(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
@@ -291,7 +291,7 @@ public class BingExcelImpl implements BingExcel {
   }
 
   @Override
-  public void writeCSV(OutputStream os, Iterable iterable, char delimiter, boolean isWithHeader,
+  public void writeCsv(OutputStream os, Iterable iterable, char delimiter, boolean isWithHeader,
       boolean isWithBOM) throws IOException {
     Writer out = new OutputStreamWriter(os, "UTF-8");
     if (isWithBOM) {
@@ -608,8 +608,14 @@ public class BingExcelImpl implements BingExcel {
 
 
   @Override
-  public void writeSheetsExcel(String path, SheetExcel... sheetExcels) {
+  public void writeXlsx(String path, SheetExcel... sheetExcels) {
     WriteHandler handler = ExcelWriterFactory.createXSSF(path);
+    writeToSheetExcel(handler, sheetExcels);
+  }
+
+  @Override
+  public void writeXls(String path, SheetExcel... sheetExcels) {
+    WriteHandler handler = ExcelWriterFactory.createHSSF(path);
     writeToSheetExcel(handler, sheetExcels);
   }
 

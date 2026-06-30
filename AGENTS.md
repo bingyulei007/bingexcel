@@ -53,7 +53,7 @@ This file provides guidance to the AI agent when working with code in this repos
 |--------|-----------|---------|-------|
 | excel | poi / poi-ooxml | 5.4.1 | 5.5.1 available, not critical |
 | excel | commons-lang3 | 3.18.0 | Bumped from 3.17.0 in commit b9525f3 |
-| excel | commons-csv | 1.11.0 (optional) | Marked optional in commit df30a37; `writeCSV` callers must self-declare |
+| excel | commons-csv | 1.11.0 (optional) | Marked optional in commit df30a37; `writeCsv` callers must self-declare |
 | excel | ~~caffeine~~ | — | Removed in commit df30a37; `converterCache` now uses `ConcurrentHashMap` |
 | excel | xercesImpl | 2.12.2 | Latest |
 | excel | junit | 4.13.2 (test) | Latest JUnit 4 |

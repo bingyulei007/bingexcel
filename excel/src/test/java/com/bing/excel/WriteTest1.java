@@ -32,10 +32,10 @@ public class WriteTest1 {
 		bing.writeXlsx(System.getProperty("java.io.tmpdir") + "WriteTest1_adb.xlsx", list);
 
 	//	bing.writeXlsx("/Users/shi/workspace/aa/adb.xls", list);
-		//bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);
+		//bing.writeCsv("/Users/shi/workspace/aa/adb.csv", list);
 	/*	try (FileOutputStream os = new FileOutputStream("D:/aoptest/adb1.csv")){
-		//bing.writeCSV("D:/aoptest/adb.csv",list);
-			bing.writeCSV(os,list);
+		//bing.writeCsv("D:/aoptest/adb.csv",list);
+			bing.writeCsv(os,list);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/

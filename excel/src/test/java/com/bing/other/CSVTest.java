@@ -54,6 +54,6 @@ ps.add(new WriteTest2
         .Person(213,"你好",3.45));
 
     String path = System.getProperty("java.io.tmpdir") + "CSVTest_ab.csv";
-    excel.writeCSV(path,ps);
+    excel.writeCsv(path,ps);
   }
 }
