@@ -66,11 +66,11 @@ public class WriteTest2 {
 
 			String tmp = System.getProperty("java.io.tmpdir");
 			if (Math.random() > 0.4) {
-				bing.writeExcel(tmp + "WriteTest2_adb"
+				bing.writeXlsx(tmp + "WriteTest2_adb"
 						+ Thread.currentThread().getName() + ".xlsx", list,
 						list);
 			} else {
-				bing.writeOldExcel(tmp + "WriteTest2_adb"
+				bing.writeXls(tmp + "WriteTest2_adb"
 						+ Thread.currentThread().getName() + ".xls", list);
 			}
 			System.out.println("end:" + Thread.currentThread().getName());

@@ -215,7 +215,7 @@ class BingExcelReadTest {
 
     @Test
     void readByIndex_success() throws Exception {
-        // BingExcel.writeExcel 写出 Person，再读回
+        // BingExcel.writeXlsx 写出 Person，再读回
         Path file = newTempFile(".xlsx");
         List<Person> data = new ArrayList<>();
         data.add(new Person("Alice", 30, 8000.0, 0));
@@ -223,7 +223,7 @@ class BingExcelReadTest {
         data.add(new Person("Carol", 22, 5000.0, 0));
 
         try (FileOutputStream fos = new FileOutputStream(file.toFile())) {
-            bingExcel.writeExcel(fos, data);
+            bingExcel.writeXlsx(fos, data);
         }
 
         ReaderCondition<Person> cond = new ReaderCondition<>(0, 1, Person.class);
@@ -652,7 +652,7 @@ class BingExcelReadTest {
 
         Path file = newTempFile(".xlsx");
         try (FileOutputStream fos = new FileOutputStream(file.toFile())) {
-            bingExcel.writeExcel(fos, original);
+            bingExcel.writeXlsx(fos, original);
         }
 
         ReaderCondition<Person> cond = new ReaderCondition<>(0, 1, Person.class);
@@ -728,7 +728,7 @@ class BingExcelReadTest {
         List<Person> empty = new ArrayList<>();
 
         try (FileOutputStream fos = new FileOutputStream(file.toFile())) {
-            assertDoesNotThrow(() -> bingExcel.writeExcel(fos, empty));
+            assertDoesNotThrow(() -> bingExcel.writeXlsx(fos, empty));
         }
 
         // 空文件可能无法读取，但写入不应抛异常

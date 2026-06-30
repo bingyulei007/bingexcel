@@ -48,7 +48,7 @@ public class WriteTest7 {
     public void testWriteXlsx() throws IOException {
         List<Person> list = createPersonList();
         String path = System.getProperty("java.io.tmpdir") + "write_test_basic.xlsx";
-        bing.writeExcel(path, list);
+        bing.writeXlsx(path, list);
         System.out.println("xlsx导出成功: " + path);
     }
 
@@ -59,7 +59,7 @@ public class WriteTest7 {
     public void testWriteXls() throws IOException {
         List<Person> list = createPersonList();
         String path = System.getProperty("java.io.tmpdir") + "write_test_basic.xls";
-        bing.writeOldExcel(path, list);
+        bing.writeXls(path, list);
         System.out.println("xls导出成功: " + path);
     }
 
@@ -72,7 +72,7 @@ public class WriteTest7 {
         String path = System.getProperty("java.io.tmpdir") + "write_test_stream.xlsx";
 
         try (FileOutputStream fos = new FileOutputStream(path)) {
-            bing.writeExcel(fos, list);
+            bing.writeXlsx(fos, list);
         }
         System.out.println("OutputStream导出成功: " + path);
     }
@@ -138,7 +138,7 @@ public class WriteTest7 {
             new User("王五", true)
         );
         String path = System.getProperty("java.io.tmpdir") + "write_test_converter.xlsx";
-        bing.writeExcel(path, list);
+        bing.writeXlsx(path, list);
         System.out.println("自定义转换器导出成功: " + path);
     }
 
@@ -149,7 +149,7 @@ public class WriteTest7 {
     public void testWriteEmptyList() throws IOException {
         List<Person> list = new ArrayList<>();
         String path = System.getProperty("java.io.tmpdir") + "write_test_empty.xlsx";
-        bing.writeExcel(path, list);
+        bing.writeXlsx(path, list);
         System.out.println("空列表导出成功: " + path);
     }
 
@@ -198,7 +198,7 @@ public class WriteTest7 {
 
         List<Person> list = createPersonList();
         String path = System.getProperty("java.io.tmpdir") + "write_test_runtime_mapping.xlsx";
-        bingWithMapping.writeExcel(path, list);
+        bingWithMapping.writeXlsx(path, list);
         System.out.println("运行时映射导出成功: " + path);
     }
 

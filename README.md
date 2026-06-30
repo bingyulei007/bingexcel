@@ -128,7 +128,7 @@ List<Person> people = Arrays.asList(
     new Person("李四", 30, 15000.0)
 );
 
-bingExcel.writeExcel("output.xlsx", people);
+bingExcel.writeXlsx("output.xlsx", people);
 ```
 
 ## 核心注解
@@ -249,15 +249,15 @@ try (InputStream input = new FileInputStream("person.xlsx")) {
 ### 写出单个 Sheet
 
 ```java
-bingExcel.writeExcel("output.xlsx", people);     // xlsx
-bingExcel.writeOldExcel("output.xls", people);  // xls
+bingExcel.writeXlsx("output.xlsx", people);     // xlsx
+bingExcel.writeXls("output.xls", people);  // xls
 ```
 
 也可以写入 `OutputStream`：
 
 ```java
 try (OutputStream output = new FileOutputStream("output.xlsx")) {
-    bingExcel.writeExcel(output, people);
+    bingExcel.writeXlsx(output, people);
 }
 ```
 
@@ -266,7 +266,7 @@ try (OutputStream output = new FileOutputStream("output.xlsx")) {
 直接传入多个集合时，每个集合会写入一个 Sheet：
 
 ```java
-bingExcel.writeExcel("company.xlsx", people, departments);
+bingExcel.writeXlsx("company.xlsx", people, departments);
 ```
 
 需要为不同 Sheet 指定名称或列表时，可以使用 `SheetExcel`：
@@ -289,10 +289,10 @@ bingExcel.writeSheetsExcel("company.xlsx", peopleSheet, departmentSheet);
 
 | 方法 | 说明 |
 | --- | --- |
-| `writeExcel(String path, Iterable... iterables)` | 写出 `.xlsx` 文件。 |
-| `writeOldExcel(String path, Iterable... iterables)` | 写出 `.xls` 文件。 |
-| `writeExcel(OutputStream stream, Iterable... iterables)` | 写出 `.xlsx` 到输出流。 |
-| `writeOldExcel(OutputStream stream, Iterable... iterables)` | 写出 `.xls` 到输出流。 |
+| `writeXlsx(String path, Iterable... iterables)` | 写出 `.xlsx` 文件。 |
+| `writeXls(String path, Iterable... iterables)` | 写出 `.xls` 文件。 |
+| `writeXlsx(OutputStream stream, Iterable... iterables)` | 写出 `.xlsx` 到输出流。 |
+| `writeXls(OutputStream stream, Iterable... iterables)` | 写出 `.xls` 到输出流。 |
 | `writeSheetsExcel(String path, SheetExcel... sheetExcels)` | 按 `SheetExcel` 描述写出多个 Sheet。 |
 
 ## 写出 CSV

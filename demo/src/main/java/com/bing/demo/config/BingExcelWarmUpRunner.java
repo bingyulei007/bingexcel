@@ -25,7 +25,7 @@ public class BingExcelWarmUpRunner {
     public CommandLineRunner warmUpBingExcel(BingExcel bingExcel) {
         return args -> {
             try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-                bingExcel.writeExcel(bos, List.of(new Person("__warmup__", 0, 0.0, 0)));
+                bingExcel.writeXlsx(bos, List.of(new Person("__warmup__", 0, 0.0, 0)));
                 log.info("BingExcel warmed up: Person mapper initialized");
             } catch (Exception e) {
                 log.warn("BingExcel warm-up failed", e);

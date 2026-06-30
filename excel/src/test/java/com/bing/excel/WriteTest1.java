@@ -29,9 +29,9 @@ public class WriteTest1 {
 		list.add(new Person(23, "nihoa", 234.9));
 		list.add(new Person(122, "noa", 23434.9));
 
-		bing.writeExcel(System.getProperty("java.io.tmpdir") + "WriteTest1_adb.xlsx", list);
+		bing.writeXlsx(System.getProperty("java.io.tmpdir") + "WriteTest1_adb.xlsx", list);
 
-	//	bing.writeExcel("/Users/shi/workspace/aa/adb.xls", list);
+	//	bing.writeXlsx("/Users/shi/workspace/aa/adb.xls", list);
 		//bing.writeCSV("/Users/shi/workspace/aa/adb.csv", list);
 	/*	try (FileOutputStream os = new FileOutputStream("D:/aoptest/adb1.csv")){
 		//bing.writeCSV("D:/aoptest/adb.csv",list);
@@ -39,7 +39,7 @@ public class WriteTest1 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		//bing.writeExcel("D:/aoptest/adb.xlsx", list,list,list);
+		//bing.writeXlsx("D:/aoptest/adb.xlsx", list,list,list);
 	}
 
 	@OutAlias("xiaoshou")

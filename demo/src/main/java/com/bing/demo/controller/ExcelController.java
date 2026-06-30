@@ -78,7 +78,7 @@ public class ExcelController {
         setExcelResponseHeaders(response, "person_sample.xlsx");
 
         try (OutputStream os = response.getOutputStream()) {
-            bingExcel.writeExcel(os, persons);
+            bingExcel.writeXlsx(os, persons);
         }
     }
 
@@ -94,7 +94,7 @@ public class ExcelController {
         setExcelResponseHeaders(response, "person_export.xlsx");
 
         try (OutputStream os = response.getOutputStream()) {
-            bingExcel.writeExcel(os, persons);
+            bingExcel.writeXlsx(os, persons);
         }
     }
 

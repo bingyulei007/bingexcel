@@ -233,7 +233,7 @@ public class ReadTestAlias {
     list.add(new Person());
     File tmp = File.createTempFile("alias_only_write", ".xlsx");
     tmp.deleteOnExit();
-    bing.writeExcel(new FileOutputStream(tmp), list);
+    bing.writeXlsx(new FileOutputStream(tmp), list);
   }
 
   @Test(expected = IllegalCellConfigException.class)

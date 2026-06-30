@@ -162,39 +162,39 @@ public class BingExcelImpl implements BingExcel {
   }
 
   @Override
-  public void writeExcel(File file, Iterable... iterables) throws FileNotFoundException {
+  public void writeXlsx(File file, Iterable... iterables) throws FileNotFoundException {
     WriteHandler handler = ExcelWriterFactory.createXSSF(file);
     writeToExcel(handler, iterables);
 
   }
 
   @Override
-  public void writeOldExcel(File file, Iterable... iterables) throws FileNotFoundException {
+  public void writeXls(File file, Iterable... iterables) throws FileNotFoundException {
     WriteHandler handler = ExcelWriterFactory.createHSSF(file);
     writeToExcel(handler, iterables);
   }
 
   @Override
-  public void writeExcel(String path, Iterable... iterables) {
+  public void writeXlsx(String path, Iterable... iterables) {
     WriteHandler handler = ExcelWriterFactory.createXSSF(path);
     writeToExcel(handler, iterables);
   }
 
   @Override
-  public void writeExcel(OutputStream stream, Iterable... iterables) {
+  public void writeXlsx(OutputStream stream, Iterable... iterables) {
     WriteHandler handler = ExcelWriterFactory.createXSSF(stream);
     writeToExcel(handler, iterables);
   }
 
   @Override
-  public void writeOldExcel(String path, Iterable... iterables) {
+  public void writeXls(String path, Iterable... iterables) {
     WriteHandler handler = ExcelWriterFactory.createHSSF(path);
     writeToExcel(handler, iterables);
 
   }
 
   @Override
-  public void writeOldExcel(OutputStream stream, Iterable... iterables) {
+  public void writeXls(OutputStream stream, Iterable... iterables) {
     WriteHandler handler = ExcelWriterFactory.createHSSF(stream);
     writeToExcel(handler, iterables);
   }

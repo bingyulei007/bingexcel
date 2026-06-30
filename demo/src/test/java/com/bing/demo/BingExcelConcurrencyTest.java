@@ -50,7 +50,7 @@ class BingExcelConcurrencyTest {
         }
         sampleFile = Files.createTempFile("stress-sample-", ".xlsx");
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            bingExcel.writeExcel(bos, persons);
+            bingExcel.writeXlsx(bos, persons);
             Files.write(sampleFile, bos.toByteArray());
         }
     }
@@ -95,7 +95,7 @@ class BingExcelConcurrencyTest {
                                         20 + k, 2000.0 + k, k % 2));
                             }
                             try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-                                bingExcel.writeExcel(bos, data);
+                                bingExcel.writeXlsx(bos, data);
                                 if (bos.size() > 0) {
                                     writeSuccess.incrementAndGet();
                                 }
@@ -155,7 +155,7 @@ class BingExcelConcurrencyTest {
                         }
                         Path out = Files.createTempFile("stress-out-", ".xlsx");
                         try {
-                            bingExcel.writeExcel(out.toFile(), data);
+                            bingExcel.writeXlsx(out.toFile(), data);
                             if (Files.size(out) > 0) {
                                 success.incrementAndGet();
                             }

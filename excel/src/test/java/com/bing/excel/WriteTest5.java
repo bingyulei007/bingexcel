@@ -41,7 +41,7 @@ public class WriteTest5 {
     listFriend.add(obj2);
     person.setFriends(listFriend);
     list.add(person);
-    bing.writeExcel(System.getProperty("java.io.tmpdir") + "WriteTest5_student.xlsx",list,listFriend);
+    bing.writeXlsx(System.getProperty("java.io.tmpdir") + "WriteTest5_student.xlsx",list,listFriend);
 
 
   }

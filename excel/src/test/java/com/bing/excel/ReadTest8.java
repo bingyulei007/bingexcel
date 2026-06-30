@@ -44,7 +44,7 @@ public class ReadTest8 {
 			for (Object o : objectList) {
 				System.out.println(o);
 			}
-		//	bing.writeExcel("/Users/shi/workspace/gaoxinqu/a.xlsx",objectList);
+		//	bing.writeXlsx("/Users/shi/workspace/gaoxinqu/a.xlsx",objectList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
