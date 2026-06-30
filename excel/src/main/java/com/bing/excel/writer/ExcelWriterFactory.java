@@ -53,7 +53,7 @@ public class ExcelWriterFactory {
 	}
 
 	public static WriteHandler createXSSF(OutputStream os) {
-		Workbook wb = new HSSFWorkbook();
+		Workbook wb = new XSSFWorkbook();
 		return new DefaultStreamWriteHandler(wb, os);
 	}
 
