@@ -22,12 +22,6 @@ public interface ExcleBuilder<T> {
 	ExcleBuilder<BingExcel> addClassNameAlias(Class<?> clazz,
 			String alias);
 
-	/**
-	 * 由build()方法代替
-	 * @return
-	 */
-	@Deprecated
-	T builder();
 	T build();
 
 	ExcleBuilder<T> registerFieldConverter(Class<?> clazz,

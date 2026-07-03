@@ -59,7 +59,7 @@ public class BingExcelBuilder implements ExcleBuilder<BingExcel> {
    * @return BingExcel 实例
    */
   public static BingExcel builderInstance() {
-    return (new BingExcelBuilder()).builder();
+    return (new BingExcelBuilder()).build();
   }
 
   @Override
@@ -110,16 +110,6 @@ public class BingExcelBuilder implements ExcleBuilder<BingExcel> {
     return this;
   }
 
-
-  @Deprecated
-  @Override
-  public BingExcel builder() {
-    if (bingExcel == null) {
-      bingExcel = new BingExcelImpl(localConverterHandler);
-    }
-
-    return this.bingExcel;
-  }
 
   @Override
   public BingExcel build() {

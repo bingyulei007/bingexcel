@@ -1,6 +1,5 @@
 package com.bing.excel.mapper;
 
-import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
 
 /**
@@ -29,18 +28,11 @@ import com.bing.excel.mapper.ConversionMapper.FieldConverterMapper;
  *       {@code registerFieldConverter} is keyed by field <em>type</em>, so it only
  *       fills in fields that declare no field-level converter.</li>
  * </ol>
- *
- * <p>Note: the deprecated event path ({@link com.bing.excel.core.BingExcelEvent})
- * uses only the annotation handler, so axis 1 collapses to annotation-only there.
  */
 public interface ExcelConverterMapperHandler {
 
 
   ConversionMapper getObjConversionMapper();
-
-  @Deprecated
-  FieldValueConverter getLocalConverter(Class definedIn,
-      String fieldName);
 
   FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,
       String fieldName);

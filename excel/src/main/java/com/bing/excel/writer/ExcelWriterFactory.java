@@ -3,6 +3,7 @@ package com.bing.excel.writer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
 
@@ -75,7 +76,16 @@ public class ExcelWriterFactory {
 		isNewPath(file.getAbsolutePath());
 		SXSSFWorkbook wb = new SXSSFWorkbook(200);
 		FileOutputStream out = new FileOutputStream(file);
-		return new SXSSFWriterHandler(wb, out);
+		try {
+			return new SXSSFWriterHandler(wb, out);
+		} catch (RuntimeException e) {
+			try {
+				out.close();
+			} catch (IOException ignored) {
+				// best-effort close on construction failure
+			}
+			throw e;
+		}
 	}
 
 }

@@ -1,7 +1,5 @@
 package com.bing.excel.mapper;
 
-import com.bing.excel.converter.FieldValueConverter;
-
 /**
  * @author shizhongtao
  * @version 1.0
@@ -31,20 +29,6 @@ public class UserDefineMapperHandler implements ExcelConverterMapperHandler {
   @Override
   public ConversionMapper getObjConversionMapper() {
     return objConversionMapper;
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.chinamobile.excel.mapper.OrmMapper#getLocalConverter(java.lang.Class,
-   * java.lang.String)
-   */
-
-  @Override
-  public FieldValueConverter getLocalConverter(Class definedIn,
-      String fieldName) {
-
-    return objConversionMapper.getLocalConverter(definedIn, fieldName);
   }
 
   @Override

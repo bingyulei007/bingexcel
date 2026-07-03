@@ -67,7 +67,7 @@ This file provides guidance to the AI agent when working with code in this repos
 
 ## Naming Conventions (Do Not "Fix")
 
-- `registeAdapter` — intentional misspelling; used across both `BingExcelImpl` and `BingExcelEventImpl`. Do not rename.
+- `registeAdapter` — intentional misspelling; used in `BingExcelImpl`. Do not rename.
 - `tagertClazz` — intentional misspelling in listener inner classes. Do not rename.
 
 ## Architecture
@@ -107,12 +107,16 @@ This file provides guidance to the AI agent when working with code in this repos
 - **HSSF** (`HSSFListenerAbstract`): Skips empty value cells (except `MissingCellDummyRecord` which adds `null`).
 - Both end up with consistent `toFullArray()` behavior; maxIndex may differ in edge cases.
 
-### Deprecated APIs
+### Removed APIs (previously deprecated)
 
-- `BingExcelBuilder.builder()` is `@Deprecated` — use `.build()` instead.
-- `BingExcelEvent` / `BingExcelEventImpl` / `BingExcelEventBuilder` are `@Deprecated` but still functional. Do not remove unless explicitly asked.
-- `ArrayConverter` / `CollectionConverter` are `@Deprecated` with TODO comments.
-- `ListRow.getList()` is `@Deprecated`.
+The following deprecated APIs have been removed. Use the replacements listed:
+
+- `BingExcelBuilder.builder()` / `ExcleBuilder.builder()` — removed; use `.build()` instead.
+- `BingExcelEvent` / `BingExcelEventImpl` / `BingExcelEventBuilder` / `BingReadListener` — removed; use `BingExcelBuilder` + `BingExcelImpl`.
+- `ArrayConverter` / `CollectionConverter` — removed (were dead code, never registered).
+- `ListRow.getList()` — removed (zero callers).
+- `ExcelConverterMapperHandler.getLocalConverter(Class, String)` — removed; use `getLocalFieldConverterMapper(Class, String)` then `.getFieldConverter()`.
+- `ExcelBuiltinFormats.getBuiltinFormats()` — removed; use `getAll()`.
 
 ## Demo Project (`demo/`)
 

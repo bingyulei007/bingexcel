@@ -158,10 +158,11 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		currentRow.setHeight((short) 0x180);
 		for (CellKV<String> cellKV : listStr) {
 			Cell cell = currentRow.createCell(cellKV.getIndex());
-			cell.setCellValue(cellKV.getValue());
+			String value = cellKV.getValue();
+			cell.setCellValue(value == null ? "" : value);
 			cell.setCellStyle(style);
 
-			int size = cellKV.getValue().length();
+			int size = value == null ? 0 : value.length();
 			if (size > 10) {
 				size = 10;
 			}
@@ -182,9 +183,10 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		currentRow.setHeight((short) 0x180);
 		for (CellKV<String> cellKV : listLine.getListStr()) {
 			Cell cell = currentRow.createCell(cellKV.getIndex());
-			cell.setCellValue(cellKV.getValue());
+			String value = cellKV.getValue();
+			cell.setCellValue(value == null ? "" : value);
 			cell.setCellStyle(style);
-			int size = cellKV.getValue().length();
+			int size = value == null ? 0 : value.length();
 			if (size > 10) {
 				size = 10;
 			}
@@ -223,7 +225,6 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			cell.setCellStyle(createHeadDateStyle());
 			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
 					(short) 5000);
-			cell.setCellValue(cellKV.getValue());
 		}
 
 	}
@@ -270,10 +271,15 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 
 		try {
 			wb.write(os);
-			wb.close();
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 			// e.printStackTrace();
+		} finally {
+			try {
+				wb.close();
+			} catch (IOException e) {
+				// best-effort close after write; primary exception (if any) already surfaced
+			}
 		}
 	}
 

@@ -50,7 +50,7 @@ public class WriteTest7 {
 
     @Before
     public void before() {
-        bing = BingExcelBuilder.toBuilder().builder();
+        bing = BingExcelBuilder.toBuilder().build();
     }
 
     /**

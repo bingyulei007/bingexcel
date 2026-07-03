@@ -4,11 +4,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.bing.excel.converter.FieldValueConverter;
 import com.bing.excel.converter.HeaderReflectConverter;
@@ -32,6 +33,9 @@ import org.apache.commons.lang3.ClassUtils;
  * @author shizhongtao
  */
 public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConverter {
+
+  private static final Logger logger =
+      Logger.getLogger(TypeAdapterConverter.class.getName());
 
   private final Constructor<T> constructor;
   /**
@@ -86,22 +90,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
 
   @Override
   public List<CellKV<String>> getHeader(ExcelConverterMapperHandler... handlers) {
-    List<CellKV<String>> list = new ArrayList<>();
-    for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
-      FieldConverterMapper fieldConverterMapper = getFieldConverterMapper(kv.getKey(),
-          handlers);
-      if (fieldConverterMapper == null) {
-        continue;
-      }
-      if (fieldConverterMapper.getIndex() < 0) {
-        throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
-            + kv.getKey() + "] has no index and cannot be written; "
-            + "set an explicit index on @CellConfig for write direction.");
-      }
-      list.add(new CellKV<String>(fieldConverterMapper.getIndex(),
-          fieldConverterMapper.getAlias()));
-    }
-    return list;
+    return getHeadertoListLine(handlers).getListStr();
   }
 
   public ListLine getHeadertoListLine(ExcelConverterMapperHandler... handlers) {
@@ -110,6 +99,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
       FieldConverterMapper fieldConverterMapper = getFieldConverterMapper(kv.getKey(),
           handlers);
       if (fieldConverterMapper == null) {
+        logSkippedField(kv.getKey(), "getHeadertoListLine");
         continue;
       }
       if (fieldConverterMapper.getIndex() < 0) {
@@ -130,6 +120,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
       FieldConverterMapper fieldConverterMapper = getFieldConverterMapper(kv.getKey(),
           fieldHandler);
       if (fieldConverterMapper == null) {
+        logSkippedField(kv.getKey(), "marshal");
         continue;
       }
       if (fieldConverterMapper.getIndex() < 0) {
@@ -217,6 +208,13 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
     return converterMapper;
   }
 
+  private void logSkippedField(String fieldName, String method) {
+    if (logger.isLoggable(Level.FINE)) {
+      logger.fine("Skipping field [" + clazz.getName() + "#" + fieldName
+          + "] in " + method + ": no @CellConfig and no user-defined mapper.");
+    }
+  }
+
   private FieldValueConverter getLocalConverter(FieldConverterMapper converterMapper) {
     FieldValueConverter converter = converterMapper.getFieldConverter();
     if (converter != null) {
@@ -279,7 +277,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
           }
           OutValue outValue = converter.toObject(obj,
               defaultLocalConverterHandler);
-          if (outValue != null) {
+          if (outValue != null && outValue.getValue() != null) {
             if (outValue.getOutType().equals(OutType.DATE)) {
               line.addValue(converterMapper.getIndex(),
                   (Date) outValue.getValue());

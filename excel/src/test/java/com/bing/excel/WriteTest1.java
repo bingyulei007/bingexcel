@@ -20,7 +20,7 @@ public class WriteTest1 {
 	BingExcel	 bing;
 	@Before
 	public void before(){
-		bing = BingExcelBuilder.toBuilder().builder();
+		bing = BingExcelBuilder.toBuilder().build();
 	}
 	@Test
 	public void testWrite() throws IOException {

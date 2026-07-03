@@ -29,11 +29,16 @@ public class SXSSFWriterHandler extends AbstractWriteHandler {
 		try {
 			if (os != null) {
 				super.flush();
-				this.os.close();
-				this.wb.dispose();
 			}
-		} catch (IOException e) {
-			throw new ExcelOutException("Happen exception when flush", e);
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					throw new ExcelOutException("Happen exception when flush", e);
+				}
+			}
+			this.wb.dispose();
 		}
 	}
 

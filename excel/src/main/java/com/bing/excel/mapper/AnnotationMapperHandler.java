@@ -84,19 +84,6 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
   public ConversionMapper getObjConversionMapper() {
     return this.objConversionMapper;
   }
-  /*
-   * (non-Javadoc)
-   *
-   * @see com.chinamobile.excel.mapper.OrmMapper#getLocalConverter(java.lang.Class,
-   * java.lang.String)
-   */
-
-  @Override
-  public FieldValueConverter getLocalConverter(Class definedIn,
-      String fieldName) {
-
-    return objConversionMapper.getLocalConverter(definedIn, fieldName);
-  }
 
   @Override
   public ConversionMapper.FieldConverterMapper getLocalFieldConverterMapper(Class definedIn,

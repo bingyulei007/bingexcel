@@ -20,30 +20,24 @@ public class ListLine {
   private int minIndex = -1;
   private int maxIndex = -1;
 
-  @SuppressWarnings("unchecked")
   public List<CellKV<String>> getListStr() {
-
-    return listStr == null ? Collections.EMPTY_LIST : List.copyOf(listStr);
+    return listStr == null ? Collections.emptyList() : Collections.unmodifiableList(listStr);
   }
 
-  @SuppressWarnings("unchecked")
   public List<CellKV<Double>> getListDouble() {
-    return listDouble == null ? Collections.EMPTY_LIST : List.copyOf(listDouble);
+    return listDouble == null ? Collections.emptyList() : Collections.unmodifiableList(listDouble);
   }
 
-  @SuppressWarnings("unchecked")
   public List<CellKV<Boolean>> getListBoolean() {
-    return listBoolean == null ? Collections.EMPTY_LIST : List.copyOf(listBoolean);
+    return listBoolean == null ? Collections.emptyList() : Collections.unmodifiableList(listBoolean);
   }
 
-  @SuppressWarnings("unchecked")
   public List<CellKV<Date>> getListDate() {
-    return listDate == null ? Collections.EMPTY_LIST : List.copyOf(listDate);
+    return listDate == null ? Collections.emptyList() : Collections.unmodifiableList(listDate);
   }
 
-  @SuppressWarnings("unchecked")
   public List<CellKV<Long>> getListLong() {
-    return listLong == null ? Collections.EMPTY_LIST : List.copyOf(listLong);
+    return listLong == null ? Collections.emptyList() : Collections.unmodifiableList(listLong);
   }
   public Object[] toFullArray() {
     int maxIndex = this.getMaxIndex();

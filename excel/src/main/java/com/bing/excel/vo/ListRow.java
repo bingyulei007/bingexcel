@@ -18,18 +18,6 @@ public class ListRow implements Iterable<CellKV<String>> {
 	private int minIndex = -1;
 	private int maxIndex = -1;
 
-	/**
-	 * 会创建一个新的arraylist 对象。
-	 * 
-	 * @return 返回新的list对象
-	 */
-	@Deprecated
-	public List<CellKV<String>> getList() {
-		if (list == null)
-			return Collections.emptyList();
-		return List.copyOf(list);
-	}
-
 	public ListRow add(CellKV<String> kv) {
 		if (list == null) {
 			list = new ArrayList<>();

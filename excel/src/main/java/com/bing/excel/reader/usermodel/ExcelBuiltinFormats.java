@@ -1,7 +1,6 @@
 package com.bing.excel.reader.usermodel;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -150,18 +149,6 @@ public class ExcelBuiltinFormats {
 		m.add(value);
 	}
 
-
-	/**
-	 * @deprecated (May 2009) use {@link #getAll()}
-	 */
-	@Deprecated
-	public static Map<Integer, String> getBuiltinFormats() {
-		Map<Integer, String> result = new LinkedHashMap<Integer, String>();
-		for (int i=0; i<_formats.length; i++) {
-			result.put(Integer.valueOf(i), _formats[i]);
-		}
-		return result;
-	}
 
 	/**
 	 * @return array of built-in data formats

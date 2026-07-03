@@ -39,24 +39,6 @@ public class ReadTestThreadLocal {
 
 		@Override
 		public void run() {
-			/*BingExcelEvent builder = BingExcelEventBuilder.toBuilder()
-					.builder();
-			try {
-				File f = new File("E:/aoptest/bc.xlsx");
-
-				builder.readFile(f, Person.class, 1, new BingReadListener() {
-					
-
-					@Override
-					public void readModel(Object object, ModelInfo modelInfo) {
-
-						
-					}
-				});
-				System.out.println(System.currentTimeMillis());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}*/
 			java.net.URL url = ThreadTest.class.getResource("/salary.xlsx");
 			File f = new File(url.getPath());
 			FileInputStream inputStream = null;

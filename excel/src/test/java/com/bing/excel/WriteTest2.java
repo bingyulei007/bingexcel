@@ -20,7 +20,7 @@ public class WriteTest2 {
 
 	@Before
 	public void before() {
-		bing = BingExcelBuilder.toBuilder().builder();
+		bing = BingExcelBuilder.toBuilder().build();
 		for (int i = 0; i < 10000; i++) {
 			Person p = new Person((int) (Math.random() * 100),
 					RandomStringUtils.randomAlphanumeric(4),

@@ -34,12 +34,6 @@ public class ConversionMapper {
     fieldMapper.put(new FieldRelation(definedIn, fieldName), mapper);
   }
 
-  public FieldValueConverter getLocalConverter(Class definedIn,
-      String fieldName) {
-    return fieldMapper.get(new FieldRelation(definedIn, fieldName))
-        .getFieldConverter();
-  }
-
   public FieldConverterMapper getLocalConverterMapper(Class definedIn,
       String fieldName) {
     return fieldMapper.get(new FieldRelation(definedIn, fieldName));

@@ -40,10 +40,15 @@ public class DefaultFileWriteHandler extends AbstractWriteHandler {
 		try {
 			if (os != null) {
 				super.flush();
-				this.os.close();
 			}
-		} catch (IOException e) {
-			throw new ExcelOutException("Happen exception when flush", e);
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					throw new ExcelOutException("Happen exception when flush", e);
+				}
+			}
 		}
 	}
 }

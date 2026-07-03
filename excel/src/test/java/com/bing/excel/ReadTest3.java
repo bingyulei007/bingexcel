@@ -31,7 +31,7 @@ public class ReadTest3 {
 		URL url = Salary.class.getResource("/salary.xlsx");
 		File f = new File(url.toURI());
 
-		BingExcel bing = BingExcelBuilder.toBuilder().builder();
+		BingExcel bing = BingExcelBuilder.toBuilder().build();
 		try {
 			SheetVo<Salary> vo = bing.readFile(f, Salary.class, 1);
 			System.out.println(vo.getSheetIndex());

@@ -29,7 +29,7 @@ public class ReadTest2 {
 		URL url = Salary.class.getResource("/salary.xlsx");
 		File f = new File(url.toURI());
 
-		BingExcel bing = BingExcelBuilder.toBuilder().builder();
+		BingExcel bing = BingExcelBuilder.toBuilder().build();
 
 		SheetVo<Salary> vo = null;
 		try {

@@ -25,7 +25,7 @@ public class WriteTestSheetExcel {
 
   @Before
   public void before() {
-    bing = BingExcelBuilder.toBuilder().builder();
+    bing = BingExcelBuilder.toBuilder().build();
   }
 
   @Test

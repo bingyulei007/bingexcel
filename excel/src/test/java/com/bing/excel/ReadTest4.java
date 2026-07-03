@@ -29,7 +29,7 @@ public class ReadTest4 {
 		URL url = Salary.class.getResource("/salary4.xlsx");
 		File f = new File(url.toURI());
 
-		BingExcel bing = BingExcelBuilder.toBuilder().builder();
+		BingExcel bing = BingExcelBuilder.toBuilder().build();
 		try {
 			ReaderCondition<Salary> condition1=new ReaderCondition<>(0,1,Salary.class);
 			ReaderCondition<Person> condition2=new ReaderCondition<>(1,1,Person.class);
