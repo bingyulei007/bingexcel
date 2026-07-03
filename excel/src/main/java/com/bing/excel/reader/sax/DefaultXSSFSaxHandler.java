@@ -214,9 +214,9 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 				}
 			}
 		} finally {
+			excelReadListener.endWorkBook();
 			pkg.revert();
 		}
-		excelReadListener.endWorkBook();
 	}
 
 	public XMLReader getParser() throws SAXException {
