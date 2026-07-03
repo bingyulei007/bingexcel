@@ -1,8 +1,11 @@
 package com.bing.excel.writer;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.poi.ss.usermodel.Workbook;
+
+import com.bing.excel.writer.exception.ExcelOutException;
 
 /**
  * 不是线程安全的
@@ -34,6 +37,11 @@ public class DefaultStreamWriteHandler extends AbstractWriteHandler {
 	public void flush() {
 		if (os != null) {
 			super.flush();
+			try {
+				os.flush();
+			} catch (IOException e) {
+				throw new ExcelOutException("Happen exception when flush", e);
+			}
 		}
 	}
 }

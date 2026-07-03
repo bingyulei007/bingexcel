@@ -37,18 +37,27 @@ public class DefaultFileWriteHandler extends AbstractWriteHandler {
 
 	@Override
 	public void flush() {
+		RuntimeException primary = null;
 		try {
 			if (os != null) {
 				super.flush();
 			}
-		} finally {
-			if (os != null) {
-				try {
-					os.close();
-				} catch (IOException e) {
-					throw new ExcelOutException("Happen exception when flush", e);
+		} catch (RuntimeException e) {
+			primary = e;
+		}
+		if (os != null) {
+			try {
+				os.close();
+			} catch (IOException e) {
+				ExcelOutException ex = new ExcelOutException("Happen exception when flush", e);
+				if (primary == null) {
+					throw ex;
 				}
+				primary.addSuppressed(ex);
 			}
+		}
+		if (primary != null) {
+			throw primary;
 		}
 	}
 }

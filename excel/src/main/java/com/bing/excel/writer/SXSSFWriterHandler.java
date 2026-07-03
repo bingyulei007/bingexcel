@@ -26,19 +26,37 @@ public class SXSSFWriterHandler extends AbstractWriteHandler {
 
 	@ Override
 	public void flush() {
+		RuntimeException primary = null;
 		try {
 			if (os != null) {
 				super.flush();
 			}
-		} finally {
-			if (os != null) {
-				try {
-					os.close();
-				} catch (IOException e) {
-					throw new ExcelOutException("Happen exception when flush", e);
+		} catch (RuntimeException e) {
+			primary = e;
+		}
+		if (os != null) {
+			try {
+				os.close();
+			} catch (IOException e) {
+				ExcelOutException ex = new ExcelOutException("Happen exception when flush", e);
+				if (primary == null) {
+					primary = ex;
+				} else {
+					primary.addSuppressed(ex);
 				}
 			}
+		}
+		try {
 			this.wb.dispose();
+		} catch (RuntimeException e) {
+			if (primary == null) {
+				primary = e;
+			} else {
+				primary.addSuppressed(e);
+			}
+		}
+		if (primary != null) {
+			throw primary;
 		}
 	}
 
