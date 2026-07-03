@@ -5,7 +5,6 @@ import java.lang.reflect.Type;
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.vo.OutValue;
-import com.bing.excel.vo.OutValue.OutType;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -26,11 +25,11 @@ public final class IntegerFieldConverter extends AbstractFieldConvertor {
 	@Override
 	public Object fromString(String cell,ConverterHandler converterHandler,Type targetType) {
 
-		if (StringUtils.isEmpty(cell)) {
+		if (StringUtils.isBlank(cell)) {
 			return null;
 		}
-		long value= Long.decode(cell).longValue();
-    	if(value < Integer.MIN_VALUE || value > 0xFFFFFFFFl) {
+		long value= Long.decode(cell.trim()).longValue();
+    	if(value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
     		throw new NumberFormatException("For input string: \"" + cell + '"');
     	}
         return Integer.valueOf((int)value);

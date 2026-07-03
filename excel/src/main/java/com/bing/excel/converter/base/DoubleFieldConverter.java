@@ -20,7 +20,7 @@ public final class DoubleFieldConverter extends AbstractFieldConvertor {
 		if(StringUtils.isBlank(cell)){
 			return null;
 		}
-		return Double.valueOf( cell);
+		return Double.valueOf(cell.trim());
 	}
 
 	@Override

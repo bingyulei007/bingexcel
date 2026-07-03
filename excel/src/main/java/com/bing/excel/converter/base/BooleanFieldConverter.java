@@ -7,6 +7,7 @@ import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
 import com.bing.excel.vo.OutValue;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -20,6 +21,7 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 	private final boolean caseSensitive;
 	private final String trueCaseStr;
 	private final String falseCaseStr;
+	private final boolean defaultBooleanWords;
 
 	/**
 	 * @param trueCaseStr 为真时候的输入
@@ -31,13 +33,17 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 		this.caseSensitive = caseSensitive;
 		this.trueCaseStr = trueCaseStr;
 		this.falseCaseStr = falseCaseStr;
+		this.defaultBooleanWords = false;
 	}
 
 	/**
-	 * 默认的boolean类型转换器，支持"TRUE", "FALSE"字符的转换
+	 * 默认的boolean类型转换器，支持true/false、on/off、yes/no、y/n、1/0字符的转换
 	 */
 	public BooleanFieldConverter() {
-		this("TRUE", "FALSE", false);
+		this.caseSensitive = false;
+		this.trueCaseStr = "TRUE";
+		this.falseCaseStr = "FALSE";
+		this.defaultBooleanWords = true;
 	}
 
 	@Override
@@ -64,24 +70,32 @@ public final class BooleanFieldConverter extends AbstractFieldConvertor {
 	 */
 	@Override
 	public Object fromString(String cell,ConverterHandler converterHandler,Type targetType) {
-		if (StringUtils.isEmpty(cell)) {
+		if (StringUtils.isBlank(cell)) {
 			return null;
+		}
+		String valueText = cell.trim();
+		if (defaultBooleanWords) {
+			Boolean value = BooleanUtils.toBooleanObject(valueText);
+			if (value == null) {
+				throw new ConversionException("Cann't parse value '"+cell+"' to java.lang.Boolean");
+			}
+			return value;
 		}
 		Boolean re;
 		if (caseSensitive) {
-			re = trueCaseStr.equals(cell) ? Boolean.TRUE : Boolean.FALSE;
+			re = trueCaseStr.equals(valueText) ? Boolean.TRUE : Boolean.FALSE;
 		} else {
-			re = trueCaseStr.equalsIgnoreCase(cell) ? Boolean.TRUE
+			re = trueCaseStr.equalsIgnoreCase(valueText) ? Boolean.TRUE
 					: Boolean.FALSE;
 		}
 		if (!re) {
 			if (caseSensitive) {
-				if (!falseCaseStr.equals(cell)) {
+				if (!falseCaseStr.equals(valueText)) {
 					throw new ConversionException("Cann't parse value '"+cell+"' to java.lang.Boolean");
 				}
 			} else {
-				if (!falseCaseStr.equalsIgnoreCase(cell)) {
-
+				if (!falseCaseStr.equalsIgnoreCase(valueText)) {
+					throw new ConversionException("Cann't parse value '"+cell+"' to java.lang.Boolean");
 				}
 			}
 		}

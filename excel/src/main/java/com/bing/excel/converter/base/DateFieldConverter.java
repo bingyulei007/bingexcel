@@ -3,10 +3,9 @@ package com.bing.excel.converter.base;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
@@ -20,14 +19,13 @@ import com.bing.excel.vo.OutValue;
  */
 public final class DateFieldConverter extends AbstractFieldConvertor {
 
-	private static final ThreadLocal<Map<Object, Object>> localFormat = new ThreadLocal<>();
+	private static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	private static final String[] SMART_FORMATS = {DEFAULT_FORMAT, "yy-MM-dd HH:mm", "yy-MM-dd"};
 	private final String inFormatStr;
-	private final String outFormatStr;
-	private final String inFormatKey = "inKey";
-	private final String outFormatKey = "outKey";
+	private final boolean smartConversion;
 
 	public DateFieldConverter(boolean smartConversion) {
-		this("yyyy-MM-dd HH:mm:ss", smartConversion);
+		this(DEFAULT_FORMAT, smartConversion);
 	}
 
 	public DateFieldConverter() {
@@ -35,13 +33,8 @@ public final class DateFieldConverter extends AbstractFieldConvertor {
 	}
 
 	public DateFieldConverter(String formats, boolean smartConversion) {
-		this(formats, formats, smartConversion);
-	}
-
-	public DateFieldConverter(String inFormats, String outFormats,
-			boolean smartConversion) {
-		this.inFormatStr = inFormats;
-		this.outFormatStr = outFormats;
+		this.inFormatStr = formats;
+		this.smartConversion = smartConversion;
 	}
 
 	@Override
@@ -59,66 +52,23 @@ public final class DateFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public   Object  fromString(String cell,ConverterHandler converterHandler,Type targetType) {
-		
-		
-		String temp=cell;
-		SimpleDateFormat inFormat=getFormat(outFormatKey);
-		
-		if(inFormat==null){
-			throw new NullPointerException("inFormat[SimpleDateFormat] is null");
+		if (StringUtils.isBlank(cell)) {
+			return null;
 		}
-		Date date;
-		try {
-			date = inFormat.parse(temp);
-			return date;
-		} catch (ParseException e) {
+		String temp = cell.trim();
+		String[] formats = smartConversion ? SMART_FORMATS : new String[] {inFormatStr};
+		ParseException parseException = null;
+		for (String format : formats) {
 			try {
-				inFormat.applyPattern("yy-MM-dd HH:mm");
-				date = inFormat.parse(temp);
-				return date;
-			} catch (ParseException e1) {
-				try {
-					inFormat.applyPattern("yy-MM-dd");
-					date = inFormat.parse(temp);
-					return date;
-				} catch (ParseException e2) {
-					throw new ConversionException("Cannot parse date" + cell, e2);
-				}
+				return getFormat(format).parse(temp);
+			} catch (ParseException e) {
+				parseException = e;
 			}
-
 		}
-
+		throw new ConversionException("Cannot parse date: " + cell, parseException);
 	}
 
-	public SimpleDateFormat getFormat(String key) {
-		if (key.equals(inFormatKey)) {
-			Map<Object, Object> map = localFormat.get();
-			if (map == null) {
-				map = Collections.synchronizedMap(new HashMap<>());
-				localFormat.set(map);
-			}
-			Object object = map.get(key);
-			if (object == null) {
-				SimpleDateFormat format = new SimpleDateFormat(inFormatStr);
-				map.put(key, format);
-				object = format;
-				
-			}
-			return (SimpleDateFormat) object;
-		} else if (key.equals(outFormatKey)) {
-			Map<Object, Object> map = localFormat.get();
-			if (map == null) {
-				map = Collections.synchronizedMap(new HashMap<>());
-				localFormat.set(map);
-			}
-			Object object = map.get(key);
-			if (object == null) {
-				SimpleDateFormat format = new SimpleDateFormat(outFormatStr);
-				map.put(key, format);
-				object = format;
-			}
-			return (SimpleDateFormat) object;
-		}
-		return null;
+	private SimpleDateFormat getFormat(String format) {
+		return new SimpleDateFormat(format);
 	}
 }

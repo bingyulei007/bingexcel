@@ -16,14 +16,10 @@ public final class LongFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public Object fromString(String cell, ConverterHandler converterHandler, Type targetType) {
-		if (StringUtils.isEmpty(cell)) {
+		if (StringUtils.isBlank(cell)) {
             return null;
         }
-		  char c1 = cell.charAt(1);
-	        if (c1 == 'x' || c1 == 'X') {
-	            return Long.decode(cell);
-	        }
-		return Long.parseLong(cell);
+		return Long.decode(cell.trim());
 	}
 
 	@Override

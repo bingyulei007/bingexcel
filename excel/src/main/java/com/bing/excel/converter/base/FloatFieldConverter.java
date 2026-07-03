@@ -22,10 +22,10 @@ public final class FloatFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public Object fromString(String cell, ConverterHandler converterHandler, Type targetType) {
-		if(StringUtils.isEmpty(cell)){
+		if(StringUtils.isBlank(cell)){
 			return null;
 		}
-		return Float.valueOf(cell);
+		return Float.valueOf(cell.trim());
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public final class FloatFieldConverter extends AbstractFieldConvertor {
 		if(source==null){
 			return null;
 		}
-		return OutValue.dateValue(((Float)source).doubleValue());
+		return OutValue.doubleValue(((Float)source).doubleValue());
 	}
 
 }

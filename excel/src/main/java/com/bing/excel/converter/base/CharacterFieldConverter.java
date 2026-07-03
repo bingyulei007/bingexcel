@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.vo.OutValue;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author shizhongtao
@@ -21,14 +22,10 @@ public final class CharacterFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public Object fromString(String cell, ConverterHandler converterHandler, Type targetType) {
-		if (cell==null) {
+		if (StringUtils.isBlank(cell)) {
 			return null;
 		}
-		 if (cell.length() == 0) {
-            return '\0';
-        } else {
-            return cell.charAt(0);
-	        }
+		return cell.trim().charAt(0);
 	}
 
 	@Override

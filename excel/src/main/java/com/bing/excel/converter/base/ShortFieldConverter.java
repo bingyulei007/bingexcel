@@ -16,10 +16,10 @@ public final class ShortFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public Object fromString(String cell, ConverterHandler converterHandler, Type targetType) {
-		if(StringUtils.isEmpty(cell)){
+		if(StringUtils.isBlank(cell)){
 			return null;
 		}
-		int value = Integer.valueOf(cell).intValue();
+		int value = Integer.valueOf(cell.trim()).intValue();
     	if(value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
     		throw new NumberFormatException("For input string: \"" + cell + '"');
     	}

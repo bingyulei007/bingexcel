@@ -24,11 +24,11 @@ public final class ByteFieldConverter extends AbstractFieldConvertor {
 
 	@Override
 	public Object fromString(String cell, ConverterHandler converterHandler, Type targetType) {
-		if (StringUtils.isEmpty(cell)) {
+		if (StringUtils.isBlank(cell)) {
 			return null;
 		}
-		int value = Integer.decode(cell).intValue();
-    	if(value < Byte.MIN_VALUE || value > 0xFF) {
+		int value = Integer.decode(cell.trim()).intValue();
+    	if(value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) {
     		throw new NumberFormatException("For input string: \"" + cell + '"');
     	}
         return Byte.valueOf((byte)value);

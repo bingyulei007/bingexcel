@@ -4,17 +4,29 @@ import com.bing.excel.annotation.BingConvertor;
 import com.bing.excel.annotation.CellConfig;
 import com.bing.excel.annotation.OutAlias;
 import com.bing.excel.converter.base.BooleanFieldConverter;
+import com.bing.excel.converter.base.ByteFieldConverter;
+import com.bing.excel.converter.base.DateFieldConverter;
+import com.bing.excel.converter.base.FloatFieldConverter;
+import com.bing.excel.converter.base.IntegerFieldConverter;
+import com.bing.excel.converter.base.LongFieldConverter;
+import com.bing.excel.converter.enums.EnumConVerter;
 import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.impl.BingExcelImpl.SheetExcel;
+import com.bing.excel.exception.ConversionException;
 import com.bing.excel.vo.ListLine;
+import com.bing.excel.vo.OutValue;
 import com.bing.excel.writer.ExcelWriterFactory;
 import com.bing.excel.writer.WriteHandler;
 import com.bing.utils.ToStringHelper;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -224,6 +236,161 @@ public class WriteTest7 {
         System.out.println("运行时映射导出成功: " + path);
     }
 
+    /**
+     * 测试11: Float基础转换器写出时应按数值类型输出。
+     */
+    @Test
+    public void testFloatConverterToObject() {
+        OutValue outValue = new FloatFieldConverter().toObject(12.5f, null);
+
+        assertEquals(OutValue.OutType.DOUBLE, outValue.getOutType());
+        assertEquals(12.5d, (Double) outValue.getValue(), 0.000001d);
+    }
+
+    /**
+     * 测试12: Boolean基础转换器默认支持常见布尔文本，遇到非法文本应抛转换异常。
+     */
+    @Test
+    public void testBooleanConverterDefaultWords() {
+        BooleanFieldConverter converter = new BooleanFieldConverter();
+
+        assertEquals(Boolean.TRUE, converter.fromString("true", null, Boolean.class));
+        assertEquals(Boolean.TRUE, converter.fromString("YES", null, Boolean.class));
+        assertEquals(Boolean.TRUE, converter.fromString("y", null, Boolean.class));
+        assertEquals(Boolean.TRUE, converter.fromString("on", null, Boolean.class));
+        assertEquals(Boolean.TRUE, converter.fromString("1", null, Boolean.class));
+        assertEquals(Boolean.FALSE, converter.fromString("false", null, Boolean.class));
+        assertEquals(Boolean.FALSE, converter.fromString("NO", null, Boolean.class));
+        assertEquals(Boolean.FALSE, converter.fromString("n", null, Boolean.class));
+        assertEquals(Boolean.FALSE, converter.fromString("off", null, Boolean.class));
+        assertEquals(Boolean.FALSE, converter.fromString("0", null, Boolean.class));
+        try {
+            converter.fromString("not-boolean", null, Boolean.class);
+            fail("Expected ConversionException");
+        } catch (ConversionException expected) {
+            // expected
+        }
+    }
+
+    /**
+     * 测试13: 自定义Boolean基础转换器仍只接受配置的文本。
+     */
+    @Test
+    public void testCustomBooleanConverterRejectsInvalidValue() {
+        BooleanFieldConverter converter = new BooleanFieldConverter("是", "否", false);
+
+        assertEquals(Boolean.TRUE, converter.fromString("是", null, Boolean.class));
+        assertEquals(Boolean.FALSE, converter.fromString("否", null, Boolean.class));
+        try {
+            converter.fromString("yes", null, Boolean.class);
+            fail("Expected ConversionException");
+        } catch (ConversionException expected) {
+            // expected
+        }
+    }
+
+    /**
+     * 测试14: Long基础转换器应支持单字符数字和十六进制，且不越界访问字符串。
+     */
+    @Test
+    public void testLongConverterDecode() {
+        LongFieldConverter converter = new LongFieldConverter();
+
+        assertEquals(Long.valueOf(1L), converter.fromString("1", null, Long.class));
+        assertEquals(Long.valueOf(16L), converter.fromString("0x10", null, Long.class));
+    }
+
+    /**
+     * 测试15: Date基础转换器应使用输入格式解析，且连续解析不会污染格式。
+     */
+    @Test
+    public void testDateConverterUsesInputFormatWithoutPatternPollution() throws Exception {
+        DateFieldConverter converter = new DateFieldConverter("yyyy/MM/dd", false);
+        SimpleDateFormat assertFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+        assertEquals(assertFormat.parse("2026/07/02"),
+            converter.fromString("2026/07/02", null, java.util.Date.class));
+        try {
+            converter.fromString("26-07-02", null, java.util.Date.class);
+            fail("Expected ConversionException");
+        } catch (ConversionException expected) {
+            // expected
+        }
+        assertEquals(assertFormat.parse("2026/07/03"),
+            converter.fromString("2026/07/03", null, java.util.Date.class));
+    }
+
+    /**
+     * 测试16: Date基础转换器开启smartConversion后支持历史兼容格式。
+     */
+    @Test
+    public void testDateConverterSmartConversion() throws Exception {
+        DateFieldConverter converter = new DateFieldConverter(true);
+        SimpleDateFormat defaultFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat fallbackFormat = new SimpleDateFormat("yy-MM-dd");
+
+        assertEquals(defaultFormat.parse("2026-07-02 08:09:10"),
+            converter.fromString("2026-07-02 08:09:10", null, java.util.Date.class));
+        assertEquals(fallbackFormat.parse("26-07-02"),
+            converter.fromString("26-07-02", null, java.util.Date.class));
+    }
+
+    /**
+     * 测试17: Byte基础转换器应按Java Byte范围校验，不允许无符号溢出。
+     */
+    @Test
+    public void testByteConverterRange() {
+        ByteFieldConverter converter = new ByteFieldConverter();
+
+        assertEquals(Byte.valueOf((byte) 127), converter.fromString("127", null, Byte.class));
+        assertEquals(Byte.valueOf((byte) -128), converter.fromString("-128", null, Byte.class));
+        try {
+            converter.fromString("255", null, Byte.class);
+            fail("Expected NumberFormatException");
+        } catch (NumberFormatException expected) {
+            // expected
+        }
+    }
+
+    /**
+     * 测试18: Integer基础转换器应按Java Integer范围校验，不允许无符号溢出。
+     */
+    @Test
+    public void testIntegerConverterRange() {
+        IntegerFieldConverter converter = new IntegerFieldConverter();
+
+        assertEquals(Integer.valueOf(Integer.MAX_VALUE),
+            converter.fromString(String.valueOf(Integer.MAX_VALUE), null, Integer.class));
+        assertEquals(Integer.valueOf(Integer.MIN_VALUE),
+            converter.fromString(String.valueOf(Integer.MIN_VALUE), null, Integer.class));
+        try {
+            converter.fromString("4294967295", null, Integer.class);
+            fail("Expected NumberFormatException");
+        } catch (NumberFormatException expected) {
+            // expected
+        }
+    }
+
+    /**
+     * 测试19: Enum基础转换器应支持读写枚举名称。
+     */
+    @Test
+    public void testEnumConverterReadWrite() {
+        EnumConVerter converter = new EnumConVerter();
+        OutValue outValue = converter.toObject(Status.ENABLED, null);
+
+        assertEquals(OutValue.OutType.STRING, outValue.getOutType());
+        assertEquals("ENABLED", outValue.getValue());
+        assertEquals(Status.ENABLED, converter.fromString("ENABLED", null, Status.class));
+        assertEquals(Status.DISABLED, converter.fromString(" disabled ", null, Status.class));
+        try {
+            converter.fromString("unknown", null, Status.class);
+            fail("Expected ConversionException");
+        } catch (ConversionException expected) {
+            // expected
+        }
+    }
+
     // ==================== 辅助方法 ====================
 
     private List<Person> createPersonList() {
@@ -235,6 +402,10 @@ public class WriteTest7 {
     }
 
     // ==================== 测试用的实体类 ====================
+
+    private enum Status {
+        ENABLED, DISABLED
+    }
 
     @OutAlias("人员信息")
     public static class Person {

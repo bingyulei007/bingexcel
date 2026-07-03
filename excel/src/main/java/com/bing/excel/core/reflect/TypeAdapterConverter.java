@@ -139,12 +139,9 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
       }
 
       BoundField boundField = kv.getValue();
-      if (fieldConverterMapper.getFieldConverter() == null) {
+      FieldValueConverter converter = getLocalConverter(fieldConverterMapper);
 
-        setLocalConverter(fieldConverterMapper);
-      }
-
-      boundField.serializeValue(source, fieldConverterMapper, line);
+      boundField.serializeValue(source, fieldConverterMapper, converter, line);
     }
     return line;
   }
@@ -178,10 +175,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
           continue;
         }
         BoundField boundField = kv.getValue();
-        if (converterMapper.getFieldConverter() == null) {
-
-          setLocalConverter(converterMapper);
-        }
+        FieldValueConverter converter = getLocalConverter(converterMapper);
 
         int index = resolver != null
             ? resolver.getResolvedIndex(kv.getKey(), converterMapper)
@@ -200,7 +194,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
           continue;
         }
         String fieldValue = length > index ? fullArray[index] : null;
-        boundField.initializeValue(obj, fieldValue, converterMapper);
+        boundField.initializeValue(obj, fieldValue, converterMapper, converter);
       }
     }
     return (T) obj;
@@ -223,19 +217,21 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
     return converterMapper;
   }
 
-  private void setLocalConverter(FieldConverterMapper converterMapper) {
-    // it is not good for wrap clazz in this place
-    Class<?> keyFieldType = converterMapper.isPrimitive() ? ClassUtils.primitiveToWrapper(converterMapper.getFieldClass()) : converterMapper.getFieldClass();
-    FieldValueConverter fieldValueConverter = defaultLocalConverterHandler
-        .getLocalConverter(keyFieldType);
-
-    if (fieldValueConverter == null) {
+  private FieldValueConverter getLocalConverter(FieldConverterMapper converterMapper) {
+    FieldValueConverter converter = converterMapper.getFieldConverter();
+    if (converter != null) {
+      return converter;
+    }
+    Class<?> keyFieldType = converterMapper.isPrimitive()
+        ? ClassUtils.primitiveToWrapper(converterMapper.getFieldClass())
+        : converterMapper.getFieldClass();
+    converter = defaultLocalConverterHandler.getLocalConverter(keyFieldType);
+    if (converter == null) {
       throw new IllegalEntityException(clazz,
           "can find the converter for fieldType ["
               + converterMapper.getFieldClass() + "]");
     }
-    converterMapper.setFieldConverter(fieldValueConverter);
-
+    return converter;
   }
 
   private class BoundField {
@@ -252,7 +248,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
      * Get listline from object
      */
     protected ListLine serializeValue(Object entity,
-        FieldConverterMapper converterMapper, ListLine line) {
+        FieldConverterMapper converterMapper, FieldValueConverter converter, ListLine line) {
       if (entity == null) {
         return line;
       } else {
@@ -260,8 +256,6 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
           throw new NullPointerException("the converterMapper for ["
               + name + "] is null");
         } else {
-          FieldValueConverter converter = converterMapper
-              .getFieldConverter();
           if (converter == null) {
             throw new NullPointerException("the converter for ["
                 + name + "] is null");
@@ -314,12 +308,10 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
     }
 
     protected Object initializeValue(Object obj, String value,
-        FieldConverterMapper converterMapper) {
+        FieldConverterMapper converterMapper, FieldValueConverter converter) {
       // field.set(obj, value);
       if (value != null) {
         if (converterMapper != null) {
-          FieldValueConverter converter = converterMapper
-              .getFieldConverter();
           if (converter == null) {
             throw new NullPointerException("the converter for ["
                 + name + "] is null");

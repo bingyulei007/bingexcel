@@ -97,7 +97,7 @@ This file provides guidance to the AI agent when working with code in this repos
   - `annotatedTypes`: `Collections.synchronizedSet()`
   - `converterCache`: `ConcurrentHashMap` (replaced Caffeine in commit df30a37)
   - `ConversionMapper.fieldMapper`: `ConcurrentHashMap`
-- **Known flaw**: `FieldConverterMapper.setFieldConverter()` is lazy-called during marshal/unmarshal without synchronization. Mitigated by **startup warm-up** in `BingExcelWarmUpRunner` — triggers all lazy-init at container startup, leaving only read paths at runtime.
+- `TypeAdapterConverter` resolves default converters per marshal/unmarshal call without writing them back to shared `FieldConverterMapper` instances. Field-level converters from annotations/user mappings remain stored in mapper objects, but default converter lookup no longer mutates shared state.
 - Each read/write operation creates its own handler/listener internally, no shared I/O state.
 
 ### `ListRow` and Cell Handling
