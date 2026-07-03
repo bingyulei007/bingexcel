@@ -312,44 +312,64 @@ for each boundField:
 
 ---
 
-## 9. 当前已识别的可优化方向（待逐个处理）
+## 9. 当前已识别的可优化方向
 
-读取侧：
-1. `DefaultXSSFSaxHandler` / `DefaultHSSFHandler` 资源关闭路径与异常处理可收紧。
-2. `readSheet(int[])` 里 `Set.copyOf(build)` 紧接 `build` 已是有效 set，多余。
-3. `HSSFListenerAbstract.processRecord` 是巨型方法，按 sid 分发可拆。
-4. `ExcelReaderFactory.create(InputStream)` 里 `PushbackInputStream` + `BufferedInputStream` + `FileMagic.prepareToCheckMagic` 嵌套层数多。
-5. `readFileToList` 与 `readStreamToList` 几乎完全重复。
-6. `BingExcelReaderListener` 在 `readFile` 单 condition 时走 `readFileToList` 拿 list[0]，可短路。
-7. XSSF `nameToColumn` 对空 `cellReference`（POI 可能给 null）无防御。
+> 更新时间：2026-07-03。标记 ✅ 为已完成，⬜ 为待处理。
 
-映射/转换侧：
-8. `OutValue` 缺 `BOOLEAN` / `BIG_DECIMAL` / `LOCAL_DATE` 类型。
-9. `FieldValueConverter.fromString` 的 `Type targetType` 实际只传 `Class`，泛型信息丢失（影响集合 converter，但集合 converter 已 deprecated）。
-10. `converter` 包混入 `ModelAdapter` / `HeaderReflectConverter`（实体级接口），职责偏宽。
+### 读取侧
 
-写出侧：
-11. CSV 三个 `writeCSV` 重载代码重复严重。
-12. `AbstractWriteHandler.flush()` 不关闭/不 flush `OutputStream`，依赖调用方。
-13. `BingExcel.writeXlsx` 默认 `XSSFWorkbook`，大数据量易 OOM；可考虑默认或可选 SXSSF。
-14. `AbstractWriteHandler` 里 `currentRowIndex < 2` 判断列宽的逻辑脆弱（与 header 写入耦合）。
-15. 日期单元格格式 `m/d/yy h:mm` 硬编码，不可配置。
+1. ✅ `readStreamToList` 的 `minNum` 初始化为 0 导致 `endRow` 限制失效（P0 bug，已修复）。
+2. ✅ `readFileToList` / `readStreamToList` 重复代码抽取为 `readWithHandler`。
+3. ✅ `DefaultXSSFSaxHandler` 三个 readSheet 方法重复逻辑抽取为 `readSheetsInternal`。
+4. ✅ `readSheet(int[])` 里 `Set.copyOf(build)` 冗余，已简化。
+5. ✅ `ExcelReaderFactory.create(InputStream)` 嵌套层数多，已清除死代码 + 移除冗余 `IOUtils.peekFirst8Bytes`。
+6. ✅ XSSF `nameToColumn` 对空 `cellReference` 无防御，已加 null/empty 判断。
+7. ✅ `XMLReaderFactory` 已 deprecated，已迁移到标准 `SAXParserFactory`。
+8. ✅ `HSSFListenerAbstract` 的 `LabelRecord` / `LabelSSTRecord` / `NumberRecord` 的 `trim()` 副作用已移除。
+9. ⬜ `HSSFListenerAbstract.processRecord` 是巨型方法（200+ 行），按 sid 分发可拆（低优先，重构风险高）。
+10. ⬜ `BingExcelReaderListener` 在 `readFile` 单 condition 时走 `readFileToList` 拿 list[0]，可短路（收益小）。
+11. ⬜ 资源关闭路径已审查，无明显的泄露问题，但异常处理可进一步收紧。
 
-测试侧：
-16. converter 测试堆在 `WriteTest7`，应拆 `BaseFieldConverterTest`。
-17. `LocalConverterHandler` / `TypeAdapterConverter` / `AnnotationMapperHandler` 无单测覆盖（codegraph 标注 no covering tests）。
+### 映射/转换侧
+
+12. ✅ `TypeAdapterConverter` 默认 converter 查询不再回写共享 `FieldConverterMapper`，根治并发懒初始化。
+13. ✅ 所有基础转换器统一 `StringUtils.isBlank` 空白策略并 `trim()` 输入。
+14. ✅ `BooleanFieldConverter` 默认模式改用 `BooleanUtils`。
+15. ✅ `DateFieldConverter` 移除 ThreadLocal，修复格式污染，`smartConversion` 生效。
+16. ✅ `EnumConVerter` 新增 `toObject`，读写一致用 `Enum.name()`。
+17. ✅ `FloatFieldConverter` 修复 `dateValue` → `doubleValue`。
+18. ✅ `LongFieldConverter` 修复 `charAt(1)` 越界。
+19. ✅ `ByteFieldConverter` / `IntegerFieldConverter` 收紧为 Java 有符号范围。
+20. ⬜ `OutValue` 缺 `BOOLEAN` / `BIG_DECIMAL` / `LOCAL_DATE` 类型。
+21. ⬜ `FieldValueConverter.fromString` 的 `Type targetType` 实际只传 `Class`，泛型信息丢失。
+22. ⬜ `converter` 包混入 `ModelAdapter` / `HeaderReflectConverter`（实体级接口），职责偏宽。
+
+### 写出侧
+
+23. ⬜ CSV 三个 `writeCSV` 重载代码重复严重。
+24. ⬜ `AbstractWriteHandler.flush()` 不关闭/不 flush `OutputStream`，依赖调用方。
+25. ⬜ `BingExcel.writeXlsx` 默认 `XSSFWorkbook`，大数据量易 OOM；可考虑默认或可选 SXSSF。
+26. ⬜ `AbstractWriteHandler` 里 `currentRowIndex < 2` 判断列宽的逻辑脆弱（与 header 写入耦合）。
+27. ⬜ 日期单元格格式 `m/d/yy h:mm` 硬编码，不可配置。
+
+### 测试侧
+
+28. ⬜ converter 测试堆在 `WriteTest7`，应拆 `BaseFieldConverterTest`。
+29. ⬜ `LocalConverterHandler` / `TypeAdapterConverter` / `AnnotationMapperHandler` 无单测覆盖。
 
 ---
 
 ## 10. 后续优化执行顺序建议
 
-按"风险低、收益明确"优先：
+已完成（commit `a90f918` + `f76282b`）：
+- 转换器层修复与线程安全优化
+- 读取链路 bug 修复与重构优化
 
-1. 读取侧资源关闭与异常处理收紧（P0，防泄露/吞异常）。
-2. `readFileToList` / `readStreamToList` 去重 + 单 condition 短路（P1）。
-3. `HSSFListenerAbstract.processRecord` 拆方法（P1，可读性）。
-4. CSV 写出去重重构（P1）。
-5. `AbstractWriteHandler.flush()` 资源语义明确化（P1）。
-6. `OutValue` 类型扩展 + BigDecimal/LocalDate converter（P2，功能增强）。
-7. converter 测试拆分（P2）。
-8. 包结构/命名整理（P3，大版本再做）。
+下一步按"风险低、收益明确"优先：
+
+1. ⬜ CSV 写出去重重构（P1）。
+2. ⬜ `AbstractWriteHandler.flush()` 资源语义明确化（P1）。
+3. ⬜ `OutValue` 类型扩展 + BigDecimal/LocalDate converter（P2，功能增强）。
+4. ⬜ converter 测试拆分（P2）。
+5. ⬜ `HSSFListenerAbstract.processRecord` 拆方法（P2，可读性，重构风险中）。
+6. ⬜ 包结构/命名整理（P3，大版本再做）。
