@@ -1,6 +1,11 @@
 package com.bing.excel.reader;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.sql.SQLException;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -9,7 +14,6 @@ import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.util.IOUtils;
 
 import com.bing.excel.reader.hssf.DefaultHSSFHandler;
 import com.bing.excel.reader.sax.DefaultXSSFSaxHandler;
@@ -90,46 +94,33 @@ public class ExcelReaderFactory {
 	public static ReadHandler create(InputStream inp,
 			ExcelReadListener excelReader, boolean ignoreNumFormat)
 			throws InvalidFormatException, IOException, SQLException {
-			 // If clearly doesn't do mark/reset, wrap up
+		if (!inp.markSupported()) {
+			inp = new PushbackInputStream(inp, 8);
+		}
+		InputStream is = FileMagic.prepareToCheckMagic(inp);
+		FileMagic fm = FileMagic.valueOf(is);
 
-	        if (! inp.markSupported()) {
-	            inp = new PushbackInputStream(inp, 8);
-	        }
-			BufferedInputStream bis = new BufferedInputStream(inp);
-	        // Ensure that there is at least some data there
-	        byte[] header8 = IOUtils.peekFirst8Bytes(bis);
-
-
-
-	//        if (POIXMLDocument.hasOOXMLHeader(bis)) {
-	//             OPCPackage pkg = OPCPackage.open(bis);
-	//             return create(pkg, excelReader, ignoreNumFormat);
-	//        }
-
-			InputStream is = FileMagic.prepareToCheckMagic(bis);
-
-			FileMagic fm = FileMagic.valueOf(is);
-
-			switch (fm) {
-				case OLE2:
-					POIFSFileSystem fs = new POIFSFileSystem(is);
-					try {
-						return create(fs, excelReader,ignoreNumFormat);
-					} catch (Exception e) {
-						fs.close();
-						throw e;
-					}
-				case OOXML:
-					OPCPackage pkg = OPCPackage.open(is);
-					try {
-						return create(pkg, excelReader, ignoreNumFormat);
-					} catch (Exception e) {
-						pkg.revert();
-						throw e;
-					}
-				default:
-					throw new InvalidFormatException("Your InputStream was neither an OLE2 stream, nor an OOXML stream");
-			}
+		switch (fm) {
+			case OLE2:
+				POIFSFileSystem fs = new POIFSFileSystem(is);
+				try {
+					return create(fs, excelReader, ignoreNumFormat);
+				} catch (Exception e) {
+					fs.close();
+					throw e;
+				}
+			case OOXML:
+				OPCPackage pkg = OPCPackage.open(is);
+				try {
+					return create(pkg, excelReader, ignoreNumFormat);
+				} catch (Exception e) {
+					pkg.revert();
+					throw e;
+				}
+			default:
+				throw new InvalidFormatException(
+						"Your InputStream was neither an OLE2 stream, nor an OOXML stream");
+		}
 	}
 
 	/**
@@ -146,15 +137,6 @@ public class ExcelReaderFactory {
 		return create(pkg, excelReader, false);
 	}
 
-	/*
-	 * public static SaxHandler create(OPCPackage pkg,ExcelReadListener
-	 * excelReadListener,Integer maxReturnLines) throws SQLException,
-	 * InvalidFormatException, IOException{ return
-	 * create(pkg,excelReadListener,false,maxReturnLines); } public static SaxHandler
-	 * create(OPCPackage pkg,ExcelReadListener excelReadListener,boolean
-	 * ignoreNumFormat) throws SQLException, InvalidFormatException,
-	 * IOException{ return create(pkg,excelReadListener,ignoreNumFormat,null); }
-	 */
 	public static ReadHandler create(OPCPackage pkg,
 			ExcelReadListener excelReadListener, boolean ignoreNumFormat) throws SQLException,
 			InvalidFormatException, IOException {
@@ -169,14 +151,6 @@ public class ExcelReaderFactory {
 		return create(fs, excelReader, false);
 	}
 
-	/*
-	 * public static SaxHandler create(POIFSFileSystem fs,ExcelReadListener
-	 * excelReader,Integer maxReturnLines) throws SQLException{ return
-	 * create(fs,excelReader,false,maxReturnLines); } public static SaxHandler
-	 * create(POIFSFileSystem fs,ExcelReadListener excelReader,boolean
-	 * ignoreNumFormat) throws SQLException{ return
-	 * create(fs,excelReader,ignoreNumFormat,null); }
-	 */
 	public static ReadHandler create(POIFSFileSystem fs,
 			ExcelReadListener excelReader, boolean ignoreNumFormat) throws SQLException {
 		DefaultHSSFHandler handler = new DefaultHSSFHandler(fs, excelReader,

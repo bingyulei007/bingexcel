@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -14,7 +17,6 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.bing.excel.exception.BingSaxReadStopException;
 import com.bing.excel.reader.ExcelReadListener;
@@ -26,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 /**
  * @author shizhongtao
@@ -117,44 +120,7 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 	
 	@Override
 	public void readSheets() throws IOException, OpenXML4JException, SAXException {
-		if (pkg == null) {
-			throw new NullPointerException("OPCPackage 对象为空");
-		}
-		try {
-			XSSFReader xssfReader = new XSSFReader(pkg);
-			XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) xssfReader
-					.getSheetsData();
-			ExcelReadOnlySharedStringsTable strings = new ExcelReadOnlySharedStringsTable(
-					pkg);
-			int sheetIndex = 0;
-			
-			ExcelXSSFSheetXMLHandler sheetXMLHandler = new ExcelXSSFSheetXMLHandler(
-					xssfReader.getStylesTable(), strings, handler, false);
-			sheetXMLHandler.ignoreNumFormat(ignoreNumFormat);
-			getParser().setContentHandler(sheetXMLHandler);
-			while (sheets.hasNext()) {
-				try (InputStream sheet = sheets.next()) {
-					String name = sheets.getSheetName();
-					excelReadListener.startSheet(sheetIndex, name);
-					InputSource sheetSource = new InputSource(sheet);
-				
-					try {
-						getParser().parse(sheetSource);
-					} catch (SAXException e) {
-						if (e instanceof BingSaxReadStopException) {
-							
-						} else {
-							throw e;
-						}
-					}
-					excelReadListener.endSheet(sheetIndex, name);
-					sheetIndex++;
-				}
-			}
-		} finally {
-			pkg.revert();
-		}
-		excelReadListener.endWorkBook();
+		readSheetsInternal((idx, name) -> true, false);
 	}
 
 	/*
@@ -183,60 +149,14 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 	@Override
 	public void readSheet(int[] indexs) throws IOException, OpenXML4JException,
 			SAXException {
-		if (pkg == null) {
-			throw new NullPointerException("OPCPackage is null");
-		}
-		//ImmutableCollection<Integer> sheetSelect=
-		Set<Integer> build = new HashSet<>();
+		Set<Integer> setSheets = new HashSet<>();
 		for (int i : indexs) {
-			if(i<0){
+			if (i < 0) {
 				throw new IllegalArgumentException("index of sheet is a number greater than 0");
-			}else{
-				build.add(i);
 			}
+			setSheets.add(i);
 		}
-		Set<Integer> setSheets = Set.copyOf(build);
-		try {
-	 		XSSFReader xssfReader = new XSSFReader(pkg);
-			XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) xssfReader
-					.getSheetsData();
-			ExcelReadOnlySharedStringsTable strings = new ExcelReadOnlySharedStringsTable(
-					pkg);
-			int sheetIndex = 0;
-			
-			ExcelXSSFSheetXMLHandler sheetXMLHandler = new ExcelXSSFSheetXMLHandler(
-					xssfReader.getStylesTable(), strings, handler, false);
-			sheetXMLHandler.ignoreNumFormat(ignoreNumFormat);
-			getParser().setContentHandler(sheetXMLHandler);
-			while (sheets.hasNext()) {
-				try (InputStream sheet = sheets.next()) {
-					String name = sheets.getSheetName();
-					if (!setSheets.contains(sheetIndex)) {
-						sheetIndex++;
-						continue;
-					}
-					
-					
-					excelReadListener.startSheet(sheetIndex, name);
-					InputSource sheetSource = new InputSource(sheet);
-					
-					try {
-						getParser().parse(sheetSource);
-					} catch (SAXException e) {
-						if (e instanceof BingSaxReadStopException) {
-							
-						} else {
-							throw e;
-						}
-					}
-					excelReadListener.endSheet(sheetIndex, name);
-					sheetIndex++;
-				}
-			}
-			excelReadListener.endWorkBook();
-		} finally {
-			pkg.revert();
-		}
+		readSheetsInternal((idx, name) -> setSheets.contains(idx), false);
 	}
 
 	@Override
@@ -249,6 +169,12 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 	@Override
 	public void readSheet(String sheetName) throws IOException, SAXException,
 			OpenXML4JException {
+		readSheetsInternal((idx, name) -> name.equals(sheetName), true);
+	}
+
+	private void readSheetsInternal(BiPredicate<Integer, String> matcher,
+			boolean stopAfterFirst) throws IOException, OpenXML4JException,
+			SAXException {
 		if (pkg == null) {
 			throw new NullPointerException("OPCPackage 对象为空");
 		}
@@ -258,17 +184,16 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 					.getSheetsData();
 			ExcelReadOnlySharedStringsTable strings = new ExcelReadOnlySharedStringsTable(
 					pkg);
-			int sheetIndex = 0;
-			
+
 			ExcelXSSFSheetXMLHandler sheetXMLHandler = new ExcelXSSFSheetXMLHandler(
 					xssfReader.getStylesTable(), strings, handler, false);
 			sheetXMLHandler.ignoreNumFormat(ignoreNumFormat);
 			getParser().setContentHandler(sheetXMLHandler);
+			int sheetIndex = 0;
 			while (sheets.hasNext()) {
 				try (InputStream sheet = sheets.next()) {
 					String name = sheets.getSheetName();
-					
-					if (!name.equals(sheetName)) {
+					if (!matcher.test(sheetIndex, name)) {
 						sheetIndex++;
 						continue;
 					}
@@ -277,26 +202,32 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 					try {
 						getParser().parse(sheetSource);
 					} catch (SAXException e) {
-						if (e instanceof BingSaxReadStopException) {
-						} else {
+						if (!(e instanceof BingSaxReadStopException)) {
 							throw e;
 						}
 					}
 					excelReadListener.endSheet(sheetIndex, name);
+					if (stopAfterFirst) {
+						break;
+					}
 					sheetIndex++;
-					break;
 				}
 			}
-			excelReadListener.endWorkBook();
 		} finally {
-			this.pkg.revert();
+			pkg.revert();
 		}
+		excelReadListener.endWorkBook();
 	}
 
 	public XMLReader getParser() throws SAXException {
 		if (parser == null) {
-			parser = XMLReaderFactory
-					.createXMLReader("org.apache.xerces.parsers.SAXParser");
+			try {
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				factory.setNamespaceAware(true);
+				parser = factory.newSAXParser().getXMLReader();
+			} catch (ParserConfigurationException e) {
+				throw new SAXException(e);
+			}
 		}
 		return parser;
 	}
@@ -361,10 +292,12 @@ public class DefaultXSSFSaxHandler implements ReadHandler {
 		public void cell(String cellReference,
 				String formattedValue, XSSFComment comment)
 				 {
-			
+			if (cellReference == null || cellReference.isEmpty()) {
+				return;
+			}
 			int column = nameToColumn(cellReference);
 			rowList.add(new CellKV<String>(column, StringUtils.isEmpty(formattedValue) ? null : formattedValue));
-			
+
 		}
 
 		@Override

@@ -116,15 +116,8 @@ public class BingExcelImpl implements BingExcel {
     List<SheetVo> resultList = new ArrayList<>();
     BingExcelReaderListener listner = new BingExcelReaderListener(conditions, resultList);
     ReadHandler handler = ExcelReaderFactory.create(file, listner, true);
-    int[] indexArr = new int[conditions.length];
-    int minNum = Integer.MAX_VALUE;
-    for (int i = 0; i < conditions.length; i++) {
-      int sheetNum = conditions[i].getSheetIndex();
-      indexArr[i] = sheetNum;
-      minNum = Math.min(minNum, conditions[i].getEndRow());
-    }
-    handler.readSheet(indexArr, minNum);
-    return resultList.size() == 0 ? Collections.emptyList() : resultList;
+    readWithHandler(handler, conditions);
+    return resultList.isEmpty() ? Collections.emptyList() : resultList;
   }
 
   @Override
@@ -148,17 +141,20 @@ public class BingExcelImpl implements BingExcel {
     List<SheetVo> resultList = new ArrayList<>();
     BingExcelReaderListener listner = new BingExcelReaderListener(conditions, resultList);
     ReadHandler handler = ExcelReaderFactory.create(stream, listner, true);
+    readWithHandler(handler, conditions);
+    return resultList.isEmpty() ? Collections.emptyList() : resultList;
+  }
+
+  private void readWithHandler(ReadHandler handler, ReaderCondition[] conditions)
+      throws IOException, OpenXML4JException, SAXException {
     int[] indexArr = new int[conditions.length];
-    int minNum = 0;
+    int minNum = Integer.MAX_VALUE;
     for (int i = 0; i < conditions.length; i++) {
       int sheetNum = conditions[i].getSheetIndex();
       indexArr[i] = sheetNum;
-      if (minNum > conditions[i].getEndRow()) {
-        minNum = conditions[i].getEndRow();
-      }
+      minNum = Math.min(minNum, conditions[i].getEndRow());
     }
     handler.readSheet(indexArr, minNum);
-    return resultList.size() == 0 ? Collections.emptyList() : resultList;
   }
 
   @Override

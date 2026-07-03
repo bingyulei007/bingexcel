@@ -289,7 +289,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 			curRow = thisRow = lrec.getRow();
 			thisColumn = lrec.getColumn();
-			value = lrec.getValue().trim();
+			value = lrec.getValue();
 			if(!StringUtils.isEmpty(value)){
 				rowlist.add(new CellKV<String>(thisColumn, value));
 				}
@@ -301,8 +301,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			if (sstRecord == null) {
 				//rowlist.add(new CellKV(thisColumn, ""));
 			} else {
-				value = sstRecord.getString(lsrec.getSSTIndex()).toString()
-						.trim();
+				value = sstRecord.getString(lsrec.getSSTIndex()).toString();
 				if(!StringUtils.isEmpty(value)){
 					rowlist.add(new CellKV<String>(thisColumn, value));
 					}
@@ -318,7 +317,7 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 
 			curRow = thisRow = numrec.getRow();
 			thisColumn = numrec.getColumn();
-			value = formatListener.formatNumberDateCell(numrec).trim();
+			value = formatListener.formatNumberDateCell(numrec);
 			// Format
 			if(!StringUtils.isEmpty(value)){
 			rowlist.add(new CellKV<String>(thisColumn, value));
