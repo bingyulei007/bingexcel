@@ -83,29 +83,71 @@ public interface BingExcel {
    *
    * @param iterables 要输出到文件的集合对象，
    * @param file 文件对象
+   * @throws FileNotFoundException 文件存在但为目录、不可创建或无法打开
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
    */
   void writeXlsx(File file, Iterable... iterables) throws FileNotFoundException;
 
+  /**
+   * 写出xls格式的excel文件到 File。
+   *
+   * @throws FileNotFoundException 文件存在但为目录、不可创建或无法打开
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
+   * @see #writeXlsx(File, Iterable...)
+   */
   void writeXls(File file, Iterable... iterables) throws FileNotFoundException;
 
   /**
    * 输出model集合到excel 文件。
    *
+   * <p>文件创建失败时抛出 {@code UnknownException}(RuntimeException)，
+   * 而非 {@link FileNotFoundException}，因为内部通过路径创建 FileOutputStream
+   * 时已将 FNFE 包装为未检异常。
+   *
    * @param path 文件路径
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws com.bing.excel.exception.UnknownException 文件创建失败（路径非法/无权限）
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
    */
   void writeXlsx(String path, Iterable... iterables);
 
   /**
-   * 写出xls格式的excel文件
+   * 写出xls格式的excel文件。
    *
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws com.bing.excel.exception.UnknownException 文件创建失败（路径非法/无权限）
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
+   * @see #writeXlsx(String, Iterable...)
    */
   void writeXls(String path, Iterable... iterables);
 
   /**
-   * 写出xlsx格式的excel到输出流
+   * 写出xlsx格式的excel到输出流。
+   *
+   * <p>调用方负责关闭 OutputStream。写出失败时流可能处于不完整状态。
+   *
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
    */
   void writeXlsx(OutputStream stream, Iterable... iterables);
 
+  /**
+   * 写出xls格式的excel到输出流。
+   *
+   * <p>调用方负责关闭 OutputStream。写出失败时流可能处于不完整状态。
+   *
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
+   * @see #writeXlsx(OutputStream, Iterable...)
+   */
   void writeXls(OutputStream stream, Iterable... iterables);
 
   void writeCsv(String path, Iterable iterable) throws IOException;
@@ -134,6 +176,10 @@ public interface BingExcel {
    *
    * @param path 文件路径
    * @param sheetExcels sheet页描述
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws com.bing.excel.exception.UnknownException 文件创建失败（路径非法/无权限）
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
    */
   void writeXlsx(String path, SheetExcel... sheetExcels);
 
@@ -142,6 +188,38 @@ public interface BingExcel {
    *
    * @param path 文件路径
    * @param sheetExcels sheet页描述
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws com.bing.excel.exception.UnknownException 文件创建失败（路径非法/无权限）
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
+   * @see #writeXlsx(String, SheetExcel...)
    */
   void writeXls(String path, SheetExcel... sheetExcels);
+
+  /**
+   * 写出多sheet页的xlsx格式excel到输出流。
+   *
+   * <p>调用方负责关闭 OutputStream。写出失败时流可能处于不完整状态。
+   *
+   * @param stream 输出流
+   * @param sheetExcels sheet页描述
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
+   */
+  void writeXlsx(OutputStream stream, SheetExcel... sheetExcels);
+
+  /**
+   * 写出多sheet页的xls格式excel到输出流。
+   *
+   * <p>调用方负责关闭 OutputStream。写出失败时流可能处于不完整状态。
+   *
+   * @param stream 输出流
+   * @param sheetExcels sheet页描述
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
+   * @see #writeXlsx(OutputStream, SheetExcel...)
+   */
+  void writeXls(OutputStream stream, SheetExcel... sheetExcels);
 }

@@ -60,4 +60,32 @@ public class DefaultFileWriteHandler extends AbstractWriteHandler {
 			throw primary;
 		}
 	}
+
+	/**
+	 * 只释放资源不写出。关闭 FileOutputStream 和 Workbook；
+	 * flush() 已关闭后调用为 no-op（os 关闭幂等，wb.close 幂等）。
+	 */
+	@Override
+	public void close() {
+		RuntimeException primary = null;
+		try {
+			super.close();
+		} catch (RuntimeException e) {
+			primary = e;
+		}
+		if (os != null) {
+			try {
+				os.close();
+			} catch (IOException e) {
+				ExcelOutException ex = new ExcelOutException("Happen exception when close", e);
+				if (primary == null) {
+					throw ex;
+				}
+				primary.addSuppressed(ex);
+			}
+		}
+		if (primary != null) {
+			throw primary;
+		}
+	}
 }

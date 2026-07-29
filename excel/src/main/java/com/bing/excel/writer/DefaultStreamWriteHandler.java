@@ -44,4 +44,13 @@ public class DefaultStreamWriteHandler extends AbstractWriteHandler {
 			}
 		}
 	}
+
+	/**
+	 * 只关闭 Workbook，不关闭 OutputStream（调用方自行关闭流）。
+	 * 与 {@link #flush()} 的契约一致：U should close the stream by yourself.
+	 */
+	@Override
+	public void close() {
+		super.close();
+	}
 }

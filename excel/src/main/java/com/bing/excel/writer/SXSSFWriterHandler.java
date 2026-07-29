@@ -60,6 +60,44 @@ public class SXSSFWriterHandler extends AbstractWriteHandler {
 		}
 	}
 
+	/**
+	 * 只释放资源不写出。关闭 OutputStream、Workbook，并清理 SXSSF 临时文件（dispose）。
+	 * flush() 已关闭后调用为 no-op。
+	 */
+	@Override
+	public void close() {
+		RuntimeException primary = null;
+		try {
+			super.close();
+		} catch (RuntimeException e) {
+			primary = e;
+		}
+		if (os != null) {
+			try {
+				os.close();
+			} catch (IOException e) {
+				ExcelOutException ex = new ExcelOutException("Happen exception when close", e);
+				if (primary == null) {
+					primary = ex;
+				} else {
+					primary.addSuppressed(ex);
+				}
+			}
+		}
+		try {
+			this.wb.dispose();
+		} catch (RuntimeException e) {
+			if (primary == null) {
+				primary = e;
+			} else {
+				primary.addSuppressed(e);
+			}
+		}
+		if (primary != null) {
+			throw primary;
+		}
+	}
+
 	public void setCurrentSheetByName(String name, int lineNum){
 		SXSSFSheet sheet = wb.getSheet(name);
 		if(sheet==null){

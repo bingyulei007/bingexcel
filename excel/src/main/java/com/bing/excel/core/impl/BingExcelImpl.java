@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -53,6 +55,8 @@ import com.bing.utils.FileCreateUtils;
  */
 public class BingExcelImpl implements BingExcel {
 
+  private static final Logger logger = Logger.getLogger(BingExcelImpl.class.getName());
+
   /**
    * model entity Converter,the relationship is sheet-to-entity
    */
@@ -62,7 +66,7 @@ public class BingExcelImpl implements BingExcel {
    * globe filed converter
    */
   private final ConverterHandler localConverterHandler;
-  private AnnotationMapperHandler annotationMapperHandler = new AnnotationMapperHandler();
+  private final AnnotationMapperHandler annotationMapperHandler = new AnnotationMapperHandler();
   private volatile UserDefineMapperHandler userDefineMapperHandler;
 
   public BingExcelImpl(ConverterHandler localConverterHandler) {
@@ -151,7 +155,12 @@ public class BingExcelImpl implements BingExcel {
     for (int i = 0; i < conditions.length; i++) {
       int sheetNum = conditions[i].getSheetIndex();
       indexArr[i] = sheetNum;
-      minNum = Math.min(minNum, conditions[i].getEndRow());
+      int endRow = conditions[i].getEndRow();
+      if (endRow <= 0) {
+        throw new IllegalArgumentException("endRow must be > 0, got " + endRow
+            + " for condition[" + i + "]; use Integer.MAX_VALUE for unlimited.");
+      }
+      minNum = Math.min(minNum, endRow);
     }
     handler.readSheet(indexArr, minNum);
   }
@@ -213,47 +222,55 @@ public class BingExcelImpl implements BingExcel {
   public void writeCsv(OutputStream os, Iterable iterable, char delimiter, boolean isWithHeader,
       boolean isWithBOM) throws IOException {
     Writer out = new OutputStreamWriter(os, "UTF-8");
-    if (isWithBOM) {
-      out.write(new String(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
-    }
-    CSVFormat format;
     CSVPrinter csvPrinter = null;
-    boolean isAdd = false;
-    TypeAdapterConverter<?> typeAdapter = null;
-    for (Object object : iterable) {
-      if (!isAdd) {
-        if (object != null) {
-          isAdd = true;
-          Class clazz = object.getClass();
-          annotationMapperHandler.processEntity(clazz);
-          registeAdapter(clazz);
-          typeAdapter = typeTokenCache.get(clazz);
-          ListLine header =
-              typeAdapter.getHeadertoListLine(getUserDefineMapperHandler(), annotationMapperHandler);
+    try {
+      if (isWithBOM) {
+        out.write(new String(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
+      }
+      CSVFormat format;
+      boolean isAdd = false;
+      TypeAdapterConverter<?> typeAdapter = null;
+      for (Object object : iterable) {
+        if (!isAdd) {
+          if (object != null) {
+            isAdd = true;
+            Class clazz = object.getClass();
+            annotationMapperHandler.processEntity(clazz);
+            registeAdapter(clazz);
+            typeAdapter = typeTokenCache.get(clazz);
+            ListLine header =
+                typeAdapter.getHeadertoListLine(getUserDefineMapperHandler(), annotationMapperHandler);
+            ListLine listLine =
+                typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
+            int maxIndex = header.getMaxIndex();
+            if (isWithHeader) {
+              String[] headerArr = new String[maxIndex + 1];
+              for (CellKV<String> kv : header.getListStr()) {
+                headerArr[kv.getIndex()] = kv.getValue();
+              }
+              format = CSVFormat.DEFAULT.withDelimiter(delimiter).withHeader(headerArr);
+            } else {
+              format = CSVFormat.DEFAULT.withDelimiter(delimiter);
+            }
+            csvPrinter = new CSVPrinter(out, format);
+            csvPrinter.printRecord(listLine.toFullArray());
+          }
+
+        } else {
           ListLine listLine =
               typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
-          int maxIndex = header.getMaxIndex();
-          if (isWithHeader) {
-            String[] headerArr = new String[maxIndex + 1];
-            for (CellKV<String> kv : header.getListStr()) {
-              headerArr[kv.getIndex()] = kv.getValue();
-            }
-            format = CSVFormat.DEFAULT.withDelimiter(delimiter).withHeader(headerArr);
-          } else {
-            format = CSVFormat.DEFAULT.withDelimiter(delimiter);
-          }
-          csvPrinter = new CSVPrinter(out, format);
           csvPrinter.printRecord(listLine.toFullArray());
         }
-
-      } else {
-        ListLine listLine =
-            typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
-        csvPrinter.printRecord(listLine.toFullArray());
       }
-    }
-    if (csvPrinter != null) {
-      csvPrinter.close();
+    } finally {
+      // csvPrinter.close() 会一并 flush 并关闭底层 OutputStreamWriter；
+      // csvPrinter 为 null 时（iterable 为空或全 null）单独关 out 确保 Writer 缓冲被释放。
+      // 不关底层 os：与 writeCsv(OutputStream) 的「调用方自行关流」契约一致。
+      if (csvPrinter != null) {
+        csvPrinter.close();
+      } else {
+        out.close();
+      }
     }
   }
 
@@ -286,37 +303,49 @@ public class BingExcelImpl implements BingExcel {
   }
 
   private void writeToExcel(WriteHandler handler, Iterable... iterables) {
-    for (Iterable list : iterables) {
-      boolean isAdd = false;
-      TypeAdapterConverter<?> typeAdapter = null;
-      if (!list.iterator().hasNext()) {
-        handler.createSheet("sheet1");
-      }
-      for (Object object : list) {
-        if (!isAdd) {
-          if (object != null) {
-            isAdd = true;
-            Class clazz = object.getClass();
-            annotationMapperHandler.processEntity(clazz);
-            registeAdapter(clazz);
-            handler.createSheet(resolveModelName(clazz));
-            typeAdapter = typeTokenCache.get(clazz);
-            List<CellKV<String>> header =
-                typeAdapter.getHeader(getUserDefineMapperHandler(), annotationMapperHandler);
-            handler.writeHeader(header);
+    try {
+      for (Iterable list : iterables) {
+        boolean isAdd = false;
+        TypeAdapterConverter<?> typeAdapter = null;
+        if (!list.iterator().hasNext()) {
+          handler.createSheet("sheet1");
+        }
+        for (Object object : list) {
+          if (!isAdd) {
+            if (object != null) {
+              isAdd = true;
+              Class clazz = object.getClass();
+              annotationMapperHandler.processEntity(clazz);
+              registeAdapter(clazz);
+              handler.createSheet(resolveModelName(clazz));
+              typeAdapter = typeTokenCache.get(clazz);
+              List<CellKV<String>> header =
+                  typeAdapter.getHeader(getUserDefineMapperHandler(), annotationMapperHandler);
+              handler.writeHeader(header);
+              ListLine listLine =
+                  typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
+              handler.writeLine(listLine);
+            } else {
+              logger.warning("Skipping null element in iterable before first non-null row; "
+                  + "header will not be written until a non-null element is found.");
+            }
+
+          } else {
+            if (object == null) {
+              logger.warning("Skipping null element in iterable; row will be omitted.");
+              continue;
+            }
             ListLine listLine =
                 typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
             handler.writeLine(listLine);
           }
-
-        } else {
-          ListLine listLine =
-              typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
-          handler.writeLine(listLine);
         }
       }
+      handler.flush();
+    } finally {
+      // flush() 成功后 close() 为 no-op；异常路径下保证 Workbook/句柄/SXSSF 临时文件被释放
+      handler.close();
     }
-    handler.flush();
 
   }
 
@@ -408,7 +437,10 @@ public class BingExcelImpl implements BingExcel {
         }
         Object object = typeAdapter.unmarshal(rowList, titleAliasResolver,
             userDefineMapperHandler, annotationMapperHandler);
-        currentSheetVo.addObject(object);
+        // 空行（无任何单元格）时 unmarshal 返回 null，跳过不加入结果 List
+        if (object != null) {
+          currentSheetVo.addObject(object);
+        }
       }
     }
 
@@ -541,6 +573,18 @@ public class BingExcelImpl implements BingExcel {
     writeToSheetExcel(handler, sheetExcels);
   }
 
+  @Override
+  public void writeXlsx(OutputStream stream, SheetExcel... sheetExcels) {
+    WriteHandler handler = ExcelWriterFactory.createXSSF(stream);
+    writeToSheetExcel(handler, sheetExcels);
+  }
+
+  @Override
+  public void writeXls(OutputStream stream, SheetExcel... sheetExcels) {
+    WriteHandler handler = ExcelWriterFactory.createHSSF(stream);
+    writeToSheetExcel(handler, sheetExcels);
+  }
+
 
   /**
    * write sheet excel 写数据到多sheet页的excel
@@ -548,48 +592,60 @@ public class BingExcelImpl implements BingExcel {
    * @param handler
    */
   private void writeToSheetExcel(WriteHandler handler, SheetExcel... sheetExcels) {
-    TypeAdapterConverter<?> typeAdapter = null;
-    for (int i = 0; i < sheetExcels.length; i++) {
-      String sheetName = null;
-      if (sheetExcels[i] != null) {
-        boolean isAdd = false;
-        // 获得定义的sheet的名称
-        sheetName = sheetExcels[i].getSheetName();
-        // 获取该sheet页的数据
-        List<?> sheetList = sheetExcels[i].getList();
-        if (sheetList == null || sheetList.size() == 0) {
-          String emptySheetName = sheetName != null ? sheetName : "sheet" + (i + 1);
-          handler.createSheet(emptySheetName);
-          continue;
-        }
+    try {
+      TypeAdapterConverter<?> typeAdapter = null;
+      for (int i = 0; i < sheetExcels.length; i++) {
+        String sheetName = null;
+        if (sheetExcels[i] != null) {
+          boolean isAdd = false;
+          // 获得定义的sheet的名称
+          sheetName = sheetExcels[i].getSheetName();
+          // 获取该sheet页的数据
+          List<?> sheetList = sheetExcels[i].getList();
+          if (sheetList == null || sheetList.size() == 0) {
+            String emptySheetName = sheetName != null ? sheetName : "sheet" + (i + 1);
+            handler.createSheet(emptySheetName);
+            continue;
+          }
 
-        for (Object object : sheetList) {
-          if (!isAdd) {
-            if (object != null) {
-              isAdd = true;
-              Class clazz = object.getClass();
-              annotationMapperHandler.processEntity(clazz);
-              registeAdapter(clazz);
-              if (sheetName == null) {
-                sheetName = resolveModelName(clazz);
+          for (Object object : sheetList) {
+            if (!isAdd) {
+              if (object != null) {
+                isAdd = true;
+                Class clazz = object.getClass();
+                annotationMapperHandler.processEntity(clazz);
+                registeAdapter(clazz);
+                if (sheetName == null) {
+                  sheetName = resolveModelName(clazz);
+                }
+                handler.createSheet(sheetName);
+                typeAdapter = typeTokenCache.get(clazz);
+                List<CellKV<String>> header =
+                    typeAdapter.getHeader(getUserDefineMapperHandler(), annotationMapperHandler);
+                handler.writeHeader(header);
+                ListLine listLine =
+                    typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
+                handler.writeLine(listLine);
+              } else {
+                logger.warning("Skipping null element in sheet[" + i
+                    + "] before first non-null row; header will not be written "
+                    + "until a non-null element is found.");
               }
-              handler.createSheet(sheetName);
-              typeAdapter = typeTokenCache.get(clazz);
-              List<CellKV<String>> header =
-                  typeAdapter.getHeader(getUserDefineMapperHandler(), annotationMapperHandler);
-              handler.writeHeader(header);
+            } else {
+              if (object == null) {
+                logger.warning("Skipping null element in sheet[" + i + "]; row will be omitted.");
+                continue;
+              }
               ListLine listLine =
                   typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
               handler.writeLine(listLine);
             }
-          } else {
-            ListLine listLine =
-                typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
-            handler.writeLine(listLine);
           }
         }
       }
+      handler.flush();
+    } finally {
+      handler.close();
     }
-    handler.flush();
   }
 }

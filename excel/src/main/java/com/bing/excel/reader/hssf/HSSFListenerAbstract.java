@@ -290,21 +290,22 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			curRow = thisRow = lrec.getRow();
 			thisColumn = lrec.getColumn();
 			value = lrec.getValue();
-			if(!StringUtils.isEmpty(value)){
-				rowlist.add(new CellKV<String>(thisColumn, value));
-				}
+			// 与 XSSF 保持一致：空字符串也 add KV(col, null)，确保 maxIndex 正确更新
+			rowlist.add(new CellKV<String>(thisColumn,
+					StringUtils.isEmpty(value) ? null : value));
 		} else if (LabelSSTRecord.sid == sid) {
 			LabelSSTRecord lsrec = (LabelSSTRecord) record;
 
 			curRow = thisRow = lsrec.getRow();
 			thisColumn = lsrec.getColumn();
 			if (sstRecord == null) {
-				//rowlist.add(new CellKV(thisColumn, ""));
+				// SST 未就绪，补 null 占位以保持列号一致
+				rowlist.add(new CellKV<String>(thisColumn, null));
 			} else {
 				value = sstRecord.getString(lsrec.getSSTIndex()).toString();
-				if(!StringUtils.isEmpty(value)){
-					rowlist.add(new CellKV<String>(thisColumn, value));
-					}
+				// 与 XSSF 保持一致：空字符串也 add KV(col, null)
+				rowlist.add(new CellKV<String>(thisColumn,
+						StringUtils.isEmpty(value) ? null : value));
 			}
 		} else if (NoteRecord.sid == sid) {
 			NoteRecord nrec = (NoteRecord) record;
@@ -318,19 +319,18 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			curRow = thisRow = numrec.getRow();
 			thisColumn = numrec.getColumn();
 			value = formatListener.formatNumberDateCell(numrec);
-			// Format
-			if(!StringUtils.isEmpty(value)){
-			rowlist.add(new CellKV<String>(thisColumn, value));
-			}
+			// 与 XSSF 保持一致：空字符串也 add KV(col, null)，确保 maxIndex 正确更新
+			rowlist.add(new CellKV<String>(thisColumn,
+					StringUtils.isEmpty(value) ? null : value));
 		} else if (RKRecord.sid == sid) {
 			RKRecord rkrec = (RKRecord) record;
 
 			curRow = thisRow = rkrec.getRow();
 			thisColumn = rkrec.getColumn();
 			value = String.valueOf(rkrec.getRKNumber());
-			if(!StringUtils.isEmpty(value)){
-				rowlist.add(new CellKV<String>(thisColumn, value));
-			}
+			// 与 XSSF 保持一致：空字符串也 add KV(col, null)
+			rowlist.add(new CellKV<String>(thisColumn,
+					StringUtils.isEmpty(value) ? null : value));
 
 		}
 

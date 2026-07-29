@@ -18,7 +18,7 @@ import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.exception.ConversionException;
 import com.bing.excel.exception.IllegalCellConfigException;
 import com.bing.excel.exception.IllegalEntityException;
-import com.bing.excel.exception.illegalValueException;
+import com.bing.excel.exception.IllegalValueException;
 import com.bing.excel.core.impl.TitleAliasResolver;
 import com.bing.excel.mapper.ExcelConverterMapperHandler;
 import com.bing.excel.vo.CellKV;
@@ -148,6 +148,16 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
    */
   public T unmarshal(ListRow source, TitleAliasResolver resolver,
       ExcelConverterMapperHandler... fieldHandler) {
+    String[] fullArray = source.toFullArray();
+    int length = fullArray.length;
+
+    // 空行（无任何单元格，maxIndex==-1）无法解析出有效实体，返回 null。
+    // 调用方（BingExcelReaderListener.optRow）据此跳过，不污染结果 List。
+    // 注意：有单元格但值全空的行 length>0，仍正常走字段填充，字段保持默认值。
+    if (length == 0) {
+      return null;
+    }
+
     final Object obj;
     try {
       obj = constructor.newInstance();
@@ -156,37 +166,33 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
       throw new IllegalEntityException(constructor.getName() + "构造实例失败",
           e);
     }
-    String[] fullArray = source.toFullArray();
-    int length = fullArray.length;
 
-    if (length > 0) {
-      for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
-        FieldConverterMapper converterMapper = getFieldConverterMapper(kv.getKey(), fieldHandler);
-        if (converterMapper == null) {
-          continue;
-        }
-        BoundField boundField = kv.getValue();
-        FieldValueConverter converter = getLocalConverter(converterMapper);
-
-        int index = resolver != null
-            ? resolver.getResolvedIndex(kv.getKey(), converterMapper)
-            : converterMapper.getIndex();
-        if (index < 0) {
-          // aliasName-based field was not resolved and has no index to read from.
-          // If readRequired, this is a hard error (should have been caught in resolve).
-          // For optional fields, skip silently → field stays at its default value (null/0).
-          if (converterMapper.isReadRequired()) {
-            throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
-                + kv.getKey() + "] has no column index to read; if it relies on "
-                + "aliasName, the title row was not found at startRow-1 or did not "
-                + "contain '" + converterMapper.getAlias() + "'. Set startRow>=1 with "
-                + "a title row, or set an explicit index on @CellConfig.");
-          }
-          continue;
-        }
-        String fieldValue = length > index ? fullArray[index] : null;
-        boundField.initializeValue(obj, fieldValue, converterMapper, converter);
+    for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
+      FieldConverterMapper converterMapper = getFieldConverterMapper(kv.getKey(), fieldHandler);
+      if (converterMapper == null) {
+        continue;
       }
+      BoundField boundField = kv.getValue();
+      FieldValueConverter converter = getLocalConverter(converterMapper);
+
+      int index = resolver != null
+          ? resolver.getResolvedIndex(kv.getKey(), converterMapper)
+          : converterMapper.getIndex();
+      if (index < 0) {
+        // aliasName-based field was not resolved and has no index to read from.
+        // If readRequired, this is a hard error (should have been caught in resolve).
+        // For optional fields, skip silently -> field stays at its default value (null/0).
+        if (converterMapper.isReadRequired()) {
+          throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
+              + kv.getKey() + "] has no column index to read; if it relies on "
+              + "aliasName, the title row was not found at startRow-1 or did not "
+              + "contain '" + converterMapper.getAlias() + "'. Set startRow>=1 with "
+              + "a title row, or set an explicit index on @CellConfig.");
+        }
+        continue;
+      }
+      String fieldValue = length > index ? fullArray[index] : null;
+      boundField.initializeValue(obj, fieldValue, converterMapper, converter);
     }
     return (T) obj;
   }
@@ -344,7 +350,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
         }
       } else {
         if (converterMapper.isReadRequired()) {
-          throw new illegalValueException(
+          throw new IllegalValueException(
               "  field in [" + converterMapper.getContainer()
                   + "] indexed " + converterMapper.getIndex() + " is required");
 

@@ -283,4 +283,17 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		}
 	}
 
+	/**
+	 * 只关闭 Workbook，不执行写出。OutputStream 的关闭由子类决定
+	 * （File 路径关、Stream 路径不关用户流）。flush() 已关闭 Workbook 后调用为 no-op。
+	 */
+	@Override
+	public void close() {
+		try {
+			wb.close();
+		} catch (IOException e) {
+			// best-effort close; caller handles the primary exception
+		}
+	}
+
 }

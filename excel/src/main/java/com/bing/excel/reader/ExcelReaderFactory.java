@@ -49,7 +49,7 @@ public class ExcelReaderFactory {
 			OPCPackage pkg = OPCPackage.open(file, PackageAccess.READ);
 			try {
 				return create(pkg, excelReadListener, ignoreNumFormat);
-			} catch (IllegalArgumentException | IOException e1) {
+			} catch (Exception e1) {
 				pkg.revert();
 				throw e1;
 			}
