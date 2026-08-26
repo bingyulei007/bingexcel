@@ -3,6 +3,7 @@ package com.bing.excel.core.impl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -207,6 +208,9 @@ public class BingExcelImpl implements BingExcel {
   // 临时使用下
   public void writeCsv(String path, Iterable iterable) throws IOException {
     File file = FileCreateUtils.createFile(path);
+    if (file == null) {
+      throw new FileNotFoundException("cannot create file: " + path);
+    }
     try (FileOutputStream fos = new FileOutputStream(file)) {
       writeCsv(fos, iterable, ',', true, true);
     }
@@ -221,8 +225,18 @@ public class BingExcelImpl implements BingExcel {
   @Override
   public void writeCsv(OutputStream os, Iterable iterable, char delimiter, boolean isWithHeader,
       boolean isWithBOM) throws IOException {
-    Writer out = new OutputStreamWriter(os, "UTF-8");
+    // commons-csv 的 CSVPrinter.close() 无论传什么参数都会级联关闭底层流，
+    // 违反「调用方自行关流」契约；用 FilterWriter 吞掉 close，让 printer
+    // 关不到真正的流，最后只 flush。
+    Writer realOut = new OutputStreamWriter(os, "UTF-8");
+    Writer out = new FilterWriter(realOut) {
+      @Override
+      public void close() {
+        // swallow: caller owns the underlying stream
+      }
+    };
     CSVPrinter csvPrinter = null;
+    Throwable primary = null;
     try {
       if (isWithBOM) {
         out.write(new String(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}));
@@ -262,14 +276,20 @@ public class BingExcelImpl implements BingExcel {
           csvPrinter.printRecord(listLine.toFullArray());
         }
       }
+    } catch (Throwable t) {
+      primary = t;
+      throw t;
     } finally {
-      // csvPrinter.close() 会一并 flush 并关闭底层 OutputStreamWriter；
-      // csvPrinter 为 null 时（iterable 为空或全 null）单独关 out 确保 Writer 缓冲被释放。
-      // 不关底层 os：与 writeCsv(OutputStream) 的「调用方自行关流」契约一致。
-      if (csvPrinter != null) {
-        csvPrinter.close();
-      } else {
-        out.close();
+      // printer.close() 只会关到 FilterWriter（close 被吞），底层 os 不受影响；
+      // 这里手动 flush 真正的 Writer，把缓冲写透到调用方流。
+      // 主体已抛异常时，flush 异常只做 suppressed，避免顶掉原始异常。
+      try {
+        realOut.flush();
+      } catch (IOException flushEx) {
+        if (primary == null) {
+          throw new IOException("Failed to flush CSV output", flushEx);
+        }
+        primary.addSuppressed(flushEx);
       }
     }
   }
@@ -307,8 +327,9 @@ public class BingExcelImpl implements BingExcel {
       for (Iterable list : iterables) {
         boolean isAdd = false;
         TypeAdapterConverter<?> typeAdapter = null;
-        if (!list.iterator().hasNext()) {
+        if (list == null || !list.iterator().hasNext()) {
           handler.createSheet("sheet1");
+          continue;
         }
         for (Object object : list) {
           if (!isAdd) {
@@ -340,6 +361,13 @@ public class BingExcelImpl implements BingExcel {
             handler.writeLine(listLine);
           }
         }
+        if (!isAdd) {
+          // 元素全为 null：未写任何行，仍需创建 sheet，否则输出零 sheet 的非法文件
+          handler.createSheet("sheet1");
+        }
+      }
+      if (iterables.length == 0) {
+        handler.createSheet("sheet1");
       }
       handler.flush();
     } finally {
@@ -596,52 +624,61 @@ public class BingExcelImpl implements BingExcel {
       TypeAdapterConverter<?> typeAdapter = null;
       for (int i = 0; i < sheetExcels.length; i++) {
         String sheetName = null;
-        if (sheetExcels[i] != null) {
-          boolean isAdd = false;
-          // 获得定义的sheet的名称
-          sheetName = sheetExcels[i].getSheetName();
-          // 获取该sheet页的数据
-          List<?> sheetList = sheetExcels[i].getList();
-          if (sheetList == null || sheetList.size() == 0) {
-            String emptySheetName = sheetName != null ? sheetName : "sheet" + (i + 1);
-            handler.createSheet(emptySheetName);
-            continue;
-          }
+        if (sheetExcels[i] == null) {
+          handler.createSheet("sheet" + (i + 1));
+          continue;
+        }
+        boolean isAdd = false;
+        // 获得定义的sheet的名称
+        sheetName = sheetExcels[i].getSheetName();
+        // 获取该sheet页的数据
+        List<?> sheetList = sheetExcels[i].getList();
+        if (sheetList == null || sheetList.size() == 0) {
+          String emptySheetName = sheetName != null ? sheetName : "sheet" + (i + 1);
+          handler.createSheet(emptySheetName);
+          continue;
+        }
 
-          for (Object object : sheetList) {
-            if (!isAdd) {
-              if (object != null) {
-                isAdd = true;
-                Class clazz = object.getClass();
-                annotationMapperHandler.processEntity(clazz);
-                registeAdapter(clazz);
-                if (sheetName == null) {
-                  sheetName = resolveModelName(clazz);
-                }
-                handler.createSheet(sheetName);
-                typeAdapter = typeTokenCache.get(clazz);
-                List<CellKV<String>> header =
-                    typeAdapter.getHeader(getUserDefineMapperHandler(), annotationMapperHandler);
-                handler.writeHeader(header);
-                ListLine listLine =
-                    typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
-                handler.writeLine(listLine);
-              } else {
-                logger.warning("Skipping null element in sheet[" + i
-                    + "] before first non-null row; header will not be written "
-                    + "until a non-null element is found.");
+        for (Object object : sheetList) {
+          if (!isAdd) {
+            if (object != null) {
+              isAdd = true;
+              Class clazz = object.getClass();
+              annotationMapperHandler.processEntity(clazz);
+              registeAdapter(clazz);
+              if (sheetName == null) {
+                sheetName = resolveModelName(clazz);
               }
-            } else {
-              if (object == null) {
-                logger.warning("Skipping null element in sheet[" + i + "]; row will be omitted.");
-                continue;
-              }
+              handler.createSheet(sheetName);
+              typeAdapter = typeTokenCache.get(clazz);
+              List<CellKV<String>> header =
+                  typeAdapter.getHeader(getUserDefineMapperHandler(), annotationMapperHandler);
+              handler.writeHeader(header);
               ListLine listLine =
                   typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
               handler.writeLine(listLine);
+            } else {
+              logger.warning("Skipping null element in sheet[" + i
+                  + "] before first non-null row; header will not be written "
+                  + "until a non-null element is found.");
             }
+          } else {
+            if (object == null) {
+              logger.warning("Skipping null element in sheet[" + i + "]; row will be omitted.");
+              continue;
+            }
+            ListLine listLine =
+                typeAdapter.marshal(object, getUserDefineMapperHandler(), annotationMapperHandler);
+            handler.writeLine(listLine);
           }
         }
+        if (!isAdd) {
+          // 元素全为 null：未写任何行，仍需创建 sheet，否则输出零 sheet 的非法文件
+          handler.createSheet(sheetName != null ? sheetName : "sheet" + (i + 1));
+        }
+      }
+      if (sheetExcels.length == 0) {
+        handler.createSheet("sheet1");
       }
       handler.flush();
     } finally {

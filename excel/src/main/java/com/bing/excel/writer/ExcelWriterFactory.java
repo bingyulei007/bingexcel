@@ -13,18 +13,19 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelWriterFactory {
-	private static final Pattern OLD_EXCEL_PATH = Pattern
-			.compile("^\\S*\\.xls$");
-	private static final Pattern EXCEL_PATH = Pattern.compile("^\\S*\\.xlsx$");
+	private static final Pattern OLD_EXCEL_PATH = Pattern.compile(".*\\.xls",
+			Pattern.CASE_INSENSITIVE);
+	private static final Pattern EXCEL_PATH = Pattern.compile(".*\\.xlsx",
+			Pattern.CASE_INSENSITIVE);
 
 	private static void isOldPath(String path) {
-		if (!OLD_EXCEL_PATH.matcher(path).matches()) {
+		if (path == null || !OLD_EXCEL_PATH.matcher(path).matches()) {
 			throw new IllegalArgumentException("the file has a illegal name");
 		}
 	}
 
 	private static void isNewPath(String path) {
-		if (!EXCEL_PATH.matcher(path).matches()) {
+		if (path == null || !EXCEL_PATH.matcher(path).matches()) {
 			throw new IllegalArgumentException("the file has a illegal name");
 		}
 	}
@@ -39,7 +40,12 @@ public class ExcelWriterFactory {
 			throws FileNotFoundException {
 		isOldPath(file.getAbsolutePath());
 		Workbook wb = new HSSFWorkbook();
-		return new DefaultFileWriteHandler(wb, file);
+		try {
+			return new DefaultFileWriteHandler(wb, file);
+		} catch (FileNotFoundException e) {
+			closeQuietly(wb);
+			throw e;
+		}
 	}
 
 	public static WriteHandler createHSSF(OutputStream os) {
@@ -62,13 +68,24 @@ public class ExcelWriterFactory {
 			throws FileNotFoundException {
 		isNewPath(file.getAbsolutePath());
 		Workbook wb = new XSSFWorkbook();
-		return new DefaultFileWriteHandler(wb, file);
+		try {
+			return new DefaultFileWriteHandler(wb, file);
+		} catch (FileNotFoundException e) {
+			closeQuietly(wb);
+			throw e;
+		}
 	}
 
 	public static WriteHandler createSXSSF(String path) {
 		isNewPath(path);
 		SXSSFWorkbook wb = new SXSSFWorkbook(200);
-		return new SXSSFWriterHandler(wb, path);
+		try {
+			return new SXSSFWriterHandler(wb, path);
+		} catch (RuntimeException e) {
+			closeQuietly(wb);
+			wb.dispose();
+			throw e;
+		}
 	}
 
 	public static WriteHandler createSXSSF(File file)
@@ -84,7 +101,17 @@ public class ExcelWriterFactory {
 			} catch (IOException ignored) {
 				// best-effort close on construction failure
 			}
+			closeQuietly(wb);
+			wb.dispose();
 			throw e;
+		}
+	}
+
+	private static void closeQuietly(Workbook wb) {
+		try {
+			wb.close();
+		} catch (IOException ignored) {
+			// best-effort close on construction failure
 		}
 	}
 

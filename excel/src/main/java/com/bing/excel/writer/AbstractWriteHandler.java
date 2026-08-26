@@ -35,6 +35,11 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 	public AbstractWriteHandler(Workbook wb, String path) {
 		this.wb = wb;
 		File f = FileCreateUtils.createFile(path);
+		if (f == null) {
+			// createFile 失败（父目录无法创建等）时返回 null，转成明确异常而非裸 NPE
+			throw new UnknownException(
+					new FileNotFoundException("cannot create file: " + path));
+		}
 		try {
 			os = new FileOutputStream(f);
 		} catch (FileNotFoundException e) {
@@ -221,7 +226,10 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		}
 		for (CellKV<Date> cellKV : listLine.getListDate()) {
 			Cell cell = currentRow.createCell(cellKV.getIndex());
-			cell.setCellValue(cellKV.getValue());
+			Date date = cellKV.getValue();
+			if (date != null) {
+				cell.setCellValue(date);
+			}
 			cell.setCellStyle(createHeadDateStyle());
 			currentSheet.setColumnWidth((short) (cellKV.getIndex()),
 					(short) 5000);

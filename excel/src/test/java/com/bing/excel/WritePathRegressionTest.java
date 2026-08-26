@@ -1,14 +1,19 @@
 package com.bing.excel;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -179,6 +184,97 @@ public class WritePathRegressionTest {
     assertTrue(Files.size(file) > 0);
     try (Workbook wb = WorkbookFactory.create(file.toFile())) {
       assertEquals(1, wb.getNumberOfSheets());
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // CSV: writeCsv(OutputStream) 不得关闭调用方的流
+  // ------------------------------------------------------------------
+
+  @Test
+  public void writeCsv_toOutputStream_streamStillOpenAfterReturn() throws Exception {
+    CloseTrackingStream out = new CloseTrackingStream();
+    List<SimpleModel> list = Arrays.asList(
+        new SimpleModel("a"), new SimpleModel("b"));
+
+    bing.writeCsv(out, list);
+
+    assertFalse("writeCsv must not close caller's stream", out.closed);
+    String csv = new String(out.toByteArray(), StandardCharsets.UTF_8);
+    assertTrue(csv.contains("a"));
+    // 流仍可用：可以继续写数据
+    out.write(0x41);
+    out.flush();
+    assertEquals('A', out.toByteArray()[out.size() - 1]);
+    out.close();
+  }
+
+  @Test
+  public void writeCsv_emptyIterable_streamStillOpenAndFlushed() throws Exception {
+    CloseTrackingStream out = new CloseTrackingStream();
+
+    bing.writeCsv(out, Collections.emptyList());
+
+    assertFalse("writeCsv must not close caller's stream", out.closed);
+    out.close();
+  }
+
+  /** 记录 close 调用的 OutputStream，用于验证调用方流未被关闭。 */
+  public static class CloseTrackingStream extends ByteArrayOutputStream {
+    boolean closed = false;
+
+    @Override
+    public void close() throws IOException {
+      closed = true;
+      super.close();
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // 空 iterable 变体：全 null 元素、零 varargs、null iterable
+  // ------------------------------------------------------------------
+
+  @Test
+  public void writeXlsx_allNullElements_validMinimalXlsx() throws Exception {
+    Path file = newTempFile(".xlsx");
+    List<SimpleModel> list = Arrays.asList(null, null);
+    bing.writeXlsx(file.toString(), list);
+
+    assertTrue(Files.size(file) > 0);
+    try (Workbook wb = WorkbookFactory.create(file.toFile())) {
+      assertEquals(1, wb.getNumberOfSheets());
+      // 无数据行：POI 空 sheet 的 lastRowNum 为 -1
+      assertEquals(-1, wb.getSheetAt(0).getLastRowNum());
+    }
+  }
+
+  @Test
+  public void writeXlsx_zeroVarargs_validMinimalXlsx() throws Exception {
+    Path file = newTempFile(".xlsx");
+    // String+零 varargs 在 Iterable/SheetExcel 两个重载间有歧义，用 File 重载验证
+    bing.writeXlsx(file.toFile());
+
+    assertTrue(Files.size(file) > 0);
+    try (Workbook wb = WorkbookFactory.create(file.toFile())) {
+      assertEquals(1, wb.getNumberOfSheets());
+    }
+  }
+
+  @Test
+  public void writeSheetsExcel_mixedNullEntries_sheetPerEntry() throws Exception {
+    Path file = newTempFile(".xlsx");
+    SheetExcel se1 = new SheetExcel("Real", Arrays.asList(new SimpleModel("a")));
+    SheetExcel se2 = new SheetExcel("Empty", Collections.emptyList());
+    SheetExcel se3 = null;
+
+    bing.writeXlsx(file.toString(), se1, se2, se3);
+
+    try (Workbook wb = WorkbookFactory.create(file.toFile())) {
+      assertEquals(3, wb.getNumberOfSheets());
+      assertEquals("Real", wb.getSheetName(0));
+      assertEquals("Empty", wb.getSheetName(1));
+      // null SheetExcel 按位置 i+1 命名
+      assertEquals(2, wb.getSheetIndex("sheet3"));
     }
   }
 
