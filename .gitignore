@@ -31,6 +31,8 @@ CLAUDE.md
 # Local tooling
 .codegraph/
 .qoder/
+.commandcode/
+.workbuddy/
 
 # Build outputs
 target/
