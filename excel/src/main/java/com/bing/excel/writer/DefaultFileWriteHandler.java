@@ -2,7 +2,6 @@ package com.bing.excel.writer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -23,7 +22,7 @@ public class DefaultFileWriteHandler extends AbstractWriteHandler {
 
 	 DefaultFileWriteHandler(Workbook wb, File file)
 			throws FileNotFoundException {
-		super(wb,new FileOutputStream(file));
+		super(wb,file);
 		this.os=super.os;
 	}
 
@@ -51,10 +50,14 @@ public class DefaultFileWriteHandler extends AbstractWriteHandler {
 			} catch (IOException e) {
 				ExcelOutException ex = new ExcelOutException("Happen exception when flush", e);
 				if (primary == null) {
-					throw ex;
+					primary = ex;
+				} else {
+					primary.addSuppressed(ex);
 				}
-				primary.addSuppressed(ex);
 			}
+		}
+		if (primary == null) {
+			commitFile();
 		}
 		if (primary != null) {
 			throw primary;
@@ -79,8 +82,19 @@ public class DefaultFileWriteHandler extends AbstractWriteHandler {
 			} catch (IOException e) {
 				ExcelOutException ex = new ExcelOutException("Happen exception when close", e);
 				if (primary == null) {
-					throw ex;
+					primary = ex;
+				} else {
+					primary.addSuppressed(ex);
 				}
+			}
+		}
+		IOException cleanupException = discardFile();
+		if (cleanupException != null) {
+			ExcelOutException ex = new ExcelOutException(
+					"Happen exception when clean temporary file", cleanupException);
+			if (primary == null) {
+				primary = ex;
+			} else {
 				primary.addSuppressed(ex);
 			}
 		}

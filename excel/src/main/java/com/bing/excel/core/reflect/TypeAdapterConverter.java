@@ -94,6 +94,7 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
   }
 
   public ListLine getHeadertoListLine(ExcelConverterMapperHandler... handlers) {
+    validateWriteIndexes(handlers);
     ListLine line = new ListLine();
     for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
       FieldConverterMapper fieldConverterMapper = getFieldConverterMapper(kv.getKey(),
@@ -102,19 +103,38 @@ public class TypeAdapterConverter<T> implements ModelAdapter, HeaderReflectConve
         logSkippedField(kv.getKey(), "getHeadertoListLine");
         continue;
       }
-      if (fieldConverterMapper.getIndex() < 0) {
-        throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
-            + kv.getKey() + "] has no index and cannot be written; "
-            + "set an explicit index on @CellConfig for write direction.");
-      }
       line.addValue(fieldConverterMapper.getIndex(),
           fieldConverterMapper.getAlias());
     }
     return line;
   }
 
+  private void validateWriteIndexes(ExcelConverterMapperHandler... handlers) {
+    Map<Integer, String> fieldNamesByIndex = new HashMap<>();
+    for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
+      FieldConverterMapper fieldConverterMapper = getFieldConverterMapper(kv.getKey(),
+          handlers);
+      if (fieldConverterMapper == null) {
+        continue;
+      }
+      if (fieldConverterMapper.getIndex() < 0) {
+        throw new IllegalCellConfigException("field[" + clazz.getName() + "#"
+            + kv.getKey() + "] has no index and cannot be written; "
+            + "set an explicit index on @CellConfig for write direction.");
+      }
+      String previousField = fieldNamesByIndex.putIfAbsent(fieldConverterMapper.getIndex(),
+          kv.getKey());
+      if (previousField != null) {
+        throw new IllegalCellConfigException("fields[" + clazz.getName() + "#"
+            + previousField + " and " + clazz.getName() + "#" + kv.getKey()
+            + "] both use index " + fieldConverterMapper.getIndex() + " for write");
+      }
+    }
+  }
+
   @Override
   public ListLine marshal(Object source, ExcelConverterMapperHandler... fieldHandler) {
+    validateWriteIndexes(fieldHandler);
     ListLine line = new ListLine();
     for (Map.Entry<String, BoundField> kv : boundFields.entrySet()) {
       FieldConverterMapper fieldConverterMapper = getFieldConverterMapper(kv.getKey(),

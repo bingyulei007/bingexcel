@@ -108,42 +108,40 @@ public class AnnotationMapperHandler implements ExcelConverterMapperHandler, Ann
         if (annotatedTypes.contains(type)) {
           continue;
         }
-        try {
-          // 转换的类型不可能对应的是基本类型
-          if (type.isPrimitive()) {
-            continue;
-          }
-          // 目前先不考虑model的接口继承问题 TODO
-          if (type.isInterface()
-              || (type.getModifiers() & Modifier.ABSTRACT) > 0) {
-            continue;
-          }
-          final Field[] fields = type.getDeclaredFields();
-          for (int i = 0; i < fields.length; i++) {
-            final Field field = fields[i];
-
-            if (field.isEnumConstant()
-                || (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
-              continue;
-            }
-            // 应该不会出现
-            if (field.isSynthetic()) {
-              continue;
-            }
-
-            addMapper(type, field);
-          }
-          //注册表（sheet）别名
-          Annotation annotation = type.getAnnotation(OutAlias.class);
-          if (annotation != null) {
-            String value = ((OutAlias) annotation).value();
-
-            objConversionMapper.addModelName(type, value);
-          }
-
-        } finally {
+        // 转换的类型不可能对应的是基本类型
+        if (type.isPrimitive()) {
           annotatedTypes.add(type);
+          continue;
         }
+        // 目前先不考虑model的接口继承问题 TODO
+        if (type.isInterface()
+            || (type.getModifiers() & Modifier.ABSTRACT) > 0) {
+          annotatedTypes.add(type);
+          continue;
+        }
+        final Field[] fields = type.getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+          final Field field = fields[i];
+
+          if (field.isEnumConstant()
+              || (field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) > 0) {
+            continue;
+          }
+          // 应该不会出现
+          if (field.isSynthetic()) {
+            continue;
+          }
+
+          addMapper(type, field);
+        }
+        //注册表（sheet）别名
+        Annotation annotation = type.getAnnotation(OutAlias.class);
+        if (annotation != null) {
+          String value = ((OutAlias) annotation).value();
+
+          objConversionMapper.addModelName(type, value);
+        }
+        annotatedTypes.add(type);
 
       }
     }

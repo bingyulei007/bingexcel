@@ -175,7 +175,10 @@ public abstract class HSSFListenerAbstract implements HSSFListener {
 			}
 			if(boundSheetRecords.size()==(sheetIndex+1)){
 				excelReader.endWorkBook();
-				closeFs();
+				// 不能在迭代中途 closeFs()：此刻仍在 processWorkbookEvents 的 record 循环里，
+				// 关掉 fs 之后下一次 nextRecord() 会读到已关闭的 channel（File 入口下 POIFS 是
+				// file-backed，会抛 IllegalStateException: ClosedChannelException）。
+				// 资源统一由 process() 的 finally 关闭。
 			}
 		}else if (BOFRecord.sid == sid) {
 			BOFRecord br = (BOFRecord) record;

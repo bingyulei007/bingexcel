@@ -1,5 +1,7 @@
 package com.bing.excel.writer;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -20,6 +22,12 @@ public class SXSSFWriterHandler extends AbstractWriteHandler {
 	
 	public SXSSFWriterHandler(Workbook wb, String path) {
 		super(wb, path);
+		this.os=super.os;
+		this.wb=(SXSSFWorkbook) wb;
+	}
+
+	public SXSSFWriterHandler(Workbook wb, File file) throws FileNotFoundException {
+		super(wb, file);
 		this.os=super.os;
 		this.wb=(SXSSFWorkbook) wb;
 	}
@@ -54,6 +62,9 @@ public class SXSSFWriterHandler extends AbstractWriteHandler {
 			} else {
 				primary.addSuppressed(e);
 			}
+		}
+		if (primary == null) {
+			commitFile();
 		}
 		if (primary != null) {
 			throw primary;
@@ -91,6 +102,16 @@ public class SXSSFWriterHandler extends AbstractWriteHandler {
 				primary = e;
 			} else {
 				primary.addSuppressed(e);
+			}
+		}
+		IOException cleanupException = discardFile();
+		if (cleanupException != null) {
+			ExcelOutException ex = new ExcelOutException(
+					"Happen exception when clean temporary file", cleanupException);
+			if (primary == null) {
+				primary = ex;
+			} else {
+				primary.addSuppressed(ex);
 			}
 		}
 		if (primary != null) {

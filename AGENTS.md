@@ -79,6 +79,13 @@ This file provides guidance to the AI agent when working with code in this repos
 - `addFieldConversionMapper(...)` is **whole-field replacement**, not per-property merge. Once called for a field, annotations on that field are fully masked. Do not "enhance" it to merge.
 - **`aliasName` is read-only**. Do not add aliasName support to the write path.
 
+### Row Range (`startRow` / `endRow`) — per-condition, filtered in the listener
+
+- Both are 0-based absolute row indexes; the range is `[startRow, endRow)`.
+- Both are applied by `BingExcelReaderListener.optRow` **per sheet**, not by `ReadHandler`.
+- **Do not pass a row limit down to `ReadHandler`.** `ReadHandler` only has a single `maxReadLine` shared across all sheets, so it cannot express per-condition semantics — collapsing N conditions into one `min(endRow)` silently truncates the sheets with larger `endRow`. This was the bug fixed on 2026-08-28; `readWithHandler` now calls `handler.readSheet(indexArr)` with no limit and only validates `endRow > 0`.
+- Consequence: `endRow` no longer short-circuits parsing — a sheet with a small `endRow` is still fully parsed and the rows are dropped in the listener (same as `startRow` has always behaved). See `excel/docs/design.md` §9 item 13 for how to restore short-circuiting if ever needed.
+
 ### TitleAliasResolver Behavior (updated in commit 266d3bd)
 
 - `captureTitleRow()` skips `null` value cells — they are not added to the title map.

@@ -152,7 +152,6 @@ public class BingExcelImpl implements BingExcel {
   private void readWithHandler(ReadHandler handler, ReaderCondition[] conditions)
       throws IOException, OpenXML4JException, SAXException {
     int[] indexArr = new int[conditions.length];
-    int minNum = Integer.MAX_VALUE;
     for (int i = 0; i < conditions.length; i++) {
       int sheetNum = conditions[i].getSheetIndex();
       indexArr[i] = sheetNum;
@@ -161,9 +160,11 @@ public class BingExcelImpl implements BingExcel {
         throw new IllegalArgumentException("endRow must be > 0, got " + endRow
             + " for condition[" + i + "]; use Integer.MAX_VALUE for unlimited.");
       }
-      minNum = Math.min(minNum, endRow);
     }
-    handler.readSheet(indexArr, minNum);
+    // endRow 不下传给 handler：ReadHandler 只有 maxReadLine 这一个跨 sheet 共享的标量，
+    // 无法表达 per-condition 语义（多个 condition 会被压成同一个上限）。
+    // 由 BingExcelReaderListener 按 sheet 过滤，与 startRow 的处理方式保持一致。
+    handler.readSheet(indexArr);
   }
 
   @Override
@@ -429,6 +430,7 @@ public class BingExcelImpl implements BingExcel {
     private final ReaderCondition[] conditions;
     private Class tagertClazz = null;
     private int startRow = 0;// start to read from first lines;
+    private int endRow = Integer.MAX_VALUE;// exclusive end row index, 0 started;
     private List<SheetVo> list;
     private SheetVo currentSheetVo;
     private TitleAliasResolver titleAliasResolver;
@@ -455,7 +457,7 @@ public class BingExcelImpl implements BingExcel {
             userDefineMapperHandler, annotationMapperHandler);
         return;
       }
-      if (curRow < startRow) {
+      if (curRow < startRow || curRow >= endRow) {
         return;
       }
       if (tagertClazz != null) {
@@ -477,6 +479,7 @@ public class BingExcelImpl implements BingExcel {
 
       tagertClazz = null;
       startRow = 0;
+      endRow = Integer.MAX_VALUE;
       titleAliasResolver = null;
       for (int i = 0; i < conditions.length; i++) {
         if (conditions[i].getSheetIndex() == sheetIndex) {
@@ -497,6 +500,7 @@ public class BingExcelImpl implements BingExcel {
             }
           }
           startRow = conditionStartRow;
+          endRow = conditions[i].getEndRow();
           currentSheetVo = new SheetVo<>(sheetIndex, name);
           break;
         }

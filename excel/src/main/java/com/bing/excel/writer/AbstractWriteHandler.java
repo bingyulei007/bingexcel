@@ -2,12 +2,15 @@ package com.bing.excel.writer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.List;
 
+import com.bing.excel.exception.ConversionException;
 import com.bing.excel.exception.UnknownException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,12 +20,16 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListLine;
-import com.bing.utils.FileCreateUtils;
+import com.bing.excel.writer.exception.ExcelOutException;
 
 public abstract class AbstractWriteHandler implements WriteHandler {
+	private static final long MAX_EXACT_INTEGER = (1L << 53) - 1;
+
 	Sheet currentSheet;
 	private final Workbook wb;
 	transient OutputStream os;
+	private Path targetPath;
+	private Path tempPath;
 	private CellStyle headerCellStyle;
 	private CellStyle dateCellStyle;
 	private CellStyle headDateCellStyle;
@@ -32,22 +39,46 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		os = outStream;
 	}
 
+	public AbstractWriteHandler(Workbook wb, File targetFile) throws FileNotFoundException {
+		this.wb = wb;
+		try {
+			initializePath(targetFile);
+		} catch (IOException e) {
+			IOException cleanupException = discardFile();
+			if (cleanupException != null) {
+				e.addSuppressed(cleanupException);
+			}
+			FileNotFoundException exception =
+					new FileNotFoundException("cannot create file: " + targetFile);
+			exception.initCause(e);
+			throw exception;
+		}
+	}
+
 	public AbstractWriteHandler(Workbook wb, String path) {
 		this.wb = wb;
-		File f = FileCreateUtils.createFile(path);
-		if (f == null) {
-			// createFile 失败（父目录无法创建等）时返回 null，转成明确异常而非裸 NPE
-			throw new UnknownException(
-					new FileNotFoundException("cannot create file: " + path));
-		}
 		try {
-			os = new FileOutputStream(f);
-		} catch (FileNotFoundException e) {
-			// system bug
-			f.deleteOnExit();
+			initializePath(new File(path));
+		} catch (IOException e) {
+			IOException cleanupException = discardFile();
+			if (cleanupException != null) {
+				e.addSuppressed(cleanupException);
+			}
 			throw new UnknownException(e);
 		}
+	}
 
+	private void initializePath(File targetFile) throws IOException {
+		targetPath = targetFile.toPath().toAbsolutePath().normalize();
+		if (Files.isDirectory(targetPath)) {
+			throw new FileNotFoundException("cannot create file: " + targetFile);
+		}
+		Path parent = targetPath.getParent();
+		if (parent != null) {
+			Files.createDirectories(parent);
+		}
+		tempPath = Files.createTempFile(parent, ".bingexcel-", ".tmp");
+		os = Files.newOutputStream(tempPath);
 	}
 
 	
@@ -140,8 +171,14 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 			cell.setCellValue(kv.getValue());
 		}
 		for (CellKV<Long> kv : line.getListLong()) {
+			long value = kv.getValue();
+			if (value < -MAX_EXACT_INTEGER || value > MAX_EXACT_INTEGER) {
+				throw new ConversionException("long value [" + value
+						+ "] at index " + kv.getIndex()
+						+ " exceeds Excel's exact integer range");
+			}
 			Cell cell = row.createCell(kv.getIndex());
-			cell.setCellValue(kv.getValue());
+			cell.setCellValue(value);
 		}
 	}
 
@@ -272,6 +309,37 @@ public abstract class AbstractWriteHandler implements WriteHandler {
 		explicitListConstraint.setExplicitListValues(validationStr);
 		dataValidation = helper.createValidation(explicitListConstraint, regions);
 		currentSheet.addValidationData(dataValidation);
+	}
+
+	protected void commitFile() {
+		if (tempPath == null) {
+			return;
+		}
+		try {
+			Files.move(tempPath, targetPath, StandardCopyOption.ATOMIC_MOVE,
+					StandardCopyOption.REPLACE_EXISTING);
+			tempPath = null;
+		} catch (IOException e) {
+			IOException cleanupException = discardFile();
+			if (cleanupException != null) {
+				e.addSuppressed(cleanupException);
+			}
+			throw new ExcelOutException("cannot atomically replace output file: "
+					+ targetPath, e);
+		}
+	}
+
+	protected IOException discardFile() {
+		if (tempPath == null) {
+			return null;
+		}
+		try {
+			Files.deleteIfExists(tempPath);
+			tempPath = null;
+			return null;
+		} catch (IOException e) {
+			return e;
+		}
 	}
 
 	@Override

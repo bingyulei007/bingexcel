@@ -1,11 +1,14 @@
 package com.bing.excel;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
@@ -32,8 +35,13 @@ import com.bing.excel.core.BingExcel;
 import com.bing.excel.core.BingExcelBuilder;
 import com.bing.excel.core.ReaderCondition;
 import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.core.handler.LocalConverterHandler;
 import com.bing.excel.core.impl.BingExcelImpl.SheetExcel;
+import com.bing.excel.core.reflect.TypeAdapterConverter;
 import com.bing.excel.core.impl.BingExcelImpl.SheetVo;
+import com.bing.excel.exception.ConversionException;
+import com.bing.excel.exception.IllegalCellConfigException;
+import com.bing.excel.mapper.AnnotationMapperHandler;
 import com.bing.excel.vo.CellKV;
 import com.bing.excel.vo.ListLine;
 import com.bing.excel.vo.OutValue;
@@ -278,7 +286,152 @@ public class WritePathRegressionTest {
     }
   }
 
+  @Test
+  public void writeXlsx_failedConversion_preservesExistingFile() throws Exception {
+    Path file = newTempFile(".xlsx");
+    byte[] original = "original-content".getBytes(StandardCharsets.UTF_8);
+    Files.write(file, original);
+
+    try {
+      bing.writeXlsx(file.toString(),
+          Collections.singletonList(new InvalidAfterValidModel()));
+      fail("invalid model should fail the write");
+    } catch (IllegalCellConfigException expected) {
+    }
+
+    assertArrayEquals(original, Files.readAllBytes(file));
+  }
+
+  @Test
+  public void writeXlsxFile_invalidParent_preservesFileNotFoundContract() throws Exception {
+    Path parentFile = newTempFile(".tmp");
+    Path target = parentFile.resolve("child.xlsx");
+
+    try {
+      bing.writeXlsx(target.toFile(), Collections.emptyList());
+      fail("a regular file cannot be used as a parent directory");
+    } catch (FileNotFoundException expected) {
+    } catch (RuntimeException actual) {
+      fail("expected FileNotFoundException but got " + actual.getClass().getName());
+    }
+  }
+
+  @Test
+  public void writeXlsx_successfulWrite_replacesExistingFile() throws Exception {
+    Path file = newTempFile(".xlsx");
+    Files.write(file, "old-content".getBytes(StandardCharsets.UTF_8));
+
+    bing.writeXlsx(file.toString(), Collections.singletonList(new SimpleModel("new")));
+
+    try (Workbook wb = WorkbookFactory.create(file.toFile())) {
+      assertEquals("new", wb.getSheetAt(0).getRow(1).getCell(0).getStringCellValue());
+    }
+  }
+
+  @Test(expected = ConversionException.class)
+  public void writeXlsx_longAboveExactRange_rejected() {
+    BingExcel b = BingExcelBuilder.toBuilder().build();
+    b.writeXlsx(new ByteArrayOutputStream(),
+        Collections.singletonList(new LongModel(9007199254740992L)));
+  }
+
+  @Test(expected = ConversionException.class)
+  public void writeXlsx_longBelowExactRange_rejected() {
+    BingExcel b = BingExcelBuilder.toBuilder().build();
+    b.writeXlsx(new ByteArrayOutputStream(),
+        Collections.singletonList(new LongModel(-9007199254740992L)));
+  }
+
+  @Test
+  public void writeXlsx_longAtExactRange_writtenAsNumber() throws Exception {
+    Path file = newTempFile(".xlsx");
+    BingExcel b = BingExcelBuilder.toBuilder().build();
+    b.writeXlsx(file.toString(),
+        Collections.singletonList(new LongModel(9007199254740991L)));
+
+    try (Workbook wb = WorkbookFactory.create(file.toFile())) {
+      Cell cell = wb.getSheetAt(0).getRow(1).getCell(0);
+      assertEquals(9007199254740991.0, cell.getNumericCellValue(), 0.0);
+    }
+  }
+
+  @Test(expected = IllegalCellConfigException.class)
+  public void writeXlsx_duplicateIndexes_rejected() {
+    BingExcel b = BingExcelBuilder.toBuilder().build();
+    b.writeXlsx(new ByteArrayOutputStream(),
+        Collections.singletonList(new DuplicateIndexModel()));
+  }
+
+  @Test(expected = IllegalCellConfigException.class)
+  public void typeAdapter_marshal_duplicateIndexes_rejected() throws Exception {
+    AnnotationMapperHandler annotationMapper = new AnnotationMapperHandler();
+    annotationMapper.processEntity(DuplicateIndexModel.class);
+    TypeAdapterConverter<DuplicateIndexModel> adapter = new TypeAdapterConverter<>(
+        DuplicateIndexModel.class.getDeclaredConstructor(),
+        DuplicateIndexModel.class.getDeclaredFields(),
+        new LocalConverterHandler());
+
+    adapter.marshal(new DuplicateIndexModel(), annotationMapper);
+  }
+
+  @Test
+  public void writeXlsx_annotationRegistrationFailure_doesNotPoisonRetry() {
+    BingExcel b = BingExcelBuilder.toBuilder().build();
+    List<InvalidAfterValidModel> rows =
+        Collections.singletonList(new InvalidAfterValidModel());
+
+    try {
+      b.writeXlsx(new ByteArrayOutputStream(), rows);
+      fail("first write should reject invalid field configuration");
+    } catch (IllegalCellConfigException expected) {
+    }
+
+    try {
+      b.writeXlsx(new ByteArrayOutputStream(), rows);
+      fail("retry should reject the same invalid field configuration");
+    } catch (IllegalCellConfigException expected) {
+    }
+  }
+
   // ==================== 测试模型 ====================
+
+  public static class LongModel {
+    @CellConfig(index = 0)
+    public long value;
+
+    public LongModel() {
+    }
+
+    public LongModel(long value) {
+      this.value = value;
+    }
+  }
+
+  public static class DuplicateIndexModel {
+    @CellConfig(index = 0)
+    public String text;
+
+    @CellConfig(index = 0)
+    public int number;
+
+    public DuplicateIndexModel() {
+      text = "text";
+      number = 42;
+    }
+  }
+
+  public static class InvalidAfterValidModel {
+    @CellConfig(index = 0)
+    public String valid;
+
+    @CellConfig(index = -1)
+    public String invalid;
+
+    public InvalidAfterValidModel() {
+      valid = "valid";
+      invalid = "invalid";
+    }
+  }
 
   public static class NullAliasModel {
     @CellConfig(index = 0)

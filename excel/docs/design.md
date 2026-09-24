@@ -139,8 +139,8 @@ BingExcel 是一个基于 Apache POI 的轻量级 Excel 读写工具库，核心
 BingExcelImpl.readFileToList(file, conditions)
   └─ new BingExcelReaderListener(conditions, resultList)   # 内部类，extends AbstractExcelReadListener
   └─ ExcelReaderFactory.create(file, listener, true)       # 按 magic 选 XSSF SAX 或 HSSF
-  └─ 计算 indexArr + minNum (各 condition endRow 的最小值)
-  └─ handler.readSheet(indexArr, minNum)
+  └─ 计算 indexArr（endRow 只做 <=0 校验，不下传）
+  └─ handler.readSheet(indexArr)          # 不限行，行范围过滤在 listener里
         ├─ XSSF: DefaultXSSFSaxHandler.readSheet(int[])
         │     ├─ OPCPackage.open 已在 factory 完成
         │     ├─ XSSFReader + ExcelReadOnlySharedStringsTable
@@ -175,7 +175,7 @@ optRow(curRow, rowList):
       titleAliasResolver.captureTitleRow(rowList)      # 抓标题行
       titleAliasResolver.resolve(...)                  # 解析 alias → index
       return
-  if (curRow < startRow) return
+  if (curRow < startRow || curRow >= endRow) return   # 行范围过滤，startRow/endRow 都是 per-condition
   if (tagertClazz != null):
       typeAdapter = typeTokenCache.get(tagertClazz)
       obj = typeAdapter.unmarshal(rowList, titleAliasResolver, userDefineMapperHandler, annotationMapperHandler)
@@ -329,6 +329,11 @@ for each boundField:
 9. ⬜ `HSSFListenerAbstract.processRecord` 是巨型方法（200+ 行），按 sid 分发可拆（低优先，重构风险高）。
 10. ⬜ `BingExcelReaderListener` 在 `readFile` 单 condition 时走 `readFileToList` 拿 list[0]，可短路（收益小）。
 11. ⬜ 资源关闭路径已审查，无明显的泄露问题，但异常处理可进一步收紧。
+12. ✅ `endRow` 语义修正为 per-condition。原先 `readWithHandler` 把所有 condition 的 `endRow` 取 `min` 作为全局 `maxReadLine` 下传给 handler，导致「sheet0 限 10 行 + sheet1 不限」时两个 sheet 都被截断到 10 行。现在 `endRow` 由 `BingExcelReaderListener` 按 sheet 过滤，与 `startRow` 的处理位置一致；handler 只收 `indexArr`，不再收行上限。
+    代价：丢掉了 handler 层的 parse 短路——`endRow` 较小的 sheet 仍会整表 parse 后再在 listener 里丢弃（与 `startRow` 之前的行为一致）。
+13. ⬜ 若需要恢复 parse 短路，应在 `ReadHandler` 增加 per-sheet 上限（如 `readSheet(int[] indexs, IntUnaryOperator maxLineProvider)`），落点已具备：XSSF 在 `readSheetsInternal` 命中 matcher 后、`parse` 前；HSSF 在 BOFRecord 分支 `sheetIndex++` 之后。
+14. ✅ `HSSFListenerAbstract` 的 EOF 分支不再调用 `closeFs()`。它在 `processWorkbookEvents` 的 record 迭代中途关掉 POIFSFileSystem，File 入口（file-backed POIFS，`close()` 真的关 FileChannel）下后续 `nextRecord()` 会抛 `IllegalStateException: ClosedChannelException`；stream 入口是内存型 POIFS，`close()` 是 no-op，不受影响。触发条件苛刻：Workbook 流最后一个 sheet 的 EOF 之后必须紧跟一个 BOF（`RecordFactoryInputStream` 只在下一个 sid 是 BOF 时才越过 level-0 EOF 继续），且要跨过 POIFS block 才会真的碰到 channel。异常形态与"文件格式有问题"完全对不上，很难排查。资源统一由 `process()` 的 finally 关闭，代价只是晚释放几微秒。
+15. ⬜ `boundSheetRecords.size()==(sheetIndex+1)` 这个判据不可靠：`sheetIndex` 只数 `TYPE_WORKSHEET` 的 BOF，而 BoundSheetRecord 统计所有 sheet。含 chartsheet / dialogsheet 的文件两者不相等 → `endWorkBook()` 永远不触发（对 `BingExcelReaderListener` 无影响，其实现为空；对外部 `ExcelReadListener` 是漏回调）。
 
 ### 映射/转换侧
 

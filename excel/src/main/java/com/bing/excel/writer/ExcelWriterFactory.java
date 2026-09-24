@@ -2,7 +2,6 @@ package com.bing.excel.writer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
@@ -33,7 +32,12 @@ public class ExcelWriterFactory {
 	public static WriteHandler createHSSF(String path) {
 		isOldPath(path);
 		Workbook wb = new HSSFWorkbook();
-		return new DefaultFileWriteHandler(wb, path);
+		try {
+			return new DefaultFileWriteHandler(wb, path);
+		} catch (RuntimeException e) {
+			closeQuietly(wb);
+			throw e;
+		}
 	}
 
 	public static WriteHandler createHSSF(File file)
@@ -43,6 +47,9 @@ public class ExcelWriterFactory {
 		try {
 			return new DefaultFileWriteHandler(wb, file);
 		} catch (FileNotFoundException e) {
+			closeQuietly(wb);
+			throw e;
+		} catch (RuntimeException e) {
 			closeQuietly(wb);
 			throw e;
 		}
@@ -56,7 +63,12 @@ public class ExcelWriterFactory {
 	public static WriteHandler createXSSF(String path) {
 		isNewPath(path);
 		Workbook wb = new XSSFWorkbook();
-		return new DefaultFileWriteHandler(wb, path);
+		try {
+			return new DefaultFileWriteHandler(wb, path);
+		} catch (RuntimeException e) {
+			closeQuietly(wb);
+			throw e;
+		}
 	}
 
 	public static WriteHandler createXSSF(OutputStream os) {
@@ -71,6 +83,9 @@ public class ExcelWriterFactory {
 		try {
 			return new DefaultFileWriteHandler(wb, file);
 		} catch (FileNotFoundException e) {
+			closeQuietly(wb);
+			throw e;
+		} catch (RuntimeException e) {
 			closeQuietly(wb);
 			throw e;
 		}
@@ -92,15 +107,13 @@ public class ExcelWriterFactory {
 			throws FileNotFoundException {
 		isNewPath(file.getAbsolutePath());
 		SXSSFWorkbook wb = new SXSSFWorkbook(200);
-		FileOutputStream out = new FileOutputStream(file);
 		try {
-			return new SXSSFWriterHandler(wb, out);
+			return new SXSSFWriterHandler(wb, file);
+		} catch (FileNotFoundException e) {
+			closeQuietly(wb);
+			wb.dispose();
+			throw e;
 		} catch (RuntimeException e) {
-			try {
-				out.close();
-			} catch (IOException ignored) {
-				// best-effort close on construction failure
-			}
 			closeQuietly(wb);
 			wb.dispose();
 			throw e;
