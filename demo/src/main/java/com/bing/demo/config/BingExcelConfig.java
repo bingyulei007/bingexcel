@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Configuration;
 /**
  * BingExcel 单例配置。
  *
- * <p>BingExcel 内部使用 ConcurrentHashMap / volatile / synchronized 保护共享状态，
- * 基本线程安全。唯一瑕疵：{@code FieldConverterMapper.setFieldConverter(...)} 在首次
- * marshal/unmarshal 时被懒加载调用，缺乏 happens-before 保证。这里通过启动时预热
- * （见 {@link BingExcelWarmUpRunner}）让所有 lazy init 在容器启动阶段完成，
- * 运行时只剩只读访问，规避该瑕疵。
+ * <p>BingExcel 单例可安全并发使用：内部共享状态全部由并发容器或同步原语保护
+ * （{@code typeTokenCache} 为 ConcurrentHashMap、{@code userDefineMapperHandler}
+ * 为 volatile + DCL、{@code annotatedTypes} 为 synchronizedSet，
+ * ConversionMapper 的字段同样是 ConcurrentHashMap）；默认转换器查找在
+ * marshal/unmarshal 时按需解析，不回写共享状态。无需启动预热。
  */
 @Configuration
 public class BingExcelConfig {
