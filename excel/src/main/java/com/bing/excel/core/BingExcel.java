@@ -222,4 +222,66 @@ public interface BingExcel {
    * @see #writeXlsx(OutputStream, SheetExcel...)
    */
   void writeXls(OutputStream stream, SheetExcel... sheetExcels);
+
+  /**
+   * 流式写出 model 集合到 xlsx 文件（SXSSF，行窗口 200 行常驻内存），
+   * 适合大数据量导出，规避全内存 XSSF 的 OOM 风险。
+   *
+   * <p>仅支持 xlsx——HSSF 没有 03 格式的流式写 API。
+   *
+   * @param file 文件对象
+   * @param iterables 要输出到文件的集合对象
+   * @throws FileNotFoundException 文件存在但为目录、不可创建或无法打开
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
+   */
+  void writeXlsxStreaming(File file, Iterable... iterables) throws FileNotFoundException;
+
+  /**
+   * 流式写出 model 集合到 xlsx 文件。
+   *
+   * @param path 文件路径
+   * @throws IllegalCellConfigException 字段缺少 index 配置（aliasName-only 字段无法写出）
+   * @throws IllegalEntityException 实体类缺少无参构造器
+   * @throws com.bing.excel.exception.UnknownException 文件创建失败（路径非法/无权限）
+   * @throws IllegalStateException POI 写出失败（由 flush 包装）
+   * @see #writeXlsxStreaming(File, Iterable...)
+   */
+  void writeXlsxStreaming(String path, Iterable... iterables);
+
+  /**
+   * 流式写出 model 集合到输出流（SXSSF）。
+   *
+   * <p>注意：与 {@link #writeXlsx(OutputStream, Iterable...)} 不同，本方法在
+   * 写出结束（含失败时的清理）就会关闭传入的 OutputStream。若直接传入
+   * Servlet 响应流，失败路径也会因关流而提交响应、无法再改写状态码。
+   * 写出失败时流可能处于不完整状态。
+   *
+   * @see #writeXlsxStreaming(File, Iterable...)
+   */
+  void writeXlsxStreaming(OutputStream stream, Iterable... iterables);
+
+  /**
+   * 流式写出多 sheet 页的 xlsx 格式 excel 文件（SXSSF）。
+   *
+   * @param path 文件路径
+   * @param sheetExcels sheet页描述
+   * @see #writeXlsxStreaming(File, Iterable...)
+   */
+  void writeXlsxStreaming(String path, SheetExcel... sheetExcels);
+
+  /**
+   * 流式写出多 sheet 页的 xlsx 格式 excel 到输出流（SXSSF）。
+   *
+   * <p>注意：与 {@link #writeXlsx(OutputStream, SheetExcel...)} 不同，本方法在
+   * 写出结束（含失败时的清理）就会关闭传入的 OutputStream。若直接传入
+   * Servlet 响应流，失败路径也会因关流而提交响应、无法再改写状态码。
+   * 写出失败时流可能处于不完整状态。
+   *
+   * @param stream 输出流
+   * @param sheetExcels sheet页描述
+   * @see #writeXlsxStreaming(File, Iterable...)
+   */
+  void writeXlsxStreaming(OutputStream stream, SheetExcel... sheetExcels);
 }

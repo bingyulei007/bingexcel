@@ -324,6 +324,7 @@ public class BingExcelImpl implements BingExcel {
   }
 
   private void writeToExcel(WriteHandler handler, Iterable... iterables) {
+    Throwable primary = null;
     try {
       for (Iterable list : iterables) {
         boolean isAdd = false;
@@ -371,9 +372,21 @@ public class BingExcelImpl implements BingExcel {
         handler.createSheet("sheet1");
       }
       handler.flush();
+    } catch (Throwable t) {
+      primary = t;
+      throw t;
     } finally {
-      // flush() 成功后 close() 为 no-op；异常路径下保证 Workbook/句柄/SXSSF 临时文件被释放
-      handler.close();
+      // flush() 成功后 close() 为 no-op；异常路径下保证 Workbook/句柄/SXSSF 临时文件被释放。
+      // close() 自身失败（os.close/discardFile IO 异常）时挂 suppressed，避免顶掉原始根因。
+      try {
+        handler.close();
+      } catch (Throwable closeEx) {
+        if (primary != null) {
+          primary.addSuppressed(closeEx);
+        } else {
+          throw closeEx;
+        }
+      }
     }
 
   }
@@ -624,6 +637,7 @@ public class BingExcelImpl implements BingExcel {
    * @param handler
    */
   private void writeToSheetExcel(WriteHandler handler, SheetExcel... sheetExcels) {
+    Throwable primary = null;
     try {
       TypeAdapterConverter<?> typeAdapter = null;
       for (int i = 0; i < sheetExcels.length; i++) {
@@ -685,8 +699,52 @@ public class BingExcelImpl implements BingExcel {
         handler.createSheet("sheet1");
       }
       handler.flush();
+    } catch (Throwable t) {
+      primary = t;
+      throw t;
     } finally {
-      handler.close();
+      // 同 writeToExcel：close() 自身失败时挂 suppressed，避免顶掉原始根因
+      try {
+        handler.close();
+      } catch (Throwable closeEx) {
+        if (primary != null) {
+          primary.addSuppressed(closeEx);
+        } else {
+          throw closeEx;
+        }
+      }
     }
+  }
+
+  // ================ 流式写出（SXSSF）：大数据量导出，仅 xlsx ================
+
+  @Override
+  public void writeXlsxStreaming(File file, Iterable... iterables) throws FileNotFoundException {
+    WriteHandler handler = ExcelWriterFactory.createSXSSF(file);
+    writeToExcel(handler, iterables);
+  }
+
+  @Override
+  public void writeXlsxStreaming(String path, Iterable... iterables) {
+    WriteHandler handler = ExcelWriterFactory.createSXSSF(path);
+    writeToExcel(handler, iterables);
+  }
+
+  @Override
+  public void writeXlsxStreaming(OutputStream stream, Iterable... iterables) {
+    WriteHandler handler = ExcelWriterFactory.createSXSSF(stream);
+    writeToExcel(handler, iterables);
+  }
+
+  @Override
+  public void writeXlsxStreaming(String path, SheetExcel... sheetExcels) {
+    WriteHandler handler = ExcelWriterFactory.createSXSSF(path);
+    writeToSheetExcel(handler, sheetExcels);
+  }
+
+  @Override
+  public void writeXlsxStreaming(OutputStream stream, SheetExcel... sheetExcels) {
+    WriteHandler handler = ExcelWriterFactory.createSXSSF(stream);
+    writeToSheetExcel(handler, sheetExcels);
   }
 }

@@ -120,6 +120,13 @@ public class ExcelWriterFactory {
 		}
 	}
 
+	public static WriteHandler createSXSSF(OutputStream os) {
+		SXSSFWorkbook wb = new SXSSFWorkbook(200);
+		// SXSSFWriterHandler(wb, OutputStream) 构造器只做字段赋值，不会抛异常，
+		// 与 createHSSF/createXSSF 的 OutputStream 变体一样无需 try/catch 清理
+		return new SXSSFWriterHandler(wb, os);
+	}
+
 	private static void closeQuietly(Workbook wb) {
 		try {
 			wb.close();

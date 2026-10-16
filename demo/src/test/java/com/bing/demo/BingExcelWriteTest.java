@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *   <li>{@code writeXlsx} 写 .xlsx 文件后读回，验证数据完整</li>
  *   <li>{@code writeXls} 写 .xls 文件后读回，验证数据完整</li>
  *   <li>{@code writeXlsx} 写到 OutputStream，校验产物为合法 xlsx (zip, PK 头)</li>
+ *   <li>{@code writeXlsxStreaming} SXSSF 流式写出大数据量（2 万行）后读回，验证行数与首尾数据</li>
  * </ol>
  */
 class BingExcelWriteTest {
@@ -104,6 +105,39 @@ class BingExcelWriteTest {
             byte[] bytes = bos.toByteArray();
             assertTrue(bytes.length > 0);
             // xlsx 是 zip 容器，魔数 "PK" (0x50 0x4B)
+            assertEquals('P', (char) (bytes[0] & 0xFF));
+            assertEquals('K', (char) (bytes[1] & 0xFF));
+        }
+    }
+
+    @Test
+    void writeXlsxStreaming_largeDataset_roundtrip() throws Exception {
+        int count = 20_000;
+        List<Person> list = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            list.add(new Person("user-" + i, 20 + (i % 50), 1000.0 + i, i % 2));
+        }
+
+        // File 路径：写出后读回，验证行数与首尾数据
+        Path file = newTempFile(".xlsx");
+        bingExcel.writeXlsxStreaming(file.toFile(), list);
+
+        ReaderCondition<Person> cond = new ReaderCondition<>(0, 1, Person.class);
+        SheetVo<Person> result = bingExcel.readFile(file.toFile(), cond);
+
+        assertNotNull(result);
+        List<Person> readBack = result.getObjectList();
+        assertEquals(count, readBack.size(), "流式写出的行数应完整");
+        assertEquals("user-0", readBack.get(0).getName());
+        assertEquals(Integer.valueOf(20), readBack.get(0).getAge());
+        assertEquals("user-" + (count - 1), readBack.get(count - 1).getName());
+        assertEquals(Double.valueOf(1000.0 + count - 1), readBack.get(count - 1).getSalary());
+
+        // OutputStream 路径：产物为合法 xlsx
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            bingExcel.writeXlsxStreaming(bos, samplePersons());
+            byte[] bytes = bos.toByteArray();
+            assertTrue(bytes.length > 0);
             assertEquals('P', (char) (bytes[0] & 0xFF));
             assertEquals('K', (char) (bytes[1] & 0xFF));
         }
