@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -73,13 +72,7 @@ public class ExcelController {
      */
     @GetMapping("/download-sample")
     public void downloadSample(HttpServletResponse response) throws IOException {
-        List<Person> persons = createSampleData();
-
-        setExcelResponseHeaders(response, "person_sample.xlsx");
-
-        try (OutputStream os = response.getOutputStream()) {
-            bingExcel.writeXlsx(os, persons);
-        }
+        writePersonsToResponse(response, "person_sample.xlsx", createSampleData());
     }
 
     /**
@@ -91,11 +84,22 @@ public class ExcelController {
         if (persons == null) {
             persons = List.of();
         }
-        setExcelResponseHeaders(response, "person_export.xlsx");
+        writePersonsToResponse(response, "person_export.xlsx", persons);
+    }
 
-        try (OutputStream os = response.getOutputStream()) {
-            bingExcel.writeXlsx(os, persons);
-        }
+    /**
+     * 统一导出逻辑。异常不在本方法 catch，由 {@link com.bing.demo.exception.GlobalExceptionHandler}
+     * 统一处理：marshaling 类异常全部发生在 wb.write 落盘之前，响应尚未提交，
+     * advice 会 reset 后返回 500，客户端不会拿到 200 + 截断的 xlsx；
+     * 若失败时响应已提交（如客户端断连），advice 只记录日志。
+     *
+     * <p>注意不要在 finally 里 close 输出流：ServletOutputStream.close() 会提交响应，
+     * 会使 advice 的 isCommitted() 判断失效（reset 永远走不到）。请求结束时容器负责关闭流。
+     */
+    private void writePersonsToResponse(HttpServletResponse response, String fileName,
+            List<Person> persons) throws IOException {
+        setExcelResponseHeaders(response, fileName);
+        bingExcel.writeXlsx(response.getOutputStream(), persons);
     }
 
     private void setExcelResponseHeaders(HttpServletResponse response, String fileName) {

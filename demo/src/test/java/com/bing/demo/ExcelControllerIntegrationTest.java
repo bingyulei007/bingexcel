@@ -164,4 +164,34 @@ class ExcelControllerIntegrationTest {
         assertEquals(Integer.valueOf(25), persons[0].getAge());
         assertEquals("李四", persons[1].getName());
     }
+
+    // ================================================================
+    // 4. 错误路径：marshal 异常经 @RestControllerAdvice 统一转 500
+    //    4 万字符 name 触发 POI 单元格上限异常（发生在 wb.write 落盘前）
+    // ================================================================
+
+    @Test
+    void write_marshalFailure_returns500WithoutAttachmentHeader() {
+        List<Person> input = List.of(new Person("A".repeat(40000), 30, 100.0, 1));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<String> resp = restTemplate.exchange(
+                url("/api/excel/write"), HttpMethod.POST,
+                new HttpEntity<>(input, headers), String.class);
+
+        assertEquals(500, resp.getStatusCode().value(),
+                "marshal 异常应返回 500 而不是 200 + 空文件");
+
+        // advice 必须 reset 掉 xlsx/attachment 头，错误 JSON 不会被浏览器当附件下载
+        assertNull(resp.getHeaders().getFirst("Content-Disposition"),
+                "错误响应不应残留 Content-Disposition: attachment 头");
+        assertTrue(resp.getHeaders().getContentType()
+                        .isCompatibleWith(MediaType.APPLICATION_JSON),
+                "错误响应 Content-Type 应为 JSON: " + resp.getHeaders().getContentType());
+        assertNotNull(resp.getBody());
+        assertTrue(resp.getBody().contains("Internal Server Error"),
+                "错误体应来自 GlobalExceptionHandler: " + resp.getBody());
+    }
 }
