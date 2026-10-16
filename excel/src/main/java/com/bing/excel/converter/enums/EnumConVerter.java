@@ -38,8 +38,10 @@ public class EnumConVerter extends AbstractFieldConvertor {
 			return null;
 		}
 		Class targetType=(Class) type;
-		if (targetType.getSuperclass() != Enum.class) {
-			targetType = targetType.getSuperclass(); // polymorphic enums
+		if (!targetType.isEnum()) {
+			// 字段声明为 raw Enum 等无法确定具体枚举类型的场景，给出明确错误而非 NPE
+			throw new ConversionException("Cannot parse value '" + cell + "' to enum "
+					+ targetType.getName() + ": target type is not a specific enum type");
 		}
 		String enumName = cell.trim();
 		try {

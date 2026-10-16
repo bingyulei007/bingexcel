@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.exception.ConversionException;
 import com.bing.excel.vo.OutValue;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,22 +21,25 @@ public final class ByteFieldConverter extends AbstractFieldConvertor {
 		 return clz.equals(byte.class) || clz.equals(Byte.class);
 	}
 
-	
-
+	/**
+	 * 按纯十进制解析单元格文本为 byte，不接受十六进制/八进制前缀。
+	 */
 	@Override
 	public Object fromString(String cell, ConverterHandler converterHandler, Type targetType) {
 		if (StringUtils.isBlank(cell)) {
 			return null;
 		}
-		int value = Integer.decode(cell.trim()).intValue();
+		int value;
+		try {
+			value = Integer.parseInt(cell.trim());
+		} catch (NumberFormatException e) {
+			throw new ConversionException("Cannot parse value '" + cell + "' to Byte", e);
+		}
     	if(value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) {
-    		throw new NumberFormatException("For input string: \"" + cell + '"');
+    		throw new ConversionException("Value '" + cell + "' is out of range for Byte");
     	}
         return Byte.valueOf((byte)value);
 	}
-
-
-
 	@Override
 	public OutValue toObject(Object source,ConverterHandler converterHandler) {
 		if (source==null) {

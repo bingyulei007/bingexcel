@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.bing.excel.converter.AbstractFieldConvertor;
 import com.bing.excel.core.handler.ConverterHandler;
+import com.bing.excel.exception.ConversionException;
 import com.bing.excel.vo.OutValue;
 
 public final class DoubleFieldConverter extends AbstractFieldConvertor {
@@ -20,7 +21,11 @@ public final class DoubleFieldConverter extends AbstractFieldConvertor {
 		if(StringUtils.isBlank(cell)){
 			return null;
 		}
-		return Double.valueOf(cell.trim());
+		try {
+			return Double.valueOf(cell.trim());
+		} catch (NumberFormatException e) {
+			throw new ConversionException("Cannot parse value '" + cell + "' to Double", e);
+		}
 	}
 
 	@Override

@@ -290,14 +290,21 @@ public class WriteTest7 {
     }
 
     /**
-     * 测试14: Long基础转换器应支持单字符数字和十六进制，且不越界访问字符串。
+     * 测试14: Long基础转换器按纯十进制解析——前导零编号 "012" 解析为 12（不再按八进制），
+     * 十六进制 "0x10" 不再被接受，抛 ConversionException。
      */
     @Test
-    public void testLongConverterDecode() {
+    public void testLongConverterDecimalOnly() {
         LongFieldConverter converter = new LongFieldConverter();
 
         assertEquals(Long.valueOf(1L), converter.fromString("1", null, Long.class));
-        assertEquals(Long.valueOf(16L), converter.fromString("0x10", null, Long.class));
+        assertEquals(Long.valueOf(12L), converter.fromString("012", null, Long.class));
+        try {
+            converter.fromString("0x10", null, Long.class);
+            fail("Expected ConversionException");
+        } catch (ConversionException expected) {
+            // expected
+        }
     }
 
     /**
@@ -346,8 +353,8 @@ public class WriteTest7 {
         assertEquals(Byte.valueOf((byte) -128), converter.fromString("-128", null, Byte.class));
         try {
             converter.fromString("255", null, Byte.class);
-            fail("Expected NumberFormatException");
-        } catch (NumberFormatException expected) {
+            fail("Expected ConversionException");
+        } catch (ConversionException expected) {
             // expected
         }
     }
@@ -365,8 +372,8 @@ public class WriteTest7 {
             converter.fromString(String.valueOf(Integer.MIN_VALUE), null, Integer.class));
         try {
             converter.fromString("4294967295", null, Integer.class);
-            fail("Expected NumberFormatException");
-        } catch (NumberFormatException expected) {
+            fail("Expected ConversionException");
+        } catch (ConversionException expected) {
             // expected
         }
     }

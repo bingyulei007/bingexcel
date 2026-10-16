@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.exception.ConversionException;
 import com.bing.excel.vo.OutValue;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,9 +20,14 @@ public final class ShortFieldConverter extends AbstractFieldConvertor {
 		if(StringUtils.isBlank(cell)){
 			return null;
 		}
-		int value = Integer.valueOf(cell.trim()).intValue();
+		int value;
+		try {
+			value = Integer.parseInt(cell.trim());
+		} catch (NumberFormatException e) {
+			throw new ConversionException("Cannot parse value '" + cell + "' to Short", e);
+		}
     	if(value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
-    		throw new NumberFormatException("For input string: \"" + cell + '"');
+    		throw new ConversionException("Value '" + cell + "' is out of range for Short");
     	}
         return Short.valueOf((short)value);
 	}

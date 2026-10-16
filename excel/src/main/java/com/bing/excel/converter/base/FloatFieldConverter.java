@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 
 import com.bing.excel.core.handler.ConverterHandler;
 import com.bing.excel.converter.AbstractFieldConvertor;
+import com.bing.excel.exception.ConversionException;
 import com.bing.excel.vo.OutValue;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +26,11 @@ public final class FloatFieldConverter extends AbstractFieldConvertor {
 		if(StringUtils.isBlank(cell)){
 			return null;
 		}
-		return Float.valueOf(cell.trim());
+		try {
+			return Float.valueOf(cell.trim());
+		} catch (NumberFormatException e) {
+			throw new ConversionException("Cannot parse value '" + cell + "' to Float", e);
+		}
 	}
 
 	@Override
